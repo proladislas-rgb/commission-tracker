@@ -1,7 +1,5 @@
 export type Role = 'admin' | 'associe'
 
-export type UserStatus = 'online' | 'offline'
-
 export interface User {
   id: string
   username: string
@@ -53,21 +51,8 @@ export interface Prime {
   created_at?: string
 }
 
-export interface Client {
-  id: string
-  nom: string
-  email: string | null
-  telephone: string | null
-  entreprise: string | null
-  prime_id: string | null
-  created_by: string
-  created_at: string
-  updated_at: string
-  prime?: Prime
-}
-
 export type ActivityAction = 'create' | 'update' | 'delete'
-export type ActivityEntityType = 'commission' | 'paiement' | 'client' | 'user'
+export type ActivityEntityType = 'commission' | 'paiement' | 'client' | 'user' | 'prime'
 
 export interface ActivityLog {
   id: string
@@ -81,14 +66,6 @@ export interface ActivityLog {
   }
   created_at: string
   user?: User
-}
-
-export interface KpiData {
-  caTotal: number
-  commissionsTotal: number
-  encaisse: number
-  restantDu: number
-  paiementsEnRetard: number
 }
 
 export interface AuthUser {
@@ -112,6 +89,3 @@ export interface RegisterPayload {
   role?: Role
 }
 
-export interface ApiError {
-  error: string
-}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { CommissionStatusBadge } from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
@@ -82,16 +82,19 @@ export default function CommissionTable({
   const [deleteTarget, setDeleteTarget]   = useState<Commission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  const filtered = filter === 'all' ? commissions : commissions.filter(c => String(c.prime_id) === String(filter))
+  const filtered = useMemo(() =>
+    filter === 'all' ? commissions : commissions.filter(c => String(c.prime_id) === String(filter)),
+    [commissions, filter]
+  )
 
   const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
   const canDelete = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
 
-  const totals = {
+  const totals = useMemo(() => ({
     ca:         filtered.reduce((s, c) => s + (Number(c.ca) || 0), 0),
     commission: filtered.reduce((s, c) => s + (Number(c.commission) || 0), 0),
     dossiers:   filtered.reduce((s, c) => s + (Number(c.dossiers) || 0), 0),
-  }
+  }), [filtered])
 
   // --- Ajout commission sur prime existante ---
   function openAdd() {

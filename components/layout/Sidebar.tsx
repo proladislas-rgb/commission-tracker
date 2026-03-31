@@ -30,19 +30,27 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   const [activityLogs, setActivityLogs] = useState<(ActivityLog & { user?: User })[]>([])
 
   const loadUsers = useCallback(async () => {
-    const { data } = await supabase
-      .from('users')
-      .select('id, username, display_name, role, avatar_color, last_seen, created_at')
-    setUsers((data ?? []) as User[])
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('id, username, display_name, role, avatar_color, last_seen, created_at')
+      setUsers((data ?? []) as User[])
+    } catch {
+      // silencieux
+    }
   }, [])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
     loadUsers()
     const interval = setInterval(async () => {
-      if (user?.id) {
-        await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', user.id)
-        loadUsers()
+      try {
+        if (user?.id) {
+          await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', user.id)
+          loadUsers()
+        }
+      } catch {
+        // silencieux
       }
     }, 60_000)
     return () => clearInterval(interval)
@@ -51,12 +59,16 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   // Activité récente
   useEffect(() => {
     async function loadActivity() {
-      const { data } = await supabase
-        .from('activity_log')
-        .select('*, user:users(id, display_name, avatar_color)')
-        .order('created_at', { ascending: false })
-        .limit(5)
-      setActivityLogs((data ?? []) as (ActivityLog & { user?: User })[])
+      try {
+        const { data } = await supabase
+          .from('activity_log')
+          .select('*, user:users(id, display_name, avatar_color)')
+          .order('created_at', { ascending: false })
+          .limit(5)
+        setActivityLogs((data ?? []) as (ActivityLog & { user?: User })[])
+      } catch {
+        // silencieux
+      }
     }
     loadActivity()
 

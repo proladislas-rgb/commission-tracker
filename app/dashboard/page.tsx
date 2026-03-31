@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCommissions } from '@/hooks/useCommissions'
 import { usePaiements } from '@/hooks/usePaiements'
@@ -98,7 +98,7 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [primes.length, loadPrimes])
 
-  const commissionsTotal = commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0)
+  const commissionsTotal = useMemo(() => commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0), [commissions])
   const isAssociate      = user?.role === 'associe'
   const isAdmin          = user?.role === 'admin'
 
@@ -196,6 +196,21 @@ export default function DashboardPage() {
       `${user!.display_name} a supprimé la prime ${prime?.icon ?? ''} ${prime?.name ?? ''} et ses commissions associées`)
   }
 
+  const handleAddPaiement = useCallback(async (data: Omit<import('@/lib/types').Paiement, 'id' | 'created_at'>) => {
+    await addPaiement(data)
+    try {
+      await supabase.from('activity_log').insert({
+        user_id:     data.created_by,
+        action:      'create',
+        entity_type: 'paiement',
+        entity_id:   data.created_by,
+        details:     { description: `Paiement de ${new Intl.NumberFormat('fr-FR').format(data.montant)} € ajouté` },
+      })
+    } catch {
+      // log silencieux
+    }
+  }, [addPaiement])
+
   async function handleRenameAssociate(newName: string) {
     if (!associe) return
     const res = await fetch(`/api/users/${associe.id}`, {
@@ -238,11 +253,7 @@ export default function DashboardPage() {
         commissionsTotal={commissionsTotal}
         userId={user.id}
         isAssociate={isAssociate}
-        onAdd={async (data) => {
-          await addPaiement(data)
-          await logActivity('create', 'paiement', data.created_by,
-            `${user.display_name} a ajouté un paiement de ${new Intl.NumberFormat('fr-FR').format(data.montant)} €`)
-        }}
+        onAdd={handleAddPaiement}
       />
 
       <CommissionTable
