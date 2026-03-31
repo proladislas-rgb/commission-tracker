@@ -37,6 +37,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
+      type="button"
       disabled={disabled || loading}
       className={cn(
         'inline-flex items-center gap-2 rounded-btn font-medium transition-all duration-150 cursor-pointer',

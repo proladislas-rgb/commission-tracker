@@ -47,7 +47,7 @@ export function useCommissions(userId?: string) {
     table:    'commissions',
     onInsert: row => {
       const normalized = normalizeCommission(row) as unknown as Commission
-      setCommissions(prev => [normalized, ...prev])
+      setCommissions(prev => prev.some(c => c.id === normalized.id) ? prev : [normalized, ...prev])
     },
     onUpdate: row => {
       const normalized = normalizeCommission(row) as unknown as Commission

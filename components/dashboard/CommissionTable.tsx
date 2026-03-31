@@ -118,7 +118,7 @@ export default function CommissionTable({
   }
 
   async function handleSubmitCommission() {
-    if (!form.prime_id || !form.ca || !form.commission) return
+    if (!form.prime_id || !Number(form.ca) || !Number(form.commission)) return
     setLoading(true)
     try {
       const payload = {
@@ -151,7 +151,9 @@ export default function CommissionTable({
   }
 
   async function handleSubmitPrime() {
-    if (!primeForm.name.trim() || !primeForm.icon.trim() || !primeForm.ca || !primeForm.commission) return
+    const ca = Number(primeForm.ca)
+    const comm = Number(primeForm.commission)
+    if (!primeForm.name.trim() || !primeForm.icon.trim() || !ca || isNaN(ca) || !comm || isNaN(comm)) return
     setPrimeLoading(true)
     setPrimeError('')
     try {

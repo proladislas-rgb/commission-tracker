@@ -88,7 +88,6 @@ export default function DashboardPage() {
           .from('primes')
           .select('*', { count: 'exact', head: true })
         if (primesCount !== null && primesCount !== primes.length) {
-          console.warn('INCOHÉRENCE DÉTECTÉE: primes DB=' + primesCount + ' state=' + primes.length)
           loadPrimes()
         }
       } catch {
