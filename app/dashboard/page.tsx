@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCommissions } from '@/hooks/useCommissions'
 import { usePaiements } from '@/hooks/usePaiements'
 import { supabase } from '@/lib/supabase'
+import { slugifyPrimeName } from '@/lib/constants'
 
 import Header from '@/components/layout/Header'
 import KpiGrid from '@/components/dashboard/KpiGrid'
@@ -14,7 +15,7 @@ import PaiementTracker from '@/components/dashboard/PaiementTracker'
 import CommissionTable from '@/components/dashboard/CommissionTable'
 import SeedButton from '@/components/dashboard/SeedButton'
 
-import type { User, Prime, Commission, CommissionStatus } from '@/lib/types'
+import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -101,7 +102,7 @@ export default function DashboardPage() {
   const isAssociate      = user?.role === 'associe'
   const isAdmin          = user?.role === 'admin'
 
-  async function logActivity(action: string, entityType: string, entityId: string, description: string) {
+  async function logActivity(action: ActivityAction, entityType: ActivityEntityType, entityId: string, description: string) {
     try {
       await supabase.from('activity_log').insert({
         user_id:     user!.id,
@@ -140,7 +141,7 @@ export default function DashboardPage() {
     const existing = primes.find(p => p.name.toLowerCase() === data.name.trim().toLowerCase())
     if (existing) throw new Error('Cette prime existe déjà')
 
-    const id = data.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    const id = slugifyPrimeName(data.name)
     const { data: newPrime, error } = await supabase
       .from('primes')
       .insert({ id, name: data.name, color: data.color, icon: data.icon, active: true })
@@ -159,7 +160,7 @@ export default function DashboardPage() {
     if (existing) throw new Error('Cette prime existe déjà')
 
     // 1. Créer la prime
-    const id = primeData.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    const id = slugifyPrimeName(primeData.name)
     const { data: newPrime, error: primeError } = await supabase
       .from('primes')
       .insert({ id, name: primeData.name, color: primeData.color, icon: primeData.icon, active: true })
@@ -197,7 +198,7 @@ export default function DashboardPage() {
       `${user!.display_name} a supprimé la prime ${prime?.icon ?? ''} ${prime?.name ?? ''} et ses commissions associées`)
   }
 
-  const handleAddPaiement = useCallback(async (data: Omit<import('@/lib/types').Paiement, 'id' | 'created_at'>) => {
+  const handleAddPaiement = useCallback(async (data: Omit<Paiement, 'id' | 'created_at'>) => {
     await addPaiement(data)
     try {
       await supabase.from('activity_log').insert({

@@ -3,16 +3,8 @@
 import { useState } from 'react'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
+import { PRIME_COLORS } from '@/lib/constants'
 import type { Prime } from '@/lib/types'
-
-const PRIME_COLORS = [
-  { value: '#6366f1', label: 'Indigo' },
-  { value: '#f59e0b', label: 'Amber' },
-  { value: '#10b981', label: 'Emerald' },
-  { value: '#f43f5e', label: 'Rose' },
-  { value: '#38bdf8', label: 'Sky' },
-  { value: '#8b5cf6', label: 'Violet' },
-]
 
 interface PrimeSelectorProps {
   primes: Prime[]

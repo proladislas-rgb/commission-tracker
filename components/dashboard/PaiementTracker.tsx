@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
@@ -10,6 +10,7 @@ import Modal from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { CHART_TOOLTIP_STYLE } from '@/lib/constants'
 import type { Paiement, PaiementStatus } from '@/lib/types'
 
 interface Props {
@@ -26,13 +27,6 @@ const STATUS_OPTIONS = [
   { value: 'en_retard',  label: 'En retard' },
 ]
 
-const TOOLTIP_CONTENT_STYLE = {
-  backgroundColor: '#1a1f2e',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: 8,
-  padding: 10,
-}
-
 export default function PaiementTracker({ paiements, commissionsTotal, userId, isAssociate, onAdd }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading]     = useState(false)
@@ -46,18 +40,21 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
   useEffect(() => { setMounted(true) }, [])
 
-  const encaisse   = paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + Number(p.montant), 0)
-  const enAttente  = paiements.filter(p => p.status === 'en_attente').reduce((s, p) => s + Number(p.montant), 0)
-  const enRetard   = paiements.filter(p => p.status === 'en_retard').reduce((s, p) => s + Number(p.montant), 0)
-  const progress   = commissionsTotal > 0 ? Math.min(100, (encaisse / commissionsTotal) * 100) : 0
+  const { encaisse, enAttente, enRetard } = useMemo(() => ({
+    encaisse:  paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + Number(p.montant), 0),
+    enAttente: paiements.filter(p => p.status === 'en_attente').reduce((s, p) => s + Number(p.montant), 0),
+    enRetard:  paiements.filter(p => p.status === 'en_retard').reduce((s, p) => s + Number(p.montant), 0),
+  }), [paiements])
+  const progress = commissionsTotal > 0 ? Math.min(100, (encaisse / commissionsTotal) * 100) : 0
 
-  // Données graphique avec cumul
-  const sorted = [...paiements].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  let cumul = 0
-  const chartData = sorted.map(p => {
-    cumul += Number(p.montant)
-    return { date: formatDate(p.date), montant: Number(p.montant), cumul, status: p.status }
-  })
+  const chartData = useMemo(() => {
+    const sorted = [...paiements].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    let cumul = 0
+    return sorted.map(p => {
+      cumul += Number(p.montant)
+      return { date: formatDate(p.date), montant: Number(p.montant), cumul, status: p.status }
+    })
+  }, [paiements])
 
   async function handleSubmit() {
     if (!form.montant || !form.label) return
@@ -140,7 +137,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
-                contentStyle={TOOLTIP_CONTENT_STYLE}
+                contentStyle={CHART_TOOLTIP_STYLE}
                 formatter={(value) => formatCurrency(Number(value))}
                 labelStyle={{ color: '#e8edf5' }}
                 itemStyle={{ color: '#8898aa' }}

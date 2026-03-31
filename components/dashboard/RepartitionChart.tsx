@@ -2,18 +2,12 @@
 
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
+import { CHART_TOOLTIP_STYLE } from '@/lib/constants'
 import type { Commission, Prime } from '@/lib/types'
 
 interface Props {
   commissions: Commission[]
   primes: Prime[]
-}
-
-const TOOLTIP_CONTENT_STYLE = {
-  backgroundColor: '#1a1f2e',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: 8,
-  padding: 10,
 }
 
 export default function RepartitionChart({ commissions, primes }: Props) {
@@ -53,7 +47,7 @@ export default function RepartitionChart({ commissions, primes }: Props) {
               ))}
             </Pie>
             <Tooltip
-              contentStyle={TOOLTIP_CONTENT_STYLE}
+              contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
               labelStyle={{ color: '#e8edf5' }}
               itemStyle={{ color: '#8898aa' }}

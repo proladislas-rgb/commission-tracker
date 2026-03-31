@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSessionUser } from '@/lib/auth'
+import { getSessionUser, getCookieName } from '@/lib/auth'
 
 export async function GET() {
   const user = await getSessionUser()
@@ -11,6 +11,6 @@ export async function GET() {
 
 export async function DELETE() {
   const res = NextResponse.json({ ok: true })
-  res.cookies.set('ct_session', '', { maxAge: 0, path: '/' })
+  res.cookies.set(getCookieName(), '', { maxAge: 0, path: '/' })
   return res
 }

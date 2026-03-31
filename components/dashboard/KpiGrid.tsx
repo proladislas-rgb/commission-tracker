@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import KpiCard from './KpiCard'
 import { formatCurrency } from '@/lib/utils'
 import type { Commission, Paiement } from '@/lib/types'
@@ -10,11 +11,15 @@ interface KpiGridProps {
 }
 
 export default function KpiGrid({ commissions, paiements }: KpiGridProps) {
-  const caTotal          = commissions.reduce((s, c) => s + (Number(c.ca) || 0), 0)
-  const commissionsTotal = commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0)
-  const encaisse         = paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + (Number(p.montant) || 0), 0)
-  const restantDu        = commissionsTotal - encaisse
-  const enRetard         = paiements.filter(p => p.status === 'en_retard').length
+  const { caTotal, commissionsTotal } = useMemo(() => ({
+    caTotal:          commissions.reduce((s, c) => s + (Number(c.ca) || 0), 0),
+    commissionsTotal: commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0),
+  }), [commissions])
+  const { encaisse, enRetard } = useMemo(() => ({
+    encaisse: paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + (Number(p.montant) || 0), 0),
+    enRetard: paiements.filter(p => p.status === 'en_retard').length,
+  }), [paiements])
+  const restantDu = commissionsTotal - encaisse
 
   return (
     <div id="kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fadeIn">

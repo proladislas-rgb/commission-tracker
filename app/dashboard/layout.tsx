@@ -13,14 +13,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [associe, setAssociate] = useState<User | null>(null)
 
   const loadAssociate = useCallback(async () => {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('role', 'associe')
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single()
-    if (data) setAssociate(data)
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('*')
+        .eq('role', 'associe')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single()
+      if (data) setAssociate(data)
+    } catch {
+      // pas d'associé trouvé
+    }
   }, [])
 
   useEffect(() => {

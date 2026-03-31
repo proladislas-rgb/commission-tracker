@@ -45,7 +45,7 @@ export function usePaiements(createdBy?: string) {
     table:    'paiements',
     onInsert: row => {
       const normalized = normalizePaiement(row) as unknown as Paiement
-      setPaiements(prev => [normalized, ...prev])
+      setPaiements(prev => prev.some(p => p.id === normalized.id) ? prev : [normalized, ...prev])
     },
     onUpdate: row => {
       const normalized = normalizePaiement(row) as unknown as Paiement
