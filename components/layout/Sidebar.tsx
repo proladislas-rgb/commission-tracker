@@ -8,11 +8,11 @@ import { isOnline, avatarInitials, formatDate } from '@/lib/utils'
 import type { User } from '@/lib/types'
 
 const NAV_ITEMS = [
-  { id: 'kpis',        label: 'KPIs' },
-  { id: 'graphiques',  label: 'Graphiques' },
-  { id: 'paiements',   label: 'Paiements' },
-  { id: 'commissions', label: 'Commissions' },
-  { id: 'activite',    label: 'Activité' },
+  { id: 'kpis',        label: 'KPIs',        color: '#6366f1' },
+  { id: 'graphiques',  label: 'Graphiques',  color: '#10b981' },
+  { id: 'paiements',   label: 'Paiements',   color: '#f59e0b' },
+  { id: 'commissions', label: 'Commissions', color: '#38bdf8' },
+  { id: 'activite',    label: 'Activité',    color: '#8b5cf6' },
 ]
 
 interface SidebarProps {
@@ -20,9 +20,11 @@ interface SidebarProps {
   onRenameAssociate: (name: string) => Promise<void>
   mobileOpen: boolean
   onMobileClose: () => void
+  collapsed: boolean
+  onToggleCollapse: () => void
 }
 
-export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobileClose, collapsed, onToggleCollapse }: SidebarProps) {
   const { user, logout } = useAuth()
   const [users, setUsers] = useState<User[]>([])
 
@@ -34,8 +36,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
     loadUsers()
-    // Mettre à jour last_seen toutes les 60s
     const interval = setInterval(async () => {
       if (user?.id) {
         await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', user.id)
@@ -52,13 +54,34 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
 
   const sidebarContent = (
     <div className="h-full flex flex-col overflow-hidden">
+      {/* Toggle button */}
+      <button
+        onClick={onToggleCollapse}
+        className="hidden lg:flex items-center justify-center h-8 border-b border-[rgba(255,255,255,0.07)] text-txt3 hover:text-txt2 transition-colors cursor-pointer"
+        title={collapsed ? 'Déplier' : 'Replier'}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          style={{ transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[rgba(255,255,255,0.07)]">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full bg-green animate-pulse2" />
-          <span className="text-[11px] font-semibold text-txt2 uppercase tracking-widest">Commission Tracker</span>
+      <div className="px-5 py-5 border-b border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '20px 8px' : undefined }}>
+        <div className="flex items-center gap-2 mb-1" style={{ justifyContent: collapsed ? 'center' : undefined }}>
+          <span className="w-2 h-2 rounded-full bg-green animate-pulse2 flex-shrink-0" />
+          {!collapsed && (
+            <span className="text-[11px] font-semibold text-txt2 uppercase tracking-widest">Commission Tracker</span>
+          )}
         </div>
-        {associe && (
+        {!collapsed && associe && (
           <div className="text-xs text-txt3 mt-1">
             Associé :{' '}
             {user?.role === 'admin' ? (
@@ -72,67 +95,117 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
             )}
           </div>
         )}
-        <div className="text-[11px] text-txt3 mt-1">
-          Client : <span className="text-txt2 font-medium">ECODISTRIB</span>
-        </div>
-        <div className="text-[11px] text-txt3 mt-0.5">
-          {formatDate(new Date().toISOString())}
-        </div>
+        {!collapsed && (
+          <>
+            <div className="text-[11px] text-txt3 mt-1">
+              Client : <span className="text-txt2 font-medium">ECODISTRIB</span>
+            </div>
+            <div className="text-[11px] text-txt3 mt-0.5">
+              {formatDate(new Date().toISOString())}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Navigation */}
-      <div className="px-3 py-4 border-b border-[rgba(255,255,255,0.07)]">
-        <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Navigation</p>
+      <div className="px-3 py-4 border-b border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '16px 4px' : undefined }}>
+        {!collapsed && (
+          <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Navigation</p>
+        )}
         {NAV_ITEMS.map(item => (
           <button
             key={item.id}
             onClick={() => scrollTo(item.id)}
-            className="w-full text-left px-3 py-1.5 rounded-btn text-sm text-txt2 hover:text-txt hover:bg-raised transition-all duration-150 cursor-pointer"
+            className="w-full text-left rounded-btn text-sm text-txt2 hover:text-txt hover:bg-raised transition-all duration-150 cursor-pointer flex items-center gap-2"
+            style={{
+              padding: collapsed ? '6px 0' : '6px 12px',
+              justifyContent: collapsed ? 'center' : undefined,
+            }}
+            title={collapsed ? item.label : undefined}
           >
-            {item.label}
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+            {!collapsed && <span>{item.label}</span>}
           </button>
         ))}
       </div>
 
       {/* Connectés */}
-      <div className="px-3 py-4 flex-1 overflow-y-auto">
-        <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Connectés</p>
+      <div className="py-4 flex-1 overflow-y-auto" style={{ padding: collapsed ? '16px 4px' : '16px 12px' }}>
+        {!collapsed && (
+          <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Connectés</p>
+        )}
         {users.map(u => (
-          <div key={u.id} className="flex items-center gap-2.5 px-2 py-1.5 rounded-btn hover:bg-raised transition-colors">
+          <div
+            key={u.id}
+            className="flex items-center gap-2.5 py-1.5 rounded-btn hover:bg-raised transition-colors"
+            style={{
+              padding: collapsed ? '6px 0' : '6px 8px',
+              justifyContent: collapsed ? 'center' : undefined,
+            }}
+            title={collapsed ? u.display_name : undefined}
+          >
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
               style={{ backgroundColor: u.avatar_color }}
             >
               {avatarInitials(u.display_name)}
             </div>
-            <span className="text-xs text-txt2 truncate flex-1">{u.display_name}</span>
-            <span
-              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isOnline(u.last_seen) ? 'bg-green' : 'bg-txt3'}`}
-            />
+            {!collapsed && (
+              <>
+                <span className="text-xs text-txt2 truncate flex-1">{u.display_name}</span>
+                <span
+                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isOnline(u.last_seen) ? 'bg-green' : 'bg-txt3'}`}
+                />
+              </>
+            )}
           </div>
         ))}
       </div>
 
       {/* Footer */}
       {user && (
-        <div className="px-3 py-4 border-t border-[rgba(255,255,255,0.07)]">
-          <div className="flex items-center gap-2.5 mb-3 px-2">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
-              style={{ backgroundColor: user.avatar_color }}
-            >
-              {avatarInitials(user.display_name)}
+        <div className="py-4 border-t border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '16px 4px' : '16px 12px' }}>
+          {!collapsed && (
+            <div className="flex items-center gap-2.5 mb-3 px-2">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: user.avatar_color }}
+              >
+                {avatarInitials(user.display_name)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-txt truncate">{user.display_name}</p>
+                <p className="text-[10px] text-txt3 capitalize">{user.role}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-txt truncate">{user.display_name}</p>
-              <p className="text-[10px] text-txt3 capitalize">{user.role}</p>
+          )}
+          {collapsed && (
+            <div className="flex justify-center mb-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: user.avatar_color }}
+                title={user.display_name}
+              >
+                {avatarInitials(user.display_name)}
+              </div>
             </div>
-          </div>
+          )}
           <button
             onClick={logout}
-            className="w-full text-left px-3 py-1.5 rounded-btn text-xs text-txt2 hover:text-rose hover:bg-rose/10 transition-all duration-150 cursor-pointer"
+            className="w-full text-left rounded-btn text-xs text-txt2 hover:text-rose hover:bg-rose/10 transition-all duration-150 cursor-pointer"
+            style={{
+              padding: collapsed ? '6px 0' : '6px 12px',
+              textAlign: collapsed ? 'center' : 'left',
+            }}
+            title={collapsed ? 'Se déconnecter' : undefined}
           >
-            Se déconnecter
+            {collapsed ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            ) : (
+              'Se déconnecter'
+            )}
           </button>
         </div>
       )}
@@ -142,7 +215,13 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex fixed right-0 top-0 h-screen w-sidebar bg-surface border-l border-[rgba(255,255,255,0.07)] flex-col z-30">
+      <aside
+        className="hidden lg:flex fixed right-0 top-0 h-screen bg-surface border-l border-[rgba(255,255,255,0.07)] flex-col z-30"
+        style={{
+          width: collapsed ? '60px' : '220px',
+          transition: 'width 0.3s ease',
+        }}
+      >
         {sidebarContent}
       </aside>
 
@@ -150,7 +229,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/60" onClick={onMobileClose} />
-          <aside className="absolute right-0 top-0 h-full w-sidebar bg-surface border-l border-[rgba(255,255,255,0.07)]">
+          <aside className="absolute right-0 top-0 h-full bg-surface border-l border-[rgba(255,255,255,0.07)]" style={{ width: '220px' }}>
             {sidebarContent}
           </aside>
         </div>

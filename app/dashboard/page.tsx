@@ -33,14 +33,18 @@ export default function DashboardPage() {
     if (data) setAssociate(data)
   }, [])
 
-  useEffect(() => {
-    loadAssociate()
-    supabase.from('primes').select('*').eq('active', true).then(({ data }) => {
-      if (data) setPrimes(data)
-    })
-  }, [loadAssociate])
+  const loadPrimes = useCallback(async () => {
+    const { data } = await supabase.from('primes').select('*').eq('active', true)
+    if (data) setPrimes(data)
+  }, [])
 
-  // Realtime rename
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
+    loadAssociate()
+    loadPrimes()
+  }, [loadAssociate, loadPrimes])
+
+  // Realtime: users
   useEffect(() => {
     const channel = supabase
       .channel('dashboard-users')
@@ -51,6 +55,18 @@ export default function DashboardPage() {
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
+
+  // Realtime: primes
+  useEffect(() => {
+    const channel = supabase
+      .channel('dashboard-primes')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'primes' }, () => {
+        loadPrimes()
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [loadPrimes])
 
   const associeId = associe?.id
 
@@ -84,8 +100,34 @@ export default function DashboardPage() {
   }
 
   async function handleDeleteCommission(id: string) {
+    const commission = commissions.find(c => c.id === id)
+    const prime = commission ? primes.find(p => p.id === commission.prime_id) : null
     await removeCommission(id)
-    await logActivity('delete', 'commission', id, `${user!.display_name} a supprimé une commission`)
+    await logActivity('delete', 'commission', id,
+      `${user!.display_name} a supprimé une commission ${prime?.name ?? ''} de ${commission ? new Intl.NumberFormat('fr-FR').format(Number(commission.ca)) : '?'} €`)
+  }
+
+  async function handleCreatePrime(data: { name: string; color: string; icon: string }): Promise<Prime> {
+    const { data: newPrime, error } = await supabase
+      .from('primes')
+      .insert({ name: data.name, color: data.color, icon: data.icon, active: true })
+      .select()
+      .single()
+    if (error) throw new Error(error.message)
+    setPrimes(prev => [...prev, newPrime])
+    await logActivity('create', 'commission', newPrime.id,
+      `${user!.display_name} a créé la prime ${data.icon} ${data.name}`)
+    return newPrime
+  }
+
+  async function handleDeletePrime(primeId: string) {
+    const prime = primes.find(p => p.id === primeId)
+    const { error } = await supabase.from('primes').delete().eq('id', primeId)
+    if (error) throw new Error(error.message)
+    setPrimes(prev => prev.filter(p => p.id !== primeId))
+    reloadCommissions()
+    await logActivity('delete', 'commission', primeId,
+      `${user!.display_name} a supprimé la prime ${prime?.icon ?? ''} ${prime?.name ?? ''} et ses commissions associées`)
   }
 
   async function handleRenameAssociate(newName: string) {
@@ -111,7 +153,6 @@ export default function DashboardPage() {
         onMobileMenuOpen={() => {}}
       />
 
-      {/* Bouton seed — associé uniquement, vérifie lui-même si la table est vide */}
       {isAssociate && (
         <SeedButton
           userId={user.id}
@@ -119,16 +160,13 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* KPIs */}
       <KpiGrid commissions={commissions} paiements={paiements} />
 
-      {/* Graphiques */}
       <section id="graphiques" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 animate-fadeIn">
         <RepartitionChart commissions={commissions} primes={primes} />
         <CaCommissionChart commissions={commissions} primes={primes} />
       </section>
 
-      {/* Paiements */}
       <PaiementTracker
         paiements={paiements}
         commissionsTotal={commissionsTotal}
@@ -141,7 +179,6 @@ export default function DashboardPage() {
         }}
       />
 
-      {/* Commissions */}
       <CommissionTable
         commissions={commissions}
         primes={primes}
@@ -151,9 +188,10 @@ export default function DashboardPage() {
         onAdd={handleAddCommission}
         onUpdate={handleUpdateCommission}
         onDelete={handleDeleteCommission}
+        onCreatePrime={handleCreatePrime}
+        onDeletePrime={handleDeletePrime}
       />
 
-      {/* Activité */}
       <ActivityFeed />
     </>
   )

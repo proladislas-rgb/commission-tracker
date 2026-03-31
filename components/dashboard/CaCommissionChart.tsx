@@ -11,6 +11,13 @@ interface Props {
   primes: Prime[]
 }
 
+const TOOLTIP_CONTENT_STYLE = {
+  backgroundColor: '#1a1f2e',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 8,
+  padding: 10,
+}
+
 export default function CaCommissionChart({ commissions, primes }: Props) {
   const data = primes.map(prime => ({
     name:       `${prime.icon} ${prime.name}`,
@@ -23,7 +30,7 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
     v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
 
   return (
-    <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card">
+    <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card min-h-[300px]">
       <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         CA vs Commissions par prime
       </h3>
@@ -36,9 +43,10 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
             <XAxis dataKey="name" tick={{ fill: '#8898aa', fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
             <Tooltip
-              contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
+              contentStyle={TOOLTIP_CONTENT_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
               labelStyle={{ color: '#e8edf5' }}
+              itemStyle={{ color: '#8898aa' }}
             />
             <Legend formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>} />
             <Bar dataKey="ca" name="CA" fill="#6366f1" radius={[4, 4, 0, 0]} />

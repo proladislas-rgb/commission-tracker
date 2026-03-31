@@ -31,14 +31,14 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
         onClick={onClose}
       />
       {/* Panel */}
       <div
         className={cn(
           'relative w-full bg-surface border border-[rgba(255,255,255,0.1)] rounded-card',
-          'shadow-raised animate-fadeIn overflow-hidden',
+          'shadow-raised animate-modalIn overflow-hidden will-change-transform',
           sizeClasses[size]
         )}
       >

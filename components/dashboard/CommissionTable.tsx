@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import PrimeSelector from '@/components/dashboard/PrimeSelector'
 import { formatCurrency, formatMois } from '@/lib/utils'
 import type { Commission, CommissionStatus, Prime } from '@/lib/types'
 
@@ -18,6 +19,8 @@ interface Props {
   onAdd: (data: Omit<Commission, 'id' | 'created_at' | 'updated_at'>) => Promise<void>
   onUpdate: (id: string, data: Partial<Commission>) => Promise<void>
   onDelete: (id: string) => Promise<void>
+  onCreatePrime: (data: { name: string; color: string; icon: string }) => Promise<Prime>
+  onDeletePrime: (primeId: string) => Promise<void>
 }
 
 const STATUS_OPTIONS = [
@@ -37,17 +40,20 @@ const EMPTY_FORM = {
 }
 
 export default function CommissionTable({
-  commissions, primes, userId, isAssociate, isAdmin, onAdd, onUpdate, onDelete
+  commissions, primes, userId, isAssociate, isAdmin, onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime,
 }: Props) {
-  const [filter, setFilter]     = useState<string>('all')
-  const [showAdd, setShowAdd]   = useState(false)
-  const [editId, setEditId]     = useState<string | null>(null)
-  const [form, setForm]         = useState(EMPTY_FORM)
-  const [loading, setLoading]   = useState(false)
+  const [filter, setFilter]             = useState<string>('all')
+  const [showAdd, setShowAdd]           = useState(false)
+  const [editId, setEditId]             = useState<string | null>(null)
+  const [form, setForm]                 = useState(EMPTY_FORM)
+  const [loading, setLoading]           = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Commission | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const filtered = filter === 'all' ? commissions : commissions.filter(c => c.prime_id === filter)
 
   const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
+  const canDelete = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
 
   const totals = {
     ca:         filtered.reduce((s, c) => s + Number(c.ca), 0),
@@ -101,9 +107,15 @@ export default function CommissionTable({
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Supprimer cette commission ?')) return
-    await onDelete(id)
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    try {
+      await onDelete(deleteTarget.id)
+      setDeleteTarget(null)
+    } finally {
+      setDeleteLoading(false)
+    }
   }
 
   return (
@@ -152,10 +164,16 @@ export default function CommissionTable({
                   </td>
                 </tr>
               ) : (
-                filtered.map(c => {
+                filtered.map((c, i) => {
                   const prime = primes.find(p => p.id === c.prime_id)
                   return (
-                    <tr key={c.id} className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                    <tr
+                      key={c.id}
+                      className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] transition-colors will-change-transform"
+                      style={{
+                        animation: i < 10 ? `fadeIn 0.3s ease ${i * 0.03}s both` : undefined,
+                      }}
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span
@@ -171,8 +189,8 @@ export default function CommissionTable({
                       <td className="px-4 py-3 text-txt2">{formatMois(c.mois)}</td>
                       <td className="px-4 py-3"><CommissionStatusBadge status={c.status} /></td>
                       <td className="px-4 py-3">
-                        {canEdit(c) && (
-                          <div className="flex gap-1">
+                        <div className="flex gap-1">
+                          {canEdit(c) && (
                             <button
                               onClick={() => openEdit(c)}
                               className="p-1.5 rounded-btn text-txt2 hover:text-indigo hover:bg-indigo/10 transition-colors"
@@ -183,8 +201,10 @@ export default function CommissionTable({
                                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                               </svg>
                             </button>
+                          )}
+                          {canDelete(c) && (
                             <button
-                              onClick={() => handleDelete(c.id)}
+                              onClick={() => setDeleteTarget(c)}
                               className="p-1.5 rounded-btn text-txt2 hover:text-rose hover:bg-rose/10 transition-colors"
                               title="Supprimer"
                             >
@@ -194,8 +214,8 @@ export default function CommissionTable({
                                 <path d="M10 11v6M14 11v6M9 6V4h6v2" />
                               </svg>
                             </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )
@@ -224,11 +244,13 @@ export default function CommissionTable({
         title={editId ? 'Modifier la commission' : 'Ajouter une commission'}
       >
         <div className="flex flex-col gap-4">
-          <Select
-            label="Prime"
-            options={primes.map(p => ({ value: p.id, label: `${p.icon} ${p.name}` }))}
+          <PrimeSelector
+            primes={primes}
             value={form.prime_id}
-            onChange={e => setForm(f => ({ ...f, prime_id: e.target.value }))}
+            onChange={primeId => setForm(f => ({ ...f, prime_id: primeId }))}
+            isAdmin={isAdmin}
+            onCreatePrime={onCreatePrime}
+            onDeletePrime={onDeletePrime}
           />
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -281,6 +303,30 @@ export default function CommissionTable({
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Modal confirmation suppression commission */}
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Supprimer une commission"
+        size="sm"
+      >
+        {deleteTarget && (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-txt">
+              Supprimer cette commission{' '}
+              <strong>{primes.find(p => p.id === deleteTarget.prime_id)?.name ?? deleteTarget.prime_id}</strong>{' '}
+              de <strong>{formatCurrency(Number(deleteTarget.ca))}</strong> ?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Annuler</Button>
+              <Button variant="danger" loading={deleteLoading} onClick={handleConfirmDelete}>
+                Supprimer
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </section>
   )

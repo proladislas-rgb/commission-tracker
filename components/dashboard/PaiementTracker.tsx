@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
@@ -26,15 +26,25 @@ const STATUS_OPTIONS = [
   { value: 'en_retard',  label: 'En retard' },
 ]
 
+const TOOLTIP_CONTENT_STYLE = {
+  backgroundColor: '#1a1f2e',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 8,
+  padding: 10,
+}
+
 export default function PaiementTracker({ paiements, commissionsTotal, userId, isAssociate, onAdd }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading]     = useState(false)
+  const [mounted, setMounted]     = useState(false)
   const [form, setForm]           = useState({
     date:    new Date().toISOString().slice(0, 10),
     montant: '',
     label:   '',
     status:  'en_attente' as PaiementStatus,
   })
+
+  useEffect(() => { setMounted(true) }, [])
 
   const encaisse   = paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + Number(p.montant), 0)
   const enAttente  = paiements.filter(p => p.status === 'en_attente').reduce((s, p) => s + Number(p.montant), 0)
@@ -68,12 +78,6 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
     }
   }
 
-  const barColor = (entry: { status: PaiementStatus }) => {
-    if (entry.status === 'effectue')   return '#22c55e'
-    if (entry.status === 'en_retard')  return '#f43f5e'
-    return '#f59e0b'
-  }
-
   return (
     <section id="paiements" className="mb-8 animate-fadeIn">
       <div className="flex items-center justify-between mb-4">
@@ -92,7 +96,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
         ].map(item => (
           <div
             key={item.label}
-            className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4"
+            className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4 min-h-[80px]"
             style={{ borderTop: `2px solid ${item.color}` }}
           >
             <p className="text-[10px] uppercase tracking-[0.9px] font-medium mb-1" style={{ color: item.color }}>
@@ -104,17 +108,18 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
       </div>
 
       {/* Barre de progression */}
-      <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4 mb-4">
+      <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4 mb-4 min-h-[80px]">
         <div className="flex justify-between text-xs text-txt2 mb-2">
           <span>Progression encaissement</span>
           <span className="font-semibold text-txt">{progress.toFixed(1)}%</span>
         </div>
         <div className="h-2 bg-raised rounded-full overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="h-full rounded-full will-change-transform"
             style={{
-              width: `${progress}%`,
+              width: mounted ? `${progress}%` : '0%',
               background: 'linear-gradient(90deg, #6366f1, #10b981)',
+              transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
         </div>
@@ -126,7 +131,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
       {/* Graphique */}
       {chartData.length > 0 && (
-        <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4 mb-4">
+        <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-4 mb-4 min-h-[220px]">
           <ResponsiveContainer width="100%" height={180}>
             <ComposedChart data={chartData} margin={{ left: 0, right: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -135,8 +140,10 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
-                contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
+                contentStyle={TOOLTIP_CONTENT_STYLE}
                 formatter={(value) => formatCurrency(Number(value))}
+                labelStyle={{ color: '#e8edf5' }}
+                itemStyle={{ color: '#8898aa' }}
               />
               <Bar dataKey="montant" name="Montant" fill="#6366f1" radius={[4, 4, 0, 0]} />
               <Line dataKey="cumul" name="Cumul" stroke="#10b981" strokeWidth={2} dot={false} />

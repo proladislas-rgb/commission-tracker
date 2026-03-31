@@ -9,6 +9,13 @@ interface Props {
   primes: Prime[]
 }
 
+const TOOLTIP_CONTENT_STYLE = {
+  backgroundColor: '#1a1f2e',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 8,
+  padding: 10,
+}
+
 export default function RepartitionChart({ commissions, primes }: Props) {
   const data = primes.map(prime => ({
     name:  prime.name,
@@ -18,7 +25,7 @@ export default function RepartitionChart({ commissions, primes }: Props) {
   })).filter(d => d.value > 0)
 
   return (
-    <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card">
+    <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card min-h-[300px]">
       <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         Répartition CA par prime
       </h3>
@@ -41,9 +48,10 @@ export default function RepartitionChart({ commissions, primes }: Props) {
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
+              contentStyle={TOOLTIP_CONTENT_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
               labelStyle={{ color: '#e8edf5' }}
+              itemStyle={{ color: '#8898aa' }}
             />
             <Legend
               formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>}

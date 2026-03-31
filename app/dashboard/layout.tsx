@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user, isLoading, router])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
     loadAssociate()
   }, [loadAssociate])
 

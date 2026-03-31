@@ -31,6 +31,8 @@
   --animate-fadeIn: fadeIn 0.3s ease forwards;
   --animate-pulse2: pulse2 1.5s ease-in-out infinite;
   --animate-shimmer: shimmer 1.5s linear infinite;
+  --animate-modalIn: modalIn 0.2s ease forwards;
+  --animate-rowIn: fadeIn 0.3s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -46,6 +48,11 @@
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes modalIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 * {
