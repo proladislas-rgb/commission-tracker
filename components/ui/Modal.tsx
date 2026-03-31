@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 
 interface ModalProps {
@@ -18,6 +19,11 @@ const sizeClasses = {
 }
 
 export default function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
+  const [mounted, setMounted] = useState(false)
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- nécessaire pour détecter le client (SSR safety pour createPortal)
+  useEffect(() => { setMounted(true) }, [])
+
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -25,9 +31,10 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
     return () => window.removeEventListener('keydown', handler)
   }, [open, onClose])
 
+  if (!mounted) return null
   if (!open) return null
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 9998 }}>
       {/* Backdrop — couvre tout l'écran */}
       <div
@@ -57,6 +64,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
         </div>
         <div className="px-6 py-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

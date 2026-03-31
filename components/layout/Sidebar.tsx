@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import InlineEdit from '@/components/ui/InlineEdit'
 import { supabase } from '@/lib/supabase'
-import { isOnline, avatarInitials, formatDate } from '@/lib/utils'
-import type { User } from '@/lib/types'
+import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
+import type { User, ActivityLog } from '@/lib/types'
 
 const NAV_ITEMS = [
   { id: 'kpis',        label: 'KPIs',        color: '#6366f1' },
@@ -27,6 +27,7 @@ interface SidebarProps {
 export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobileClose, collapsed, onToggleCollapse }: SidebarProps) {
   const { user, logout } = useAuth()
   const [users, setUsers] = useState<User[]>([])
+  const [activityLogs, setActivityLogs] = useState<(ActivityLog & { user?: User })[]>([])
 
   const loadUsers = useCallback(async () => {
     const { data } = await supabase
@@ -46,6 +47,36 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
     }, 60_000)
     return () => clearInterval(interval)
   }, [user?.id, loadUsers])
+
+  // Activité récente
+  useEffect(() => {
+    async function loadActivity() {
+      const { data } = await supabase
+        .from('activity_log')
+        .select('*, user:users(id, display_name, avatar_color)')
+        .order('created_at', { ascending: false })
+        .limit(5)
+      setActivityLogs((data ?? []) as (ActivityLog & { user?: User })[])
+    }
+    loadActivity()
+
+    const channel = supabase
+      .channel('sidebar-activity')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'activity_log' }, async (payload: { new: Record<string, unknown> }) => {
+        const { data: logWithUser } = await supabase
+          .from('activity_log')
+          .select('*, user:users(id, display_name, avatar_color)')
+          .eq('id', (payload.new as { id: string }).id)
+          .single()
+        if (logWithUser) {
+          setActivityLogs(prev => [logWithUser as ActivityLog & { user?: User }, ...prev].slice(0, 5))
+        }
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -161,6 +192,31 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           </div>
         ))}
       </div>
+
+      {/* Activité récente */}
+      {!collapsed && (
+        <div id="activite" className="px-3 py-4 border-t border-[rgba(255,255,255,0.07)]" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+          <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Activité récente</p>
+          {activityLogs.length === 0 ? (
+            <p className="text-[10px] text-txt3 px-2">Aucune activité</p>
+          ) : (
+            activityLogs.map(log => (
+              <div key={log.id} className="flex items-start gap-2 px-2 py-1.5 rounded-btn hover:bg-raised transition-colors">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-white flex-shrink-0 mt-0.5"
+                  style={{ backgroundColor: log.user?.avatar_color ?? '#6366f1' }}
+                >
+                  {log.user ? avatarInitials(log.user.display_name) : '?'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-txt2 truncate">{log.details?.description}</p>
+                  <p className="text-[9px] text-txt3">{formatRelativeTime(log.created_at)}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Footer */}
       {user && (

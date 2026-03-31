@@ -12,7 +12,6 @@ import RepartitionChart from '@/components/dashboard/RepartitionChart'
 import CaCommissionChart from '@/components/dashboard/CaCommissionChart'
 import PaiementTracker from '@/components/dashboard/PaiementTracker'
 import CommissionTable from '@/components/dashboard/CommissionTable'
-import ActivityFeed from '@/components/dashboard/ActivityFeed'
 import SeedButton from '@/components/dashboard/SeedButton'
 
 import type { User, Prime, Commission, CommissionStatus } from '@/lib/types'
@@ -260,7 +259,6 @@ export default function DashboardPage() {
         onCreatePrimeWithCommission={handleCreatePrimeWithCommission}
       />
 
-      <ActivityFeed />
     </>
   )
 }
