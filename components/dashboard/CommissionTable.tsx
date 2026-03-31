@@ -10,6 +10,15 @@ import PrimeSelector from '@/components/dashboard/PrimeSelector'
 import { formatCurrency, formatMois } from '@/lib/utils'
 import type { Commission, CommissionStatus, Prime } from '@/lib/types'
 
+const PRIME_COLORS = [
+  { value: '#6366f1', label: 'Indigo' },
+  { value: '#f59e0b', label: 'Amber' },
+  { value: '#10b981', label: 'Emerald' },
+  { value: '#f43f5e', label: 'Rose' },
+  { value: '#38bdf8', label: 'Sky' },
+  { value: '#8b5cf6', label: 'Violet' },
+]
+
 interface Props {
   commissions: Commission[]
   primes: Prime[]
@@ -21,6 +30,10 @@ interface Props {
   onDelete: (id: string) => Promise<void>
   onCreatePrime: (data: { name: string; color: string; icon: string }) => Promise<Prime>
   onDeletePrime: (primeId: string) => Promise<void>
+  onCreatePrimeWithCommission: (
+    primeData: { name: string; color: string; icon: string },
+    commissionData: { mois: string; dossiers: number; ca: number; commission: number; status: CommissionStatus },
+  ) => Promise<void>
 }
 
 const STATUS_OPTIONS = [
@@ -29,7 +42,7 @@ const STATUS_OPTIONS = [
   { value: 'paye',    label: 'Payé' },
 ]
 
-const EMPTY_FORM = {
+const EMPTY_COMMISSION_FORM = {
   prime_id:   '',
   ca:         '',
   commission: '',
@@ -39,15 +52,34 @@ const EMPTY_FORM = {
   notes:      '',
 }
 
+const EMPTY_PRIME_FORM = {
+  name:       '',
+  icon:       '',
+  color:      '#6366f1',
+  mois:       new Date().toISOString().slice(0, 7),
+  dossiers:   '',
+  ca:         '',
+  commission: '',
+  status:     'due' as CommissionStatus,
+}
+
 export default function CommissionTable({
-  commissions, primes, userId, isAssociate, isAdmin, onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime,
+  commissions, primes, userId, isAssociate, isAdmin,
+  onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime, onCreatePrimeWithCommission,
 }: Props) {
   const [filter, setFilter]             = useState<string>('all')
+  // Formulaire ajout commission (sur prime existante)
   const [showAdd, setShowAdd]           = useState(false)
   const [editId, setEditId]             = useState<string | null>(null)
-  const [form, setForm]                 = useState(EMPTY_FORM)
+  const [form, setForm]                 = useState(EMPTY_COMMISSION_FORM)
   const [loading, setLoading]           = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState<Commission | null>(null)
+  // Formulaire création prime + commission (admin)
+  const [showNewPrime, setShowNewPrime] = useState(false)
+  const [primeForm, setPrimeForm]       = useState(EMPTY_PRIME_FORM)
+  const [primeLoading, setPrimeLoading] = useState(false)
+  const [primeError, setPrimeError]     = useState('')
+  // Suppression commission
+  const [deleteTarget, setDeleteTarget]   = useState<Commission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
   const filtered = filter === 'all' ? commissions : commissions.filter(c => c.prime_id === filter)
@@ -61,8 +93,9 @@ export default function CommissionTable({
     dossiers:   filtered.reduce((s, c) => s + Number(c.dossiers), 0),
   }
 
+  // --- Ajout commission sur prime existante ---
   function openAdd() {
-    setForm({ ...EMPTY_FORM, prime_id: primes[0]?.id ?? '' })
+    setForm({ ...EMPTY_COMMISSION_FORM, prime_id: primes[0]?.id ?? '' })
     setEditId(null)
     setShowAdd(true)
   }
@@ -81,7 +114,7 @@ export default function CommissionTable({
     setShowAdd(true)
   }
 
-  async function handleSubmit() {
+  async function handleSubmitCommission() {
     if (!form.prime_id || !form.ca || !form.commission) return
     setLoading(true)
     try {
@@ -107,6 +140,38 @@ export default function CommissionTable({
     }
   }
 
+  // --- Création prime + commission (admin) ---
+  function openNewPrime() {
+    setPrimeForm({ ...EMPTY_PRIME_FORM })
+    setPrimeError('')
+    setShowNewPrime(true)
+  }
+
+  async function handleSubmitPrime() {
+    if (!primeForm.name.trim() || !primeForm.icon.trim() || !primeForm.ca || !primeForm.commission) return
+    setPrimeLoading(true)
+    setPrimeError('')
+    try {
+      await onCreatePrimeWithCommission(
+        { name: primeForm.name.trim(), color: primeForm.color, icon: primeForm.icon.trim() },
+        {
+          mois:       primeForm.mois,
+          dossiers:   parseInt(primeForm.dossiers) || 0,
+          ca:         parseFloat(primeForm.ca),
+          commission: parseFloat(primeForm.commission),
+          status:     primeForm.status,
+        },
+      )
+      setShowNewPrime(false)
+      setPrimeForm({ ...EMPTY_PRIME_FORM })
+    } catch (e) {
+      setPrimeError(e instanceof Error ? e.message : 'Erreur lors de la création')
+    } finally {
+      setPrimeLoading(false)
+    }
+  }
+
+  // --- Suppression commission ---
   async function handleConfirmDelete() {
     if (!deleteTarget) return
     setDeleteLoading(true)
@@ -139,9 +204,14 @@ export default function CommissionTable({
             </button>
           ))}
         </div>
-        {isAssociate && (
-          <Button size="sm" onClick={openAdd}>+ Ajouter</Button>
-        )}
+        <div className="flex gap-2">
+          {isAdmin && (
+            <Button size="sm" variant="secondary" onClick={openNewPrime}>+ Nouvelle prime</Button>
+          )}
+          {isAssociate && (
+            <Button size="sm" onClick={openAdd}>+ Ajouter</Button>
+          )}
+        </div>
       </div>
 
       <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card overflow-hidden shadow-card">
@@ -237,7 +307,7 @@ export default function CommissionTable({
         </div>
       </div>
 
-      {/* Modal add/edit */}
+      {/* Modal ajout/modification commission (sur prime EXISTANTE) */}
       <Modal
         open={showAdd}
         onClose={() => setShowAdd(false)}
@@ -298,9 +368,112 @@ export default function CommissionTable({
           />
           <div className="flex gap-3 justify-end mt-2">
             <Button variant="secondary" onClick={() => setShowAdd(false)}>Annuler</Button>
-            <Button loading={loading} onClick={handleSubmit}>
+            <Button loading={loading} onClick={handleSubmitCommission}>
               {editId ? 'Enregistrer' : 'Ajouter'}
             </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal création prime + commission (NOUVEAU — admin only) */}
+      <Modal
+        open={showNewPrime}
+        onClose={() => { setShowNewPrime(false); setPrimeError('') }}
+        title="Ajouter une prime"
+      >
+        <div className="flex flex-col gap-4">
+          {primeError && (
+            <div className="bg-rose/10 border border-rose/30 rounded-btn px-3 py-2 text-sm text-rose">
+              {primeError}
+            </div>
+          )}
+          {/* Infos prime */}
+          <div className="grid grid-cols-[1fr_64px] gap-3">
+            <Input
+              label="Nom de la prime"
+              type="text"
+              placeholder="ex : Panneaux solaires"
+              value={primeForm.name}
+              onChange={e => setPrimeForm(f => ({ ...f, name: e.target.value }))}
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">Icône</label>
+              <input
+                type="text"
+                placeholder="🔥"
+                value={primeForm.icon}
+                onChange={e => setPrimeForm(f => ({ ...f, icon: e.target.value }))}
+                className="w-full bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn px-2 py-2 text-sm text-txt text-center outline-none focus:border-indigo"
+                maxLength={4}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">Couleur</label>
+            <div className="flex gap-2">
+              {PRIME_COLORS.map(c => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setPrimeForm(f => ({ ...f, color: c.value }))}
+                  className="w-6 h-6 rounded-full transition-all duration-150 cursor-pointer"
+                  style={{
+                    backgroundColor: c.value,
+                    outline: primeForm.color === c.value ? `2px solid ${c.value}` : 'none',
+                    outlineOffset: '2px',
+                    transform: primeForm.color === c.value ? 'scale(1.15)' : 'scale(1)',
+                  }}
+                  title={c.label}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Infos commission */}
+          <div className="border-t border-[rgba(255,255,255,0.07)] pt-4">
+            <p className="text-[10px] uppercase tracking-[0.9px] text-txt3 font-semibold mb-3">Première commission</p>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="CA (€)"
+                  type="number"
+                  placeholder="ex : 500000"
+                  value={primeForm.ca}
+                  onChange={e => setPrimeForm(f => ({ ...f, ca: e.target.value }))}
+                />
+                <Input
+                  label="Commission (€)"
+                  type="number"
+                  placeholder="ex : 20000"
+                  value={primeForm.commission}
+                  onChange={e => setPrimeForm(f => ({ ...f, commission: e.target.value }))}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="Dossiers"
+                  type="number"
+                  placeholder="ex : 150"
+                  value={primeForm.dossiers}
+                  onChange={e => setPrimeForm(f => ({ ...f, dossiers: e.target.value }))}
+                />
+                <Input
+                  label="Mois"
+                  type="month"
+                  value={primeForm.mois}
+                  onChange={e => setPrimeForm(f => ({ ...f, mois: e.target.value }))}
+                />
+              </div>
+              <Select
+                label="Statut"
+                options={STATUS_OPTIONS}
+                value={primeForm.status}
+                onChange={e => setPrimeForm(f => ({ ...f, status: e.target.value as CommissionStatus }))}
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="secondary" onClick={() => { setShowNewPrime(false); setPrimeError('') }}>Annuler</Button>
+            <Button loading={primeLoading} onClick={handleSubmitPrime}>Créer</Button>
           </div>
         </div>
       </Modal>

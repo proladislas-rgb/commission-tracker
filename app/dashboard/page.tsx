@@ -15,7 +15,7 @@ import CommissionTable from '@/components/dashboard/CommissionTable'
 import ActivityFeed from '@/components/dashboard/ActivityFeed'
 import SeedButton from '@/components/dashboard/SeedButton'
 
-import type { User, Prime, Commission } from '@/lib/types'
+import type { User, Prime, Commission, CommissionStatus } from '@/lib/types'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -23,23 +23,31 @@ export default function DashboardPage() {
   const [primes, setPrimes]     = useState<Prime[]>([])
 
   const loadAssociate = useCallback(async () => {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('role', 'associe')
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single()
-    if (data) setAssociate(data)
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('*')
+        .eq('role', 'associe')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single()
+      if (data) setAssociate(data)
+    } catch {
+      // pas d'associé trouvé
+    }
   }, [])
 
   const loadPrimes = useCallback(async () => {
-    const { data } = await supabase.from('primes').select('*').eq('active', true)
-    if (data) setPrimes(data)
+    try {
+      const { data, error } = await supabase.from('primes').select('*')
+      if (error) throw error
+      setPrimes(data ?? [])
+    } catch {
+      // erreur silencieuse, garde le state actuel
+    }
   }, [])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
     loadAssociate()
     loadPrimes()
   }, [loadAssociate, loadPrimes])
@@ -56,7 +64,7 @@ export default function DashboardPage() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  // Realtime: primes
+  // Realtime: primes — refetch complet pour garder la cohérence
   useEffect(() => {
     const channel = supabase
       .channel('dashboard-primes')
@@ -68,23 +76,45 @@ export default function DashboardPage() {
     return () => { supabase.removeChannel(channel) }
   }, [loadPrimes])
 
+  // Garde-fou de cohérence : vérification toutes les 10s
   const associeId = associe?.id
 
   const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId)
   const { paiements, add: addPaiement, reload: reloadPaiements } = usePaiements(associeId)
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const { count: primesCount } = await supabase
+          .from('primes')
+          .select('*', { count: 'exact', head: true })
+        if (primesCount !== null && primesCount !== primes.length) {
+          console.warn('INCOHÉRENCE DÉTECTÉE: primes DB=' + primesCount + ' state=' + primes.length)
+          loadPrimes()
+        }
+      } catch {
+        // silencieux
+      }
+    }, 10_000)
+    return () => clearInterval(interval)
+  }, [primes.length, loadPrimes])
 
   const commissionsTotal = commissions.reduce((s, c) => s + Number(c.commission), 0)
   const isAssociate      = user?.role === 'associe'
   const isAdmin          = user?.role === 'admin'
 
   async function logActivity(action: string, entityType: string, entityId: string, description: string) {
-    await supabase.from('activity_log').insert({
-      user_id:     user!.id,
-      action,
-      entity_type: entityType,
-      entity_id:   entityId,
-      details:     { description },
-    })
+    try {
+      await supabase.from('activity_log').insert({
+        user_id:     user!.id,
+        action,
+        entity_type: entityType,
+        entity_id:   entityId,
+        details:     { description },
+      })
+    } catch {
+      // log silencieux
+    }
   }
 
   async function handleAddCommission(data: Omit<Commission, 'id' | 'created_at' | 'updated_at'>) {
@@ -108,6 +138,10 @@ export default function DashboardPage() {
   }
 
   async function handleCreatePrime(data: { name: string; color: string; icon: string }): Promise<Prime> {
+    // Vérification doublon
+    const existing = primes.find(p => p.name.toLowerCase() === data.name.trim().toLowerCase())
+    if (existing) throw new Error('Cette prime existe déjà')
+
     const { data: newPrime, error } = await supabase
       .from('primes')
       .insert({ name: data.name, color: data.color, icon: data.icon, active: true })
@@ -115,9 +149,42 @@ export default function DashboardPage() {
       .single()
     if (error) throw new Error(error.message)
     setPrimes(prev => [...prev, newPrime])
-    await logActivity('create', 'commission', newPrime.id,
+    await logActivity('create', 'prime', newPrime.id,
       `${user!.display_name} a créé la prime ${data.icon} ${data.name}`)
     return newPrime
+  }
+
+  async function handleCreatePrimeWithCommission(primeData: { name: string; color: string; icon: string }, commissionData: { mois: string; dossiers: number; ca: number; commission: number; status: CommissionStatus }) {
+    // Vérification doublon
+    const existing = primes.find(p => p.name.toLowerCase() === primeData.name.trim().toLowerCase())
+    if (existing) throw new Error('Cette prime existe déjà')
+
+    // 1. Créer la prime
+    const { data: newPrime, error: primeError } = await supabase
+      .from('primes')
+      .insert({ name: primeData.name, color: primeData.color, icon: primeData.icon, active: true })
+      .select()
+      .single()
+    if (primeError) throw new Error(primeError.message)
+    setPrimes(prev => [...prev, newPrime])
+
+    // 2. Créer la commission associée
+    const commPayload = {
+      prime_id:   newPrime.id,
+      ca:         commissionData.ca,
+      commission: commissionData.commission,
+      dossiers:   commissionData.dossiers,
+      mois:       commissionData.mois,
+      status:     commissionData.status,
+      notes:      null,
+      user_id:    associeId ?? user!.id,
+      created_by: user!.id,
+    }
+    await addCommission(commPayload)
+
+    // 3. Log
+    await logActivity('create', 'prime', newPrime.id,
+      `${user!.display_name} a créé la prime ${primeData.icon} ${primeData.name} avec une commission de ${new Intl.NumberFormat('fr-FR').format(commissionData.ca)} €`)
   }
 
   async function handleDeletePrime(primeId: string) {
@@ -126,7 +193,7 @@ export default function DashboardPage() {
     if (error) throw new Error(error.message)
     setPrimes(prev => prev.filter(p => p.id !== primeId))
     reloadCommissions()
-    await logActivity('delete', 'commission', primeId,
+    await logActivity('delete', 'prime', primeId,
       `${user!.display_name} a supprimé la prime ${prime?.icon ?? ''} ${prime?.name ?? ''} et ses commissions associées`)
   }
 
@@ -148,7 +215,7 @@ export default function DashboardPage() {
     <>
       <Header
         associe={associe}
-        primesCount={primes.filter(p => p.active).length}
+        primesCount={primes.length}
         onRenameAssociate={handleRenameAssociate}
         onMobileMenuOpen={() => {}}
       />
@@ -156,7 +223,7 @@ export default function DashboardPage() {
       {isAssociate && (
         <SeedButton
           userId={user.id}
-          onImported={() => { reloadCommissions(); reloadPaiements() }}
+          onImported={() => { reloadCommissions(); reloadPaiements(); loadPrimes() }}
         />
       )}
 
@@ -190,6 +257,7 @@ export default function DashboardPage() {
         onDelete={handleDeleteCommission}
         onCreatePrime={handleCreatePrime}
         onDeletePrime={handleDeletePrime}
+        onCreatePrimeWithCommission={handleCreatePrimeWithCommission}
       />
 
       <ActivityFeed />

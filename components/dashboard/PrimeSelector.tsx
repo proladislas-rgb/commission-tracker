@@ -30,12 +30,14 @@ export default function PrimeSelector({
   const [showManage, setShowManage] = useState(false)
   const [deletePrimeTarget, setDeletePrimeTarget] = useState<Prime | null>(null)
   const [createLoading, setCreateLoading] = useState(false)
+  const [createError, setCreateError]     = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [newPrime, setNewPrime] = useState({ name: '', icon: '', color: '#6366f1' })
 
   async function handleCreate() {
     if (!newPrime.name.trim() || !newPrime.icon.trim()) return
     setCreateLoading(true)
+    setCreateError('')
     try {
       const created = await onCreatePrime({
         name: newPrime.name.trim(),
@@ -45,6 +47,8 @@ export default function PrimeSelector({
       onChange(created.id)
       setNewPrime({ name: '', icon: '', color: '#6366f1' })
       setShowCreate(false)
+    } catch (e) {
+      setCreateError(e instanceof Error ? e.message : 'Erreur lors de la création')
     } finally {
       setCreateLoading(false)
     }
@@ -105,6 +109,11 @@ export default function PrimeSelector({
       {/* Inline create form */}
       {showCreate && isAdmin && (
         <div className="bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn p-3 animate-fadeIn">
+          {createError && (
+            <div className="bg-rose/10 border border-rose/30 rounded-btn px-2.5 py-1.5 text-xs text-rose mb-2">
+              {createError}
+            </div>
+          )}
           <div className="flex gap-2 mb-2">
             <input
               type="text"
