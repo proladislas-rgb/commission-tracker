@@ -5,6 +5,13 @@ import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Paiement } from '@/lib/types'
 
+function normalizePaiement<T extends Record<string, unknown>>(row: T): T {
+  return {
+    ...row,
+    montant: Number(row.montant) || 0,
+  }
+}
+
 export function usePaiements(createdBy?: string) {
   const [paiements, setPaiements] = useState<Paiement[]>([])
   const [loading, setLoading]     = useState(true)
@@ -23,7 +30,8 @@ export function usePaiements(createdBy?: string) {
 
       const { data, error: err } = await query
       if (err) throw err
-      setPaiements(data ?? [])
+      const normalized = (data ?? []).map(p => normalizePaiement(p))
+      setPaiements(normalized as Paiement[])
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur de chargement')
     } finally {
@@ -35,8 +43,14 @@ export function usePaiements(createdBy?: string) {
 
   useRealtime({
     table:    'paiements',
-    onInsert: row => setPaiements(prev => [row as unknown as Paiement, ...prev]),
-    onUpdate: row => setPaiements(prev => prev.map(p => p.id === (row as unknown as Paiement).id ? { ...p, ...row as unknown as Paiement } : p)),
+    onInsert: row => {
+      const normalized = normalizePaiement(row) as unknown as Paiement
+      setPaiements(prev => [normalized, ...prev])
+    },
+    onUpdate: row => {
+      const normalized = normalizePaiement(row) as unknown as Paiement
+      setPaiements(prev => prev.map(p => p.id === normalized.id ? { ...p, ...normalized } : p))
+    },
     onDelete: row => setPaiements(prev => prev.filter(p => p.id !== (row as unknown as { id: string }).id)),
   })
 
@@ -51,8 +65,9 @@ export function usePaiements(createdBy?: string) {
         .select('*')
         .single()
       if (err) throw err
-      setPaiements(prev => prev.map(p => p.id === optimisticId ? inserted : p))
-      return inserted
+      const normalized = normalizePaiement(inserted) as Paiement
+      setPaiements(prev => prev.map(p => p.id === optimisticId ? normalized : p))
+      return normalized
     } catch (e) {
       setPaiements(prev => prev.filter(p => p.id !== optimisticId))
       throw e

@@ -5,6 +5,15 @@ import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Commission } from '@/lib/types'
 
+function normalizeCommission<T extends Record<string, unknown>>(row: T): T {
+  return {
+    ...row,
+    ca: Number(row.ca) || 0,
+    commission: Number(row.commission) || 0,
+    dossiers: Number(row.dossiers) || 0,
+  }
+}
+
 export function useCommissions(userId?: string) {
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [loading, setLoading]         = useState(true)
@@ -23,7 +32,8 @@ export function useCommissions(userId?: string) {
 
       const { data, error: err } = await query
       if (err) throw err
-      setCommissions(data ?? [])
+      const normalized = (data ?? []).map(c => normalizeCommission(c))
+      setCommissions(normalized as Commission[])
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur de chargement')
     } finally {
@@ -35,8 +45,14 @@ export function useCommissions(userId?: string) {
 
   useRealtime({
     table:    'commissions',
-    onInsert: row => setCommissions(prev => [row as unknown as Commission, ...prev]),
-    onUpdate: row => setCommissions(prev => prev.map(c => c.id === (row as unknown as Commission).id ? { ...c, ...row as unknown as Commission } : c)),
+    onInsert: row => {
+      const normalized = normalizeCommission(row) as unknown as Commission
+      setCommissions(prev => [normalized, ...prev])
+    },
+    onUpdate: row => {
+      const normalized = normalizeCommission(row) as unknown as Commission
+      setCommissions(prev => prev.map(c => c.id === normalized.id ? { ...c, ...normalized } : c))
+    },
     onDelete: row => setCommissions(prev => prev.filter(c => c.id !== (row as unknown as { id: string }).id)),
   })
 
@@ -51,8 +67,9 @@ export function useCommissions(userId?: string) {
         .select('*, prime:primes(*)')
         .single()
       if (err) throw err
-      setCommissions(prev => prev.map(c => c.id === optimisticId ? inserted : c))
-      return inserted
+      const normalized = normalizeCommission(inserted) as Commission
+      setCommissions(prev => prev.map(c => c.id === optimisticId ? normalized : c))
+      return normalized
     } catch (e) {
       setCommissions(prev => prev.filter(c => c.id !== optimisticId))
       throw e

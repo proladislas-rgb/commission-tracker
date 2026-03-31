@@ -28,19 +28,21 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 9998 }}>
+      {/* Backdrop — couvre tout l'écran */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        style={{ zIndex: 9998 }}
         onClick={onClose}
       />
       {/* Panel */}
       <div
         className={cn(
           'relative w-full bg-surface border border-[rgba(255,255,255,0.1)] rounded-card',
-          'shadow-raised animate-modalIn overflow-hidden will-change-transform',
+          'shadow-raised animate-modalIn overflow-hidden',
           sizeClasses[size]
         )}
+        style={{ zIndex: 9999, maxHeight: '90vh', overflowY: 'auto' }}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.07)]">
           <h2 className="text-base font-semibold text-txt">{title}</h2>
