@@ -1,0 +1,287 @@
+'use client'
+
+import { useState } from 'react'
+import { CommissionStatusBadge } from '@/components/ui/StatusBadge'
+import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import { formatCurrency, formatMois } from '@/lib/utils'
+import type { Commission, CommissionStatus, Prime } from '@/lib/types'
+
+interface Props {
+  commissions: Commission[]
+  primes: Prime[]
+  userId: string
+  isAssociate: boolean
+  isAdmin: boolean
+  onAdd: (data: Omit<Commission, 'id' | 'created_at' | 'updated_at'>) => Promise<void>
+  onUpdate: (id: string, data: Partial<Commission>) => Promise<void>
+  onDelete: (id: string) => Promise<void>
+}
+
+const STATUS_OPTIONS = [
+  { value: 'due',     label: 'Dû' },
+  { value: 'partiel', label: 'Partiel' },
+  { value: 'paye',    label: 'Payé' },
+]
+
+const EMPTY_FORM = {
+  prime_id:   '',
+  ca:         '',
+  commission: '',
+  dossiers:   '',
+  mois:       new Date().toISOString().slice(0, 7),
+  status:     'due' as CommissionStatus,
+  notes:      '',
+}
+
+export default function CommissionTable({
+  commissions, primes, userId, isAssociate, isAdmin, onAdd, onUpdate, onDelete
+}: Props) {
+  const [filter, setFilter]     = useState<string>('all')
+  const [showAdd, setShowAdd]   = useState(false)
+  const [editId, setEditId]     = useState<string | null>(null)
+  const [form, setForm]         = useState(EMPTY_FORM)
+  const [loading, setLoading]   = useState(false)
+
+  const filtered = filter === 'all' ? commissions : commissions.filter(c => c.prime_id === filter)
+
+  const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
+
+  const totals = {
+    ca:         filtered.reduce((s, c) => s + Number(c.ca), 0),
+    commission: filtered.reduce((s, c) => s + Number(c.commission), 0),
+    dossiers:   filtered.reduce((s, c) => s + Number(c.dossiers), 0),
+  }
+
+  function openAdd() {
+    setForm({ ...EMPTY_FORM, prime_id: primes[0]?.id ?? '' })
+    setEditId(null)
+    setShowAdd(true)
+  }
+
+  function openEdit(c: Commission) {
+    setForm({
+      prime_id:   c.prime_id,
+      ca:         String(c.ca),
+      commission: String(c.commission),
+      dossiers:   String(c.dossiers),
+      mois:       c.mois,
+      status:     c.status,
+      notes:      c.notes ?? '',
+    })
+    setEditId(c.id)
+    setShowAdd(true)
+  }
+
+  async function handleSubmit() {
+    if (!form.prime_id || !form.ca || !form.commission) return
+    setLoading(true)
+    try {
+      const payload = {
+        prime_id:   form.prime_id,
+        ca:         parseFloat(form.ca),
+        commission: parseFloat(form.commission),
+        dossiers:   parseInt(form.dossiers) || 0,
+        mois:       form.mois,
+        status:     form.status,
+        notes:      form.notes || null,
+        user_id:    userId,
+        created_by: userId,
+      }
+      if (editId) {
+        await onUpdate(editId, payload)
+      } else {
+        await onAdd(payload)
+      }
+      setShowAdd(false)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Supprimer cette commission ?')) return
+    await onDelete(id)
+  }
+
+  return (
+    <section id="commissions" className="mb-8 animate-fadeIn">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold mr-2">Commissions</h2>
+          {/* Filtres pills */}
+          {[{ id: 'all', label: 'Tout', color: '#6366f1' }, ...primes.map(p => ({ id: p.id, label: `${p.icon} ${p.name}`, color: p.color }))].map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
+              style={
+                filter === f.id
+                  ? { backgroundColor: `${f.color}22`, color: f.color, border: `1px solid ${f.color}44` }
+                  : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#8898aa', border: '1px solid rgba(255,255,255,0.07)' }
+              }
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        {isAssociate && (
+          <Button size="sm" onClick={openAdd}>+ Ajouter</Button>
+        )}
+      </div>
+
+      <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card overflow-hidden shadow-card">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-raised">
+                {['Prime', 'CA', 'Commission', 'Dossiers', 'Mois', 'Statut', 'Actions'].map(h => (
+                  <th key={h} className="text-left px-4 py-3 text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-txt3">
+                    Aucune commission
+                  </td>
+                </tr>
+              ) : (
+                filtered.map(c => {
+                  const prime = primes.find(p => p.id === c.prime_id)
+                  return (
+                    <tr key={c.id} className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: prime?.color }}
+                          />
+                          <span className="text-txt">{prime?.icon} {prime?.name ?? c.prime_id}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-txt">{formatCurrency(Number(c.ca))}</td>
+                      <td className="px-4 py-3 text-amber">{formatCurrency(Number(c.commission))}</td>
+                      <td className="px-4 py-3 text-txt2">{Number(c.dossiers).toLocaleString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-txt2">{formatMois(c.mois)}</td>
+                      <td className="px-4 py-3"><CommissionStatusBadge status={c.status} /></td>
+                      <td className="px-4 py-3">
+                        {canEdit(c) && (
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => openEdit(c)}
+                              className="p-1.5 rounded-btn text-txt2 hover:text-indigo hover:bg-indigo/10 transition-colors"
+                              title="Modifier"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDelete(c.id)}
+                              className="p-1.5 rounded-btn text-txt2 hover:text-rose hover:bg-rose/10 transition-colors"
+                              title="Supprimer"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14H6L5 6" />
+                                <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+            {filtered.length > 0 && (
+              <tfoot>
+                <tr className="border-t border-[rgba(255,255,255,0.1)] bg-raised">
+                  <td className="px-4 py-3 text-[10px] uppercase tracking-[0.9px] text-txt2 font-bold">Total</td>
+                  <td className="px-4 py-3 font-bold text-txt">{formatCurrency(totals.ca)}</td>
+                  <td className="px-4 py-3 font-bold text-amber">{formatCurrency(totals.commission)}</td>
+                  <td className="px-4 py-3 font-bold text-txt2">{totals.dossiers.toLocaleString('fr-FR')}</td>
+                  <td colSpan={3} />
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      </div>
+
+      {/* Modal add/edit */}
+      <Modal
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        title={editId ? 'Modifier la commission' : 'Ajouter une commission'}
+      >
+        <div className="flex flex-col gap-4">
+          <Select
+            label="Prime"
+            options={primes.map(p => ({ value: p.id, label: `${p.icon} ${p.name}` }))}
+            value={form.prime_id}
+            onChange={e => setForm(f => ({ ...f, prime_id: e.target.value }))}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="CA (€)"
+              type="number"
+              placeholder="ex : 500000"
+              value={form.ca}
+              onChange={e => setForm(f => ({ ...f, ca: e.target.value }))}
+            />
+            <Input
+              label="Commission (€)"
+              type="number"
+              placeholder="ex : 20000"
+              value={form.commission}
+              onChange={e => setForm(f => ({ ...f, commission: e.target.value }))}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Dossiers"
+              type="number"
+              placeholder="ex : 150"
+              value={form.dossiers}
+              onChange={e => setForm(f => ({ ...f, dossiers: e.target.value }))}
+            />
+            <Input
+              label="Mois (YYYY-MM)"
+              type="month"
+              value={form.mois}
+              onChange={e => setForm(f => ({ ...f, mois: e.target.value }))}
+            />
+          </div>
+          <Select
+            label="Statut"
+            options={STATUS_OPTIONS}
+            value={form.status}
+            onChange={e => setForm(f => ({ ...f, status: e.target.value as CommissionStatus }))}
+          />
+          <Input
+            label="Notes (optionnel)"
+            type="text"
+            placeholder="Remarques..."
+            value={form.notes}
+            onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+          />
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="secondary" onClick={() => setShowAdd(false)}>Annuler</Button>
+            <Button loading={loading} onClick={handleSubmit}>
+              {editId ? 'Enregistrer' : 'Ajouter'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </section>
+  )
+}
