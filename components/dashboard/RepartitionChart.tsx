@@ -17,12 +17,17 @@ const TOOLTIP_CONTENT_STYLE = {
 }
 
 export default function RepartitionChart({ commissions, primes }: Props) {
-  const data = primes.map(prime => ({
-    name:  prime.name,
-    value: commissions.filter(c => c.prime_id === prime.id).reduce((s, c) => s + Number(c.ca), 0),
-    color: prime.color,
-    icon:  prime.icon,
-  })).filter(d => d.value > 0)
+  // Robuste : String() pour comparer les IDs, Number() || 0 pour les valeurs
+  const data = primes.map(prime => {
+    const matched = commissions.filter(c => String(c.prime_id) === String(prime.id))
+    const value = matched.reduce((s, c) => s + (Number(c.ca) || 0), 0)
+    return {
+      name:  prime.name,
+      value,
+      color: prime.color,
+      icon:  prime.icon,
+    }
+  }).filter(d => d.value > 0)
 
   return (
     <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card min-h-[300px]">

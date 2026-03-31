@@ -82,15 +82,15 @@ export default function CommissionTable({
   const [deleteTarget, setDeleteTarget]   = useState<Commission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  const filtered = filter === 'all' ? commissions : commissions.filter(c => c.prime_id === filter)
+  const filtered = filter === 'all' ? commissions : commissions.filter(c => String(c.prime_id) === String(filter))
 
   const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
   const canDelete = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
 
   const totals = {
-    ca:         filtered.reduce((s, c) => s + Number(c.ca), 0),
-    commission: filtered.reduce((s, c) => s + Number(c.commission), 0),
-    dossiers:   filtered.reduce((s, c) => s + Number(c.dossiers), 0),
+    ca:         filtered.reduce((s, c) => s + (Number(c.ca) || 0), 0),
+    commission: filtered.reduce((s, c) => s + (Number(c.commission) || 0), 0),
+    dossiers:   filtered.reduce((s, c) => s + (Number(c.dossiers) || 0), 0),
   }
 
   // --- Ajout commission sur prime existante ---
@@ -235,7 +235,7 @@ export default function CommissionTable({
                 </tr>
               ) : (
                 filtered.map((c, i) => {
-                  const prime = primes.find(p => p.id === c.prime_id)
+                  const prime = primes.find(p => String(p.id) === String(c.prime_id))
                   return (
                     <tr
                       key={c.id}

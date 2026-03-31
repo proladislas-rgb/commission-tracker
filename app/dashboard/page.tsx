@@ -99,7 +99,7 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [primes.length, loadPrimes])
 
-  const commissionsTotal = commissions.reduce((s, c) => s + Number(c.commission), 0)
+  const commissionsTotal = commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0)
   const isAssociate      = user?.role === 'associe'
   const isAdmin          = user?.role === 'admin'
 

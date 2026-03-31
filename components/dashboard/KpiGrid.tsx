@@ -10,9 +10,9 @@ interface KpiGridProps {
 }
 
 export default function KpiGrid({ commissions, paiements }: KpiGridProps) {
-  const caTotal          = commissions.reduce((s, c) => s + Number(c.ca), 0)
-  const commissionsTotal = commissions.reduce((s, c) => s + Number(c.commission), 0)
-  const encaisse         = paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + Number(p.montant), 0)
+  const caTotal          = commissions.reduce((s, c) => s + (Number(c.ca) || 0), 0)
+  const commissionsTotal = commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0)
+  const encaisse         = paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + (Number(p.montant) || 0), 0)
   const restantDu        = commissionsTotal - encaisse
   const enRetard         = paiements.filter(p => p.status === 'en_retard').length
 
