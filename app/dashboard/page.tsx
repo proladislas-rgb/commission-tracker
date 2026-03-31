@@ -140,9 +140,10 @@ export default function DashboardPage() {
     const existing = primes.find(p => p.name.toLowerCase() === data.name.trim().toLowerCase())
     if (existing) throw new Error('Cette prime existe déjà')
 
+    const id = data.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
     const { data: newPrime, error } = await supabase
       .from('primes')
-      .insert({ name: data.name, color: data.color, icon: data.icon, active: true })
+      .insert({ id, name: data.name, color: data.color, icon: data.icon, active: true })
       .select()
       .single()
     if (error) throw new Error(error.message)
@@ -158,9 +159,10 @@ export default function DashboardPage() {
     if (existing) throw new Error('Cette prime existe déjà')
 
     // 1. Créer la prime
+    const id = primeData.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
     const { data: newPrime, error: primeError } = await supabase
       .from('primes')
-      .insert({ name: primeData.name, color: primeData.color, icon: primeData.icon, active: true })
+      .insert({ id, name: primeData.name, color: primeData.color, icon: primeData.icon, active: true })
       .select()
       .single()
     if (primeError) throw new Error(primeError.message)
