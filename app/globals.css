@@ -1,6 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #07080d;
+  --color-surface: #0f1117;
+  --color-raised: #151a24;
+  --color-border: rgba(255,255,255,0.07);
+  --color-border2: rgba(255,255,255,0.12);
+  --color-txt: #e8edf5;
+  --color-txt2: #8898aa;
+  --color-txt3: #3d4f63;
+  --color-indigo: #6366f1;
+  --color-indigo2: #818cf8;
+  --color-amber: #f59e0b;
+  --color-emerald: #10b981;
+  --color-green: #22c55e;
+  --color-rose: #f43f5e;
+  --color-sky: #38bdf8;
+  --color-violet: #8b5cf6;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --radius-card: 14px;
+  --radius-btn: 8px;
+
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-raised: 0 8px 32px rgba(0,0,0,0.5);
+
+  --width-sidebar: 220px;
+
+  --animate-fadeIn: fadeIn 0.3s ease forwards;
+  --animate-pulse2: pulse2 1.5s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s linear infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse2 {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
 * {
   box-sizing: border-box;

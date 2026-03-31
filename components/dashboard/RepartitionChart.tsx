@@ -42,7 +42,7 @@ export default function RepartitionChart({ commissions, primes }: Props) {
             </Pie>
             <Tooltip
               contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
-              formatter={(value: number) => formatCurrency(value)}
+              formatter={(value) => formatCurrency(Number(value))}
               labelStyle={{ color: '#e8edf5' }}
             />
             <Legend

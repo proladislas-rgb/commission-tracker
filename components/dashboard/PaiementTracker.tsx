@@ -136,7 +136,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
               />
               <Tooltip
                 contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value) => formatCurrency(Number(value))}
               />
               <Bar dataKey="montant" name="Montant" fill="#6366f1" radius={[4, 4, 0, 0]} />
               <Line dataKey="cumul" name="Cumul" stroke="#10b981" strokeWidth={2} dot={false} />
