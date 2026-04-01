@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import InlineEdit from '@/components/ui/InlineEdit'
 import { supabase } from '@/lib/supabase'
@@ -8,11 +9,8 @@ import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/
 import type { User, ActivityLog } from '@/lib/types'
 
 const NAV_ITEMS = [
-  { id: 'kpis',        label: 'KPIs',        color: '#6366f1' },
-  { id: 'graphiques',  label: 'Graphiques',  color: '#10b981' },
-  { id: 'paiements',   label: 'Paiements',   color: '#f59e0b' },
-  { id: 'commissions', label: 'Commissions', color: '#38bdf8' },
-  { id: 'activite',    label: 'Activité',    color: '#8b5cf6' },
+  { label: 'Dashboard',    color: '#6366f1', href: '/dashboard' },
+  { label: 'Facturation',  color: '#38bdf8', href: '/dashboard/invoices' },
 ]
 
 interface SidebarProps {
@@ -26,9 +24,10 @@ interface SidebarProps {
 
 export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobileClose, collapsed, onToggleCollapse }: SidebarProps) {
   const { user, logout } = useAuth()
+  const pathname = usePathname()
+  const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [activityLogs, setActivityLogs] = useState<(ActivityLog & { user?: User })[]>([])
-
   const loadUsers = useCallback(async () => {
     try {
       const { data } = await supabase
@@ -90,8 +89,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const navigateTo = (href: string) => {
+    router.push(href)
     onMobileClose()
   }
 
@@ -155,21 +154,26 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
         {!collapsed && (
           <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Navigation</p>
         )}
-        {NAV_ITEMS.map(item => (
-          <button
-            key={item.id}
-            onClick={() => scrollTo(item.id)}
-            className="w-full text-left rounded-btn text-sm text-txt2 hover:text-txt hover:bg-raised transition-all duration-150 cursor-pointer flex items-center gap-2"
-            style={{
-              padding: collapsed ? '6px 0' : '6px 12px',
-              justifyContent: collapsed ? 'center' : undefined,
-            }}
-            title={collapsed ? item.label : undefined}
-          >
-            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-            {!collapsed && <span>{item.label}</span>}
-          </button>
-        ))}
+        {NAV_ITEMS.map(item => {
+          const isActive = pathname === item.href
+          return (
+            <button
+              key={item.href}
+              onClick={() => navigateTo(item.href)}
+              className="w-full text-left rounded-btn text-sm transition-all duration-150 cursor-pointer flex items-center gap-2"
+              style={{
+                padding: collapsed ? '6px 0' : '6px 12px',
+                justifyContent: collapsed ? 'center' : undefined,
+                color: isActive ? '#e8edf5' : undefined,
+                backgroundColor: isActive ? '#151a24' : undefined,
+              }}
+              title={collapsed ? item.label : undefined}
+            >
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+              {!collapsed && <span className={isActive ? 'text-txt' : 'text-txt2'}>{item.label}</span>}
+            </button>
+          )
+        })}
       </div>
 
       {/* Connectés */}
