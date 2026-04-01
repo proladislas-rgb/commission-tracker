@@ -80,7 +80,7 @@ export default function DashboardPage() {
   const associeId = associe?.id
 
   const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId)
-  const { paiements, add: addPaiement, reload: reloadPaiements } = usePaiements(associeId)
+  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus } = usePaiements(associeId)
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -256,6 +256,7 @@ export default function DashboardPage() {
         userId={user.id}
         isAssociate={isAssociate}
         onAdd={handleAddPaiement}
+        onUpdateStatus={updatePaiementStatus}
       />
 
       <CommissionTable

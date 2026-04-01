@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
-import { PaiementStatusBadge } from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
@@ -19,6 +18,13 @@ interface Props {
   userId: string
   isAssociate: boolean
   onAdd: (data: Omit<Paiement, 'id' | 'created_at'>) => Promise<void>
+  onUpdateStatus: (id: string, status: PaiementStatus) => Promise<void>
+}
+
+const STATUS_STYLES: Record<PaiementStatus, { bg: string; color: string; border: string }> = {
+  effectue:   { bg: 'rgba(34,197,94,0.1)',  color: '#22c55e', border: 'rgba(34,197,94,0.3)' },
+  en_attente: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
+  en_retard:  { bg: 'rgba(244,63,94,0.1)',  color: '#f43f5e', border: 'rgba(244,63,94,0.3)' },
 }
 
 const STATUS_OPTIONS = [
@@ -27,7 +33,7 @@ const STATUS_OPTIONS = [
   { value: 'en_retard',  label: 'En retard' },
 ]
 
-export default function PaiementTracker({ paiements, commissionsTotal, userId, isAssociate, onAdd }: Props) {
+export default function PaiementTracker({ paiements, commissionsTotal, userId, isAssociate, onAdd, onUpdateStatus }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading]     = useState(false)
   const [mounted, setMounted]     = useState(false)
@@ -168,7 +174,29 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                   <td className="px-4 py-2.5 text-txt2">{formatDate(p.date)}</td>
                   <td className="px-4 py-2.5 text-txt">{p.label}</td>
                   <td className="px-4 py-2.5 font-semibold text-txt">{formatCurrency(Number(p.montant))}</td>
-                  <td className="px-4 py-2.5"><PaiementStatusBadge status={p.status} /></td>
+                  <td className="px-4 py-2.5">
+                    <select
+                      value={p.status}
+                      onChange={e => onUpdateStatus(p.id, e.target.value as PaiementStatus)}
+                      style={{
+                        backgroundColor: STATUS_STYLES[p.status].bg,
+                        color: STATUS_STYLES[p.status].color,
+                        border: `1px solid ${STATUS_STYLES[p.status].border}`,
+                        borderRadius: '6px',
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        outline: 'none',
+                        WebkitAppearance: 'none',
+                        appearance: 'none',
+                      }}
+                    >
+                      <option value="effectue">Effectué</option>
+                      <option value="en_attente">En attente</option>
+                      <option value="en_retard">En retard</option>
+                    </select>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -74,5 +74,20 @@ export function usePaiements(createdBy?: string) {
     }
   }, [])
 
-  return { paiements, loading, error, reload: load, add }
+  const updateStatus = useCallback(async (id: string, status: Paiement['status']) => {
+    const prev = paiements
+    setPaiements(p => p.map(x => x.id === id ? { ...x, status } : x))
+    try {
+      const { error: err } = await supabase
+        .from('paiements')
+        .update({ status })
+        .eq('id', id)
+      if (err) throw err
+    } catch (e) {
+      setPaiements(prev) // rollback
+      throw e
+    }
+  }, [paiements])
+
+  return { paiements, loading, error, reload: load, add, updateStatus }
 }
