@@ -11,6 +11,8 @@ import type { User, ActivityLog } from '@/lib/types'
 const NAV_ITEMS = [
   { label: 'Dashboard',    color: '#6366f1', href: '/dashboard' },
   { label: 'Facturation',  color: '#38bdf8', href: '/dashboard/invoices' },
+  { label: 'Drive',        color: '#f59e0b', href: '/dashboard/drive' },
+  { label: 'Email',        color: '#f43f5e', href: '/dashboard/email' },
 ]
 
 interface SidebarProps {

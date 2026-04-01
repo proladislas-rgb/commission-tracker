@@ -1,0 +1,136 @@
+'use client'
+
+interface DriveFile {
+  id: string
+  name: string
+  mimeType: string
+  modifiedTime: string
+  size?: string
+}
+
+interface DriveFileRowProps {
+  file: DriveFile
+}
+
+const TYPE_STYLES: Record<string, { color: string; label: string }> = {
+  'application/pdf': { color: '#f43f5e', label: 'PDF' },
+  'application/vnd.google-apps.document': { color: '#38bdf8', label: 'Doc' },
+  'application/vnd.google-apps.spreadsheet': { color: '#10b981', label: 'Sheet' },
+  'application/vnd.google-apps.presentation': { color: '#f59e0b', label: 'Slides' },
+  'image/': { color: '#8b5cf6', label: 'Image' },
+  'video/': { color: '#f43f5e', label: 'Vidéo' },
+}
+
+function getTypeStyle(mimeType: string): { color: string; label: string } {
+  if (TYPE_STYLES[mimeType]) return TYPE_STYLES[mimeType]
+  for (const [prefix, style] of Object.entries(TYPE_STYLES)) {
+    if (mimeType.startsWith(prefix)) return style
+  }
+  return { color: '#8b85a8', label: 'Fichier' }
+}
+
+function formatSize(bytes: string | undefined): string {
+  if (!bytes) return '—'
+  const n = Number(bytes)
+  if (n === 0) return '0 B'
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function formatDate(dateStr: string): string {
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(dateStr))
+}
+
+export default function DriveFileRow({ file }: DriveFileRowProps) {
+  const style = getTypeStyle(file.mimeType)
+
+  const openInDrive = () => {
+    window.open(`https://drive.google.com/file/d/${file.id}/view`, '_blank')
+  }
+
+  const download = () => {
+    window.open(`/api/drive/download?fileId=${file.id}`, '_blank')
+  }
+
+  return (
+    <tr
+      className="group transition-colors duration-150"
+      style={{ borderBottom: '1px solid rgba(139,92,246,0.06)' }}
+    >
+      {/* Nom + icône */}
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+            style={{ backgroundColor: `${style.color}20`, color: style.color }}
+          >
+            {style.label.slice(0, 3)}
+          </div>
+          <span className="text-sm text-txt truncate max-w-[300px]">{file.name}</span>
+        </div>
+      </td>
+
+      {/* Date */}
+      <td className="py-3 px-4">
+        <span className="text-xs text-txt2">{formatDate(file.modifiedTime)}</span>
+      </td>
+
+      {/* Taille */}
+      <td className="py-3 px-4">
+        <span className="text-xs text-txt2">{formatSize(file.size)}</span>
+      </td>
+
+      {/* Actions */}
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          {/* Ouvrir */}
+          <button
+            onClick={openInDrive}
+            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            title="Ouvrir dans Drive"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </button>
+
+          {/* Télécharger */}
+          <button
+            onClick={download}
+            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            title="Télécharger"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+
+          {/* Envoyer par email */}
+          <button
+            onClick={() => {
+              window.location.href = `/dashboard/email?attach=${file.id}&name=${encodeURIComponent(file.name)}&mime=${encodeURIComponent(file.mimeType)}`
+            }}
+            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            title="Envoyer par email"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
