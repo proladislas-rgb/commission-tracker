@@ -14,6 +14,7 @@ import CaCommissionChart from '@/components/dashboard/CaCommissionChart'
 import PaiementTracker from '@/components/dashboard/PaiementTracker'
 import CommissionTable from '@/components/dashboard/CommissionTable'
 import SeedButton from '@/components/dashboard/SeedButton'
+import ExportButton from '@/components/dashboard/ExportButton'
 
 import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
@@ -99,6 +100,7 @@ export default function DashboardPage() {
   }, [primes.length, loadPrimes])
 
   const commissionsTotal = useMemo(() => commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0), [commissions])
+  const encaisse = useMemo(() => paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + (Number(p.montant) || 0), 0), [paiements])
   const isAssociate      = user?.role === 'associe'
   const isAdmin          = user?.role === 'admin'
 
@@ -252,12 +254,22 @@ export default function DashboardPage() {
         onMobileMenuOpen={() => {}}
       />
 
-      {isAssociate && (
-        <SeedButton
-          userId={user.id}
-          onImported={() => { reloadCommissions(); reloadPaiements(); loadPrimes() }}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          {isAssociate && (
+            <SeedButton
+              userId={user.id}
+              onImported={() => { reloadCommissions(); reloadPaiements(); loadPrimes() }}
+            />
+          )}
+        </div>
+        <ExportButton
+          commissions={commissions}
+          paiements={paiements}
+          commissionsTotal={commissionsTotal}
+          encaisse={encaisse}
         />
-      )}
+      </div>
 
       <KpiGrid commissions={commissions} paiements={paiements} />
 
