@@ -51,6 +51,17 @@ export interface Prime {
   created_at?: string
 }
 
+export type SommeDueStatus = 'du' | 'effectue'
+
+export interface SommeDue {
+  id: string
+  label: string
+  montant: number
+  status: SommeDueStatus
+  created_by: string
+  created_at: string
+}
+
 export type ActivityAction = 'create' | 'update' | 'delete'
 export type ActivityEntityType = 'commission' | 'paiement' | 'client' | 'user' | 'prime'
 

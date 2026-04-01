@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCommissions } from '@/hooks/useCommissions'
 import { usePaiements } from '@/hooks/usePaiements'
+import { useSommesDues } from '@/hooks/useSommesDues'
 import { supabase } from '@/lib/supabase'
 import { slugifyPrimeName } from '@/lib/constants'
 
@@ -12,6 +13,7 @@ import KpiGrid from '@/components/dashboard/KpiGrid'
 import RepartitionChart from '@/components/dashboard/RepartitionChart'
 import CaCommissionChart from '@/components/dashboard/CaCommissionChart'
 import PaiementTracker from '@/components/dashboard/PaiementTracker'
+import SommesDues from '@/components/dashboard/SommesDues'
 import CommissionTable from '@/components/dashboard/CommissionTable'
 import SeedButton from '@/components/dashboard/SeedButton'
 import ExportButton from '@/components/dashboard/ExportButton'
@@ -82,6 +84,7 @@ export default function DashboardPage() {
 
   const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId)
   const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId)
+  const { sommesDues, add: addSommeDue, updateStatus: updateSommeDueStatus, remove: removeSommeDue } = useSommesDues(associeId)
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -271,7 +274,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <KpiGrid commissions={commissions} paiements={paiements} />
+      <KpiGrid commissions={commissions} paiements={paiements} sommesDues={sommesDues} />
 
       <section id="graphiques" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 animate-fadeIn">
         <RepartitionChart commissions={commissions} primes={primes} />
@@ -286,6 +289,16 @@ export default function DashboardPage() {
         onAdd={handleAddPaiement}
         onUpdateStatus={updatePaiementStatus}
         onDelete={handleDeletePaiement}
+      />
+
+      <SommesDues
+        sommesDues={sommesDues}
+        userId={user.id}
+        isAssociate={isAssociate}
+        isAdmin={isAdmin}
+        onAdd={addSommeDue}
+        onUpdateStatus={updateSommeDueStatus}
+        onDelete={removeSommeDue}
       />
 
       <CommissionTable
