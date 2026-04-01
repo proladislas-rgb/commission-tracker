@@ -8,11 +8,34 @@ import { supabase } from '@/lib/supabase'
 import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
 import type { User, ActivityLog } from '@/lib/types'
 
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  '/dashboard': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+  ),
+  '/dashboard/invoices': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+  ),
+  '/dashboard/drive': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+    </svg>
+  ),
+  '/dashboard/email': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+    </svg>
+  ),
+}
+
 const NAV_ITEMS = [
-  { label: 'Dashboard',    color: '#6366f1', href: '/dashboard' },
-  { label: 'Facturation',  color: '#38bdf8', href: '/dashboard/invoices' },
-  { label: 'Drive',        color: '#f59e0b', href: '/dashboard/drive' },
-  { label: 'Email',        color: '#f43f5e', href: '/dashboard/email' },
+  { label: 'Dashboard',    href: '/dashboard' },
+  { label: 'Facturation',  href: '/dashboard/invoices' },
+  { label: 'Drive',        href: '/dashboard/drive' },
+  { label: 'Email',        href: '/dashboard/email' },
 ]
 
 interface SidebarProps {
@@ -156,7 +179,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       </div>
 
       {/* Navigation */}
-      <div className="px-3 py-4 border-b border-border" style={{ padding: collapsed ? '16px 4px' : undefined }}>
+      <div className="px-3 py-4 border-b border-border" style={{ padding: collapsed ? '16px 6px' : undefined }}>
         {!collapsed && (
           <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Navigation</p>
         )}
@@ -166,17 +189,37 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
             <button
               key={item.href}
               onClick={() => navigateTo(item.href)}
-              className="w-full text-left rounded-btn text-sm transition-all duration-150 cursor-pointer flex items-center gap-2"
+              className="w-full text-left cursor-pointer flex items-center"
               style={{
-                padding: collapsed ? '6px 0' : '6px 12px',
+                padding: collapsed ? '10px 0' : '10px 14px',
+                borderRadius: '10px',
+                gap: collapsed ? '0' : '12px',
                 justifyContent: collapsed ? 'center' : undefined,
-                color: isActive ? '#f0eef8' : undefined,
-                backgroundColor: isActive ? '#16142a' : undefined,
+                fontSize: '13px',
+                fontWeight: isActive ? 600 : 500,
+                color: isActive ? '#f0eef8' : '#8b85a8',
+                backgroundColor: isActive ? 'rgba(139,92,246,0.1)' : 'transparent',
+                transition: 'all 0.2s ease',
               }}
               title={collapsed ? item.label : undefined}
+              onMouseEnter={e => {
+                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.06)'
+              }}
+              onMouseLeave={e => {
+                if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'
+              }}
             >
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color, boxShadow: isActive ? '0 0 8px rgba(139,92,246,0.4)' : 'none' }} />
-              {!collapsed && <span className={isActive ? 'text-txt' : 'text-txt2'}>{item.label}</span>}
+              <span
+                className="flex-shrink-0 flex items-center justify-center"
+                style={{
+                  color: isActive ? '#a78bfa' : '#8b85a8',
+                  filter: isActive ? 'drop-shadow(0 0 4px rgba(139,92,246,0.3))' : 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {NAV_ICONS[item.href]}
+              </span>
+              {!collapsed && <span>{item.label}</span>}
             </button>
           )
         })}
