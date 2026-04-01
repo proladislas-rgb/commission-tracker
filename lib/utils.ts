@@ -1,4 +1,4 @@
-import type { PaiementStatus, CommissionStatus } from './types'
+import type { CommissionStatus } from './types'
 
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('fr-FR', {
@@ -42,14 +42,6 @@ export function formatMois(mois: string): string {
 export function isOnline(lastSeen: string | null): boolean {
   if (!lastSeen) return false
   return new Date().getTime() - new Date(lastSeen).getTime() < 2 * 60 * 1000
-}
-
-export function paiementStatusLabel(status: PaiementStatus): string {
-  switch (status) {
-    case 'effectue':   return 'Effectué'
-    case 'en_attente': return 'En attente'
-    case 'en_retard':  return 'En retard'
-  }
 }
 
 export function commissionStatusLabel(status: CommissionStatus): string {

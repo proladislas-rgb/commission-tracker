@@ -54,11 +54,11 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
   }
 
   return (
-    <div className="rounded-[10px] border border-indigo/30 overflow-hidden" style={{ backgroundColor: '#151a24' }}>
+    <div className="rounded-[10px] overflow-hidden" style={{ backgroundColor: '#16142a', border: '1px solid rgba(139,92,246,0.2)', boxShadow: '0 0 20px rgba(139,92,246,0.1)' }}>
       {/* En-tête carte */}
-      <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.07)] flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
@@ -83,12 +83,12 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
         </div>
         <div>
           <span className="text-txt3">Montant total</span>
-          <p className="text-lg font-bold text-indigo">{formatEuro(data.amount)}</p>
+          <p className="text-lg font-bold text-indigo" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatEuro(data.amount)}</p>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="px-4 py-3 border-t border-[rgba(255,255,255,0.07)] flex gap-2 flex-wrap">
+      <div className="px-4 py-3 border-t border-border flex gap-2 flex-wrap">
         <button
           onClick={handleDownloadPDF}
           className="px-3 py-1.5 rounded-btn text-xs font-medium bg-indigo text-white hover:bg-indigo/80 transition-colors cursor-pointer"

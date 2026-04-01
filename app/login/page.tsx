@@ -38,14 +38,15 @@ export default function LoginPage() {
             <span className="w-2.5 h-2.5 rounded-full bg-green animate-pulse2" />
             <span className="text-sm font-semibold text-txt2 tracking-wide uppercase">Commission Tracker</span>
           </div>
-          <h1 className="text-2xl font-bold text-txt">Connexion</h1>
+          <h1 className="text-2xl font-bold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Connexion</h1>
           <p className="text-sm text-txt2 mt-1">Accédez à votre espace</p>
         </div>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-6 shadow-card flex flex-col gap-4"
+          className="rounded-card p-6 shadow-card flex flex-col gap-4"
+          style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.15)' }}
         >
           {error && (
             <div className="bg-rose/10 border border-rose/30 rounded-btn px-3 py-2 text-sm text-rose">

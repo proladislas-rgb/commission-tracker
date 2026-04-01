@@ -68,7 +68,7 @@ export default function PrimeSelector({
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn px-3 py-2 text-sm text-txt outline-none transition-all duration-150 cursor-pointer focus:border-indigo focus:ring-1 focus:ring-indigo/30"
+        className="w-full bg-raised border border-border rounded-btn px-3 py-2 text-sm text-txt outline-none transition-all duration-150 cursor-pointer focus:border-indigo focus:ring-1 focus:ring-indigo/30"
       >
         <option value="" className="bg-surface">Sélectionner une prime</option>
         {primes.map(p => (
@@ -100,7 +100,7 @@ export default function PrimeSelector({
 
       {/* Inline create form */}
       {showCreate && isAdmin && (
-        <div className="bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn p-3 animate-fadeIn">
+        <div className="bg-raised border border-border rounded-btn p-3 animate-fadeIn">
           {createError && (
             <div className="bg-rose/10 border border-rose/30 rounded-btn px-2.5 py-1.5 text-xs text-rose mb-2">
               {createError}
@@ -112,14 +112,14 @@ export default function PrimeSelector({
               placeholder="Nom de la prime"
               value={newPrime.name}
               onChange={e => setNewPrime(p => ({ ...p, name: e.target.value }))}
-              className="flex-1 bg-surface border border-[rgba(255,255,255,0.1)] rounded-btn px-2.5 py-1.5 text-sm text-txt outline-none focus:border-indigo"
+              className="flex-1 bg-surface border border-border rounded-btn px-2.5 py-1.5 text-sm text-txt outline-none focus:border-indigo"
             />
             <input
               type="text"
               placeholder="🔥"
               value={newPrime.icon}
               onChange={e => setNewPrime(p => ({ ...p, icon: e.target.value }))}
-              className="w-12 bg-surface border border-[rgba(255,255,255,0.1)] rounded-btn px-2 py-1.5 text-sm text-txt text-center outline-none focus:border-indigo"
+              className="w-12 bg-surface border border-border rounded-btn px-2 py-1.5 text-sm text-txt text-center outline-none focus:border-indigo"
               maxLength={4}
             />
           </div>
@@ -150,7 +150,7 @@ export default function PrimeSelector({
 
       {/* Manage primes list */}
       {showManage && isAdmin && (
-        <div className="bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn p-3 animate-fadeIn">
+        <div className="bg-raised border border-border rounded-btn p-3 animate-fadeIn">
           <p className="text-[10px] uppercase tracking-[0.9px] text-txt3 font-semibold mb-2">Primes actives</p>
           {primes.length === 0 ? (
             <p className="text-xs text-txt3">Aucune prime</p>

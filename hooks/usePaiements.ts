@@ -75,8 +75,11 @@ export function usePaiements(createdBy?: string) {
   }, [])
 
   const updateStatus = useCallback(async (id: string, status: Paiement['status']) => {
-    const prev = paiements
-    setPaiements(p => p.map(x => x.id === id ? { ...x, status } : x))
+    let snapshot: Paiement[] = []
+    setPaiements(prev => {
+      snapshot = prev
+      return prev.map(x => x.id === id ? { ...x, status } : x)
+    })
     try {
       const { error: err } = await supabase
         .from('paiements')
@@ -84,10 +87,28 @@ export function usePaiements(createdBy?: string) {
         .eq('id', id)
       if (err) throw err
     } catch (e) {
-      setPaiements(prev) // rollback
+      setPaiements(snapshot)
       throw e
     }
-  }, [paiements])
+  }, [])
 
-  return { paiements, loading, error, reload: load, add, updateStatus }
+  const remove = useCallback(async (id: string) => {
+    let snapshot: Paiement[] = []
+    setPaiements(prev => {
+      snapshot = prev
+      return prev.filter(x => x.id !== id)
+    })
+    try {
+      const { error: err } = await supabase
+        .from('paiements')
+        .delete()
+        .eq('id', id)
+      if (err) throw err
+    } catch (e) {
+      setPaiements(snapshot)
+      throw e
+    }
+  }, [])
+
+  return { paiements, loading, error, reload: load, add, updateStatus, remove }
 }

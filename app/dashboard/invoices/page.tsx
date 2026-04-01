@@ -7,7 +7,7 @@ export default function InvoicesPage() {
     <>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-txt">Facturation</h1>
+        <h1 className="text-2xl font-bold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Facturation</h1>
         <p className="text-sm text-txt2 mt-1">Générer et suivre vos factures</p>
       </div>
 

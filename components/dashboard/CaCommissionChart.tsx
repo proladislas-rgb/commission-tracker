@@ -28,8 +28,8 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
     v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
 
   return (
-    <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card min-h-[300px]">
-      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
+    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
         CA vs Commissions par prime
       </h3>
       {data.length === 0 ? (
@@ -37,18 +37,28 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} margin={{ left: 0, right: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="name" tick={{ fill: '#8898aa', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+            <defs>
+              <linearGradient id="barGradientCA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
+                <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8} />
+              </linearGradient>
+              <linearGradient id="barGradientComm" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                <stop offset="100%" stopColor="#059669" stopOpacity={0.8} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.06)" />
+            <XAxis dataKey="name" tick={{ fill: '#8b85a8', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8b85a8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
-              labelStyle={{ color: '#e8edf5' }}
-              itemStyle={{ color: '#8898aa' }}
+              labelStyle={{ color: '#f0eef8' }}
+              itemStyle={{ color: '#8b85a8' }}
             />
-            <Legend formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>} />
-            <Bar dataKey="ca" name="CA" fill="#6366f1" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="commission" name="Commission" fill="#10b981" radius={[4, 4, 0, 0]} />
+            <Legend formatter={(value) => <span style={{ color: '#8b85a8', fontSize: 12 }}>{value}</span>} />
+            <Bar dataKey="ca" name="CA" fill="url(#barGradientCA)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="commission" name="Commission" fill="url(#barGradientComm)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )}

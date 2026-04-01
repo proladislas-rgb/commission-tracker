@@ -12,12 +12,18 @@ interface KpiCardProps {
 export default function KpiCard({ label, value, accent, subtext }: KpiCardProps) {
   return (
     <div
-      className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card p-5 shadow-card
-        hover:bg-raised hover:-translate-y-0.5 hover:shadow-raised transition-all duration-200 cursor-default will-change-transform"
-      style={{ borderTop: `2px solid ${accent}` }}
+      className="border rounded-[20px] p-5 shadow-card
+        hover:-translate-y-0.5 transition-all duration-300 cursor-default will-change-transform overflow-hidden relative"
+      style={{
+        backgroundColor: '#0e0d1a',
+        borderColor: 'rgba(139,92,246,0.12)',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.25)'; e.currentTarget.style.boxShadow = '0 0 24px rgba(139,92,246,0.15)' }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.12)'; e.currentTarget.style.boxShadow = '' }}
     >
+      <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${accent}, #8b5cf6)` }} />
       <p className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-2">{label}</p>
-      <p className="text-[26px] font-extrabold text-txt leading-tight">{value}</p>
+      <p className="text-[28px] font-bold text-txt leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{value}</p>
       {subtext && <div className="mt-1.5">{subtext}</div>}
     </div>
   )

@@ -80,14 +80,14 @@ export default function DashboardPage() {
   const associeId = associe?.id
 
   const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId)
-  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus } = usePaiements(associeId)
+  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId)
 
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const { count: primesCount } = await supabase
           .from('primes')
-          .select('*', { count: 'exact', head: true })
+          .select('id', { count: 'exact', head: true })
         if (primesCount !== null && primesCount !== primes.length) {
           loadPrimes()
         }
@@ -213,6 +213,22 @@ export default function DashboardPage() {
     }
   }, [addPaiement])
 
+  const handleDeletePaiement = useCallback(async (id: string) => {
+    const paiement = paiements.find(p => p.id === id)
+    await removePaiement(id)
+    try {
+      await supabase.from('activity_log').insert({
+        user_id:     user!.id,
+        action:      'delete',
+        entity_type: 'paiement',
+        entity_id:   id,
+        details:     { description: `${user!.display_name} a supprimé le paiement ${paiement?.label ?? ''} de ${paiement ? new Intl.NumberFormat('fr-FR').format(Number(paiement.montant)) : '?'} €` },
+      })
+    } catch {
+      // log silencieux
+    }
+  }, [removePaiement, paiements, user])
+
   async function handleRenameAssociate(newName: string) {
     if (!associe) return
     const res = await fetch(`/api/users/${associe.id}`, {
@@ -257,6 +273,7 @@ export default function DashboardPage() {
         isAssociate={isAssociate}
         onAdd={handleAddPaiement}
         onUpdateStatus={updatePaiementStatus}
+        onDelete={handleDeletePaiement}
       />
 
       <CommissionTable

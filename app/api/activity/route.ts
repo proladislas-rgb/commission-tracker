@@ -6,16 +6,20 @@ export async function POST(req: NextRequest) {
   const session = await getSessionUser()
   if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
 
-  const { action, entity_type, entity_id, details } = await req.json()
+  try {
+    const { action, entity_type, entity_id, details } = await req.json()
 
-  const { error } = await supabaseAdmin.from('activity_log').insert({
-    user_id: session.id,
-    action,
-    entity_type,
-    entity_id,
-    details,
-  })
+    const { error } = await supabaseAdmin.from('activity_log').insert({
+      user_id: session.id,
+      action,
+      entity_type,
+      entity_id,
+      details,
+    })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  } catch {
+    return NextResponse.json({ error: 'Requête invalide.' }, { status: 400 })
+  }
 }

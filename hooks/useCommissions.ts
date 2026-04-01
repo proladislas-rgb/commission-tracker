@@ -77,8 +77,11 @@ export function useCommissions(userId?: string) {
   }, [])
 
   const update = useCallback(async (id: string, data: Partial<Commission>) => {
-    const prev = commissions.find(c => c.id === id)
-    setCommissions(cs => cs.map(c => c.id === id ? { ...c, ...data } : c))
+    let snapshot: Commission | undefined
+    setCommissions(cs => {
+      snapshot = cs.find(c => c.id === id)
+      return cs.map(c => c.id === id ? { ...c, ...data } : c)
+    })
     try {
       const { error: err } = await supabase
         .from('commissions')
@@ -86,22 +89,25 @@ export function useCommissions(userId?: string) {
         .eq('id', id)
       if (err) throw err
     } catch (e) {
-      if (prev) setCommissions(cs => cs.map(c => c.id === id ? prev : c))
+      if (snapshot) setCommissions(cs => cs.map(c => c.id === id ? snapshot! : c))
       throw e
     }
-  }, [commissions])
+  }, [])
 
   const remove = useCallback(async (id: string) => {
-    const backup = commissions.find(c => c.id === id)
-    setCommissions(cs => cs.filter(c => c.id !== id))
+    let snapshot: Commission | undefined
+    setCommissions(cs => {
+      snapshot = cs.find(c => c.id === id)
+      return cs.filter(c => c.id !== id)
+    })
     try {
       const { error: err } = await supabase.from('commissions').delete().eq('id', id)
       if (err) throw err
     } catch (e) {
-      if (backup) setCommissions(cs => [backup, ...cs])
+      if (snapshot) setCommissions(cs => [snapshot!, ...cs])
       throw e
     }
-  }, [commissions])
+  }, [])
 
   return { commissions, loading, error, reload: load, add, update, remove }
 }

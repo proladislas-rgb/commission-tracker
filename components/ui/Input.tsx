@@ -25,7 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             'focus:border-indigo focus:ring-1 focus:ring-indigo/30',
             error
               ? 'border-rose/50 focus:border-rose focus:ring-rose/20'
-              : 'border-[rgba(255,255,255,0.1)]',
+              : 'border-border',
             className
           )}
           {...props}

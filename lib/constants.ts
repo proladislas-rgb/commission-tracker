@@ -8,8 +8,8 @@ export const PRIME_COLORS = [
 ]
 
 export const CHART_TOOLTIP_STYLE = {
-  backgroundColor: '#1a1f2e',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: '#16142a',
+  border: '1px solid rgba(139,92,246,0.2)',
   borderRadius: 8,
   padding: 10,
 }

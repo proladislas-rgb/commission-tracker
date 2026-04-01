@@ -116,7 +116,7 @@ export default function SeedButton({ userId, onImported }: Props) {
                   </div>
                 </div>
               ))}
-              <div className="border-t border-[rgba(255,255,255,0.07)] pt-1.5 flex justify-between font-bold text-sm">
+              <div className="border-t border-border pt-1.5 flex justify-between font-bold text-sm">
                 <span className="text-txt">Total</span>
                 <div className="flex gap-4">
                   <span className="text-txt">CA : {formatCurrency(totalCA)}</span>
@@ -139,7 +139,7 @@ export default function SeedButton({ userId, onImported }: Props) {
                   </div>
                 </div>
               ))}
-              <div className="border-t border-[rgba(255,255,255,0.07)] pt-1.5 text-sm font-semibold text-right">
+              <div className="border-t border-border pt-1.5 text-sm font-semibold text-right">
                 Total encaissé : <span className="text-green">{formatCurrency(totalPaye)}</span>
               </div>
             </div>

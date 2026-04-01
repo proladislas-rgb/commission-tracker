@@ -41,3 +41,6 @@
 - Permissions : vérifier le rôle (admin/associe) avant chaque action
 - Source unique de vérité : useCommissions pour CA/commissions, usePaiements pour paiements
 - npm run build doit passer sans erreur avant chaque commit
+
+## Skills installés
+- ui-ux-pro-max-skill : installé dans .claude/skills/ui-ux — utiliser les guidelines de ce skill pour tout le frontend (design, animations, typographie, couleurs, layout)

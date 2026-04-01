@@ -194,7 +194,7 @@ export default function CommissionTable({
               style={
                 filter === f.id
                   ? { backgroundColor: `${f.color}22`, color: f.color, border: `1px solid ${f.color}44` }
-                  : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#8898aa', border: '1px solid rgba(255,255,255,0.07)' }
+                  : { backgroundColor: 'rgba(139,92,246,0.04)', color: '#8b85a8', border: '1px solid rgba(139,92,246,0.1)' }
               }
             >
               {f.label}
@@ -211,11 +211,11 @@ export default function CommissionTable({
         </div>
       </div>
 
-      <div className="bg-surface border border-[rgba(255,255,255,0.07)] rounded-card overflow-hidden shadow-card">
+      <div className="rounded-card overflow-hidden shadow-card" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-raised">
+              <tr style={{ backgroundColor: 'rgba(139,92,246,0.04)' }}>
                 {['Prime', 'CA', 'Commission', 'Dossiers', 'Mois', 'Statut', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold whitespace-nowrap">
                     {h}
@@ -236,7 +236,7 @@ export default function CommissionTable({
                   return (
                     <tr
                       key={c.id}
-                      className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] transition-colors will-change-transform"
+                      className="border-t border-[rgba(139,92,246,0.06)] hover:bg-[rgba(139,92,246,0.06)] transition-colors duration-300 will-change-transform even:bg-[rgba(139,92,246,0.02)]"
                       style={{
                         animation: i < 10 ? `fadeIn 0.3s ease ${i * 0.03}s both` : undefined,
                       }}
@@ -250,8 +250,8 @@ export default function CommissionTable({
                           <span className="text-txt">{prime?.icon} {prime?.name ?? c.prime_id}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-txt">{formatCurrency(Number(c.ca))}</td>
-                      <td className="px-4 py-3 text-amber">{formatCurrency(Number(c.commission))}</td>
+                      <td className="px-4 py-3 font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(Number(c.ca))}</td>
+                      <td className="px-4 py-3 text-amber" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(Number(c.commission))}</td>
                       <td className="px-4 py-3 text-txt2">{Number(c.dossiers).toLocaleString('fr-FR')}</td>
                       <td className="px-4 py-3 text-txt2">{formatMois(c.mois)}</td>
                       <td className="px-4 py-3"><CommissionStatusBadge status={c.status} /></td>
@@ -291,10 +291,10 @@ export default function CommissionTable({
             </tbody>
             {filtered.length > 0 && (
               <tfoot>
-                <tr className="border-t border-[rgba(255,255,255,0.1)] bg-raised">
+                <tr style={{ borderTop: '1px solid rgba(139,92,246,0.15)', backgroundColor: 'rgba(139,92,246,0.04)' }}>
                   <td className="px-4 py-3 text-[10px] uppercase tracking-[0.9px] text-txt2 font-bold">Total</td>
-                  <td className="px-4 py-3 font-bold text-txt">{formatCurrency(totals.ca)}</td>
-                  <td className="px-4 py-3 font-bold text-amber">{formatCurrency(totals.commission)}</td>
+                  <td className="px-4 py-3 font-bold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(totals.ca)}</td>
+                  <td className="px-4 py-3 font-bold text-amber" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(totals.commission)}</td>
                   <td className="px-4 py-3 font-bold text-txt2">{totals.dossiers.toLocaleString('fr-FR')}</td>
                   <td colSpan={3} />
                 </tr>
@@ -400,7 +400,7 @@ export default function CommissionTable({
                 placeholder="🔥"
                 value={primeForm.icon}
                 onChange={e => setPrimeForm(f => ({ ...f, icon: e.target.value }))}
-                className="w-full bg-raised border border-[rgba(255,255,255,0.1)] rounded-btn px-2 py-2 text-sm text-txt text-center outline-none focus:border-indigo"
+                className="w-full bg-raised border border-border rounded-btn px-2 py-2 text-sm text-txt text-center outline-none focus:border-indigo"
                 maxLength={4}
               />
             </div>
@@ -426,7 +426,7 @@ export default function CommissionTable({
             </div>
           </div>
           {/* Infos commission */}
-          <div className="border-t border-[rgba(255,255,255,0.07)] pt-4">
+          <div className="border-t border-border pt-4">
             <p className="text-[10px] uppercase tracking-[0.9px] text-txt3 font-semibold mb-3">Première commission</p>
             <div className="flex flex-col gap-3">
               <div className="grid grid-cols-2 gap-3">

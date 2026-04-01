@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #07080d;
-  --color-surface: #0f1117;
-  --color-raised: #151a24;
-  --color-border: rgba(255,255,255,0.07);
-  --color-border2: rgba(255,255,255,0.12);
-  --color-txt: #e8edf5;
-  --color-txt2: #8898aa;
-  --color-txt3: #3d4f63;
+  --color-bg: #06050e;
+  --color-surface: #0e0d1a;
+  --color-raised: #16142a;
+  --color-border: rgba(139,92,246,0.08);
+  --color-border2: rgba(139,92,246,0.18);
+  --color-txt: #f0eef8;
+  --color-txt2: #8b85a8;
+  --color-txt3: #4a4466;
   --color-indigo: #6366f1;
   --color-indigo2: #818cf8;
   --color-amber: #f59e0b;
@@ -17,27 +17,34 @@
   --color-rose: #f43f5e;
   --color-sky: #38bdf8;
   --color-violet: #8b5cf6;
+  --color-aurora-glow: rgba(139,92,246,0.15);
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: var(--font-dm-sans), 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: var(--font-space-grotesk), 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-space-grotesk), 'Space Grotesk', ui-monospace, monospace;
 
   --radius-card: 14px;
   --radius-btn: 8px;
+  --radius-kpi: 20px;
 
-  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
-  --shadow-raised: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.06);
+  --shadow-raised: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.1);
+  --shadow-glow: 0 0 24px rgba(139,92,246,0.2), 0 0 48px rgba(139,92,246,0.08);
+  --shadow-glow-sm: 0 0 14px rgba(139,92,246,0.12);
 
   --width-sidebar: 220px;
 
-  --animate-fadeIn: fadeIn 0.3s ease forwards;
+  --animate-fadeIn: fadeIn 0.4s ease forwards;
   --animate-pulse2: pulse2 1.5s ease-in-out infinite;
   --animate-shimmer: shimmer 1.5s linear infinite;
-  --animate-modalIn: modalIn 0.2s ease forwards;
-  --animate-rowIn: fadeIn 0.3s ease forwards;
+  --animate-modalIn: modalIn 0.25s ease forwards;
+  --animate-rowIn: fadeIn 0.4s ease forwards;
+  --animate-auroraShift: auroraShift 12s ease-in-out infinite;
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse2 {
@@ -51,8 +58,20 @@
 }
 
 @keyframes modalIn {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: none; }
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes auroraShift {
+  0%, 100% { background-position: 0% 0%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 50% 100%; }
+  75% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(139,92,246,0.1); }
+  50% { box-shadow: 0 0 30px rgba(139,92,246,0.2); }
 }
 
 * {
@@ -60,25 +79,46 @@
 }
 
 html, body {
-  background-color: #07080d;
-  color: #e8edf5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #06050e;
+  color: #f0eef8;
+  font-family: var(--font-dm-sans), 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+/* Aurora background — violet ultra-foncé animé */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 5%, rgba(139,92,246,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 85%, rgba(99,102,241,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 40%, rgba(139,92,246,0.06) 0%, transparent 60%),
+    linear-gradient(180deg, #06050e 0%, #0a0816 25%, #0e0b1e 50%, #0a0816 75%, #06050e 100%);
+  background-size: 200% 200%;
+  animation: auroraShift 12s ease-in-out infinite;
+  pointer-events: none;
+}
 
-/* Selection */
-::selection { background: rgba(99,102,241,0.3); }
+/* Scrollbar violet */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.45); }
+
+/* Selection violet */
+::selection { background: rgba(139,92,246,0.35); }
 
 /* Skeleton animation */
 .skeleton {
-  background: linear-gradient(90deg, #151a24 25%, #1f2836 50%, #151a24 75%);
+  background: linear-gradient(90deg, #16142a 25%, #1e1b38 50%, #16142a 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s linear infinite;
+}
+
+/* Headings = Space Grotesk */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
 }

@@ -45,14 +45,14 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
       {/* Panel */}
       <div
         className={cn(
-          'relative w-full bg-surface border border-[rgba(255,255,255,0.1)] rounded-card',
+          'relative w-full rounded-card',
           'shadow-raised animate-modalIn overflow-hidden',
           sizeClasses[size]
         )}
-        style={{ zIndex: 9999, maxHeight: '90vh', overflowY: 'auto' }}
+        style={{ zIndex: 9999, maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.18)' }}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.07)]">
-          <h2 className="text-base font-semibold text-txt">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{title}</h2>
           <button
             onClick={onClose}
             className="text-txt2 hover:text-txt transition-colors p-1 rounded-btn hover:bg-raised"

@@ -26,7 +26,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             'focus:border-indigo focus:ring-1 focus:ring-indigo/30',
             error
               ? 'border-rose/50'
-              : 'border-[rgba(255,255,255,0.1)]',
+              : 'border-border',
             className
           )}
           {...props}

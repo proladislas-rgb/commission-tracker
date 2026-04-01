@@ -19,7 +19,7 @@ export default function Header({ associe, primesCount, onRenameAssociate, onMobi
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="w-2.5 h-2.5 rounded-full bg-green animate-pulse2" />
-          <h1 className="text-xl font-bold text-txt">Commission Tracker</h1>
+          <h1 className="text-xl font-bold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Commission Tracker</h1>
         </div>
         <div className="flex items-center gap-2 text-sm text-txt2">
           <span>Associé :</span>
@@ -44,13 +44,13 @@ export default function Header({ associe, primesCount, onRenameAssociate, onMobi
 
       <div className="flex items-center gap-3">
         {primesCount > 0 && (
-          <span className="px-2.5 py-1 bg-indigo/10 border border-indigo/30 rounded-full text-xs text-indigo font-medium">
+          <span className="px-2.5 py-1 bg-indigo/10 border border-indigo/30 rounded-full text-xs text-indigo font-medium" style={{ boxShadow: '0 0 10px rgba(99, 102, 241, 0.15)' }}>
             {primesCount} prime{primesCount > 1 ? 's' : ''} active{primesCount > 1 ? 's' : ''}
           </span>
         )}
         {/* Burger mobile */}
         <button
-          className="lg:hidden p-2 rounded-btn bg-surface border border-[rgba(255,255,255,0.07)] text-txt2 hover:text-txt"
+          className="lg:hidden p-2 rounded-btn bg-surface border border-border text-txt2 hover:text-txt transition-colors duration-300"
           onClick={onMobileMenuOpen}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -75,13 +75,17 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       .channel('sidebar-activity')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'activity_log' }, async (payload: { new: Record<string, unknown> }) => {
-        const { data: logWithUser } = await supabase
-          .from('activity_log')
-          .select('*, user:users(id, display_name, avatar_color)')
-          .eq('id', (payload.new as { id: string }).id)
-          .single()
-        if (logWithUser) {
-          setActivityLogs(prev => [logWithUser as ActivityLog & { user?: User }, ...prev].slice(0, 5))
+        try {
+          const { data: logWithUser } = await supabase
+            .from('activity_log')
+            .select('*, user:users(id, display_name, avatar_color)')
+            .eq('id', (payload.new as { id: string }).id)
+            .single()
+          if (logWithUser) {
+            setActivityLogs(prev => [logWithUser as ActivityLog & { user?: User }, ...prev].slice(0, 5))
+          }
+        } catch {
+          // silencieux
         }
       })
       .subscribe()
@@ -99,7 +103,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       {/* Toggle button */}
       <button
         onClick={onToggleCollapse}
-        className="hidden lg:flex items-center justify-center h-8 border-b border-[rgba(255,255,255,0.07)] text-txt3 hover:text-txt2 transition-colors cursor-pointer"
+        className="hidden lg:flex items-center justify-center h-8 border-b border-border text-txt3 hover:text-txt2 transition-colors duration-300 cursor-pointer"
         title={collapsed ? 'Déplier' : 'Replier'}
       >
         <svg
@@ -116,7 +120,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       </button>
 
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '20px 8px' : undefined }}>
+      <div className="px-5 py-5 border-b border-border" style={{ padding: collapsed ? '20px 8px' : undefined }}>
         <div className="flex items-center gap-2 mb-1" style={{ justifyContent: collapsed ? 'center' : undefined }}>
           <span className="w-2 h-2 rounded-full bg-green animate-pulse2 flex-shrink-0" />
           {!collapsed && (
@@ -150,7 +154,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       </div>
 
       {/* Navigation */}
-      <div className="px-3 py-4 border-b border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '16px 4px' : undefined }}>
+      <div className="px-3 py-4 border-b border-border" style={{ padding: collapsed ? '16px 4px' : undefined }}>
         {!collapsed && (
           <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Navigation</p>
         )}
@@ -164,12 +168,12 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
               style={{
                 padding: collapsed ? '6px 0' : '6px 12px',
                 justifyContent: collapsed ? 'center' : undefined,
-                color: isActive ? '#e8edf5' : undefined,
-                backgroundColor: isActive ? '#151a24' : undefined,
+                color: isActive ? '#f0eef8' : undefined,
+                backgroundColor: isActive ? '#16142a' : undefined,
               }}
               title={collapsed ? item.label : undefined}
             >
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color, boxShadow: isActive ? '0 0 8px rgba(139,92,246,0.4)' : 'none' }} />
               {!collapsed && <span className={isActive ? 'text-txt' : 'text-txt2'}>{item.label}</span>}
             </button>
           )
@@ -193,7 +197,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           >
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
-              style={{ backgroundColor: u.avatar_color }}
+              style={{ backgroundColor: u.avatar_color, border: '1px solid rgba(139,92,246,0.2)' }}
             >
               {avatarInitials(u.display_name)}
             </div>
@@ -211,7 +215,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
 
       {/* Activité récente */}
       {!collapsed && (
-        <div id="activite" className="px-3 py-4 border-t border-[rgba(255,255,255,0.07)]" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+        <div id="activite" className="px-3 py-4 border-t border-border" style={{ maxHeight: '200px', overflowY: 'auto' }}>
           <p className="text-[9px] uppercase tracking-[1.2px] text-txt3 px-2 mb-2 font-semibold">Activité récente</p>
           {activityLogs.length === 0 ? (
             <p className="text-[10px] text-txt3 px-2">Aucune activité</p>
@@ -236,7 +240,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
 
       {/* Footer */}
       {user && (
-        <div className="py-4 border-t border-[rgba(255,255,255,0.07)]" style={{ padding: collapsed ? '16px 4px' : '16px 12px' }}>
+        <div className="py-4 border-t border-border" style={{ padding: collapsed ? '16px 4px' : '16px 12px' }}>
           {!collapsed && (
             <div className="flex items-center gap-2.5 mb-3 px-2">
               <div
@@ -288,10 +292,11 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
     <>
       {/* Desktop */}
       <aside
-        className="hidden lg:flex fixed right-0 top-0 h-screen bg-surface border-l border-[rgba(255,255,255,0.07)] flex-col z-30"
+        className="hidden lg:flex fixed right-0 top-0 h-screen border-l border-border flex-col z-30"
         style={{
           width: collapsed ? '60px' : '220px',
           transition: 'width 0.3s ease',
+          backgroundColor: '#08071a',
         }}
       >
         {sidebarContent}
@@ -301,7 +306,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/60" onClick={onMobileClose} />
-          <aside className="absolute right-0 top-0 h-full bg-surface border-l border-[rgba(255,255,255,0.07)]" style={{ width: '220px' }}>
+          <aside className="absolute right-0 top-0 h-full border-l border-border" style={{ width: '220px', backgroundColor: '#08071a' }}>
             {sidebarContent}
           </aside>
         </div>
