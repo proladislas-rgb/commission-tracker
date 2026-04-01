@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
 import { CHART_TOOLTIP_STYLE } from '@/lib/constants'
@@ -11,8 +12,7 @@ interface Props {
 }
 
 export default function RepartitionChart({ commissions, primes }: Props) {
-  // Robuste : String() pour comparer les IDs, Number() || 0 pour les valeurs
-  const data = primes.map(prime => {
+  const data = useMemo(() => primes.map(prime => {
     const matched = commissions.filter(c => String(c.prime_id) === String(prime.id))
     const value = matched.reduce((s, c) => s + (Number(c.ca) || 0), 0)
     return {
@@ -21,7 +21,7 @@ export default function RepartitionChart({ commissions, primes }: Props) {
       color: prime.color,
       icon:  prime.icon,
     }
-  }).filter(d => d.value > 0)
+  }).filter(d => d.value > 0), [commissions, primes])
 
   return (
     <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>

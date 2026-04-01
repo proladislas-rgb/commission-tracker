@@ -10,6 +10,7 @@ export interface InvoiceData {
 
 export function generateInvoiceHTML(data: InvoiceData): string {
   const formattedAmount = formatEuro(data.amount)
+  const formattedZero = formatEuro(0)
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -21,68 +22,74 @@ export function generateInvoiceHTML(data: InvoiceData): string {
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #1a2332;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #2c3e50;
     background: #ffffff;
     width: 210mm;
-    min-height: 297mm;
+    height: 297mm;
     margin: 0 auto;
-    position: relative;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+  .page {
+    padding: 12mm;
+    height: 297mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
   }
 </style>
 </head>
 <body>
-<!-- ===== MAIN CONTAINER ===== -->
-<div style="padding: 48px 52px 32px 52px; min-height: 297mm; display: flex; flex-direction: column;">
+<div class="page">
 
-  <!-- ===== HEADER ===== -->
-  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
-    <!-- Left: Logo + Company -->
-    <div style="display: flex; align-items: center; gap: 14px;">
-      <div style="width: 52px; height: 52px; background: #1a2332; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-        <span style="color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: 1px;">LR</span>
-      </div>
-      <div>
-        <div style="font-size: 20px; font-weight: 700; color: #1a2332; letter-spacing: 0.3px;">LR Consulting</div>
-        <div style="font-size: 11px; color: #6b7280; margin-top: 1px;">C.R. Number: 190710 - 1</div>
-      </div>
-    </div>
-    <!-- Right: INVOICE title + badge -->
+  <!-- ===== 1. HEADER ===== -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+    <table><tr>
+      <td style="width:40px;height:40px;background-color:#192a45;color:#ffffff;font-family:'Didot','Bodoni MT','Book Antiqua','Palatino',serif;font-size:19px;font-weight:400;font-style:normal;text-align:center;vertical-align:middle;border-radius:6px;letter-spacing:3px">LR</td>
+      <td style="padding-left:12px;vertical-align:middle">
+        <div style="font-size:18px;font-weight:700;color:#192a45">LR Consulting</div>
+        <div style="font-size:10px;color:#888">C.R. Number: 190710 - 1</div>
+      </td>
+    </tr></table>
     <div style="text-align: right;">
-      <div style="font-size: 36px; font-weight: 800; color: #1a2332; letter-spacing: 1px; line-height: 1;">INVOICE</div>
-      <div style="margin-top: 8px;">
-        <span style="display: inline-block; background: #1a2332; color: #ffffff; font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 4px; letter-spacing: 0.5px;">#${data.invoiceNumber}</span>
+      <div style="font-size: 28px; font-weight: 800; color: #192a45; letter-spacing: 1px; line-height: 1;">INVOICE</div>
+      <div style="margin-top: 6px;">
+        <span style="display: inline-block; background-color: #192a45; color: #ffffff; font-size: 16px; font-weight: 700; padding: 4px 16px; border-radius: 4px;">#${data.invoiceNumber}</span>
       </div>
     </div>
   </div>
 
-  <!-- ===== DATE ROW ===== -->
-  <div style="display: flex; gap: 0; margin-bottom: 32px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-    <div style="flex: 1; padding: 14px 20px; border-right: 1px solid #e5e7eb;">
-      <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Invoice Date</div>
-      <div style="font-size: 14px; font-weight: 600; color: #1a2332;">${data.invoiceDate}</div>
+  <!-- ===== 2. DATES ROW ===== -->
+  <div style="display: flex; justify-content: space-between; background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; margin-bottom: 12px;">
+    <div style="flex: 1; padding-right: 16px; border-right: 1px solid #e0e0e0;">
+      <div class="label" style="margin-bottom: 3px;">Invoice Date</div>
+      <div style="font-size: 13px; font-weight: 600; color: #192a45;">${data.invoiceDate}</div>
     </div>
-    <div style="flex: 1; padding: 14px 20px; border-right: 1px solid #e5e7eb;">
-      <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Due Date</div>
-      <div style="font-size: 14px; font-weight: 600; color: #1a2332;">${data.dueDate}</div>
+    <div style="flex: 1; padding: 0 16px; border-right: 1px solid #e0e0e0;">
+      <div class="label" style="margin-bottom: 3px;">Due Date</div>
+      <div style="font-size: 13px; font-weight: 600; color: #192a45;">${data.dueDate}</div>
     </div>
-    <div style="flex: 1; padding: 14px 20px;">
-      <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Payment Terms</div>
-      <div style="font-size: 14px; font-weight: 600; color: #1a2332;">${data.paymentTerms}</div>
+    <div style="flex: 1; padding-left: 16px;">
+      <div class="label" style="margin-bottom: 3px;">Payment Terms</div>
+      <div style="font-size: 13px; font-weight: 600; color: #192a45;">${data.paymentTerms}</div>
     </div>
   </div>
 
-  <!-- ===== FROM / BILL TO ===== -->
-  <div style="display: flex; gap: 32px; margin-bottom: 36px;">
-    <!-- FROM -->
-    <div style="flex: 1;">
-      <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">From</div>
-      <div style="font-size: 14px; font-weight: 700; color: #1a2332; margin-bottom: 4px;">LR Consulting W.L.L</div>
-      <div style="font-size: 12.5px; color: #4b5563; line-height: 1.7;">
+  <!-- ===== 3. FROM / BILL TO ===== -->
+  <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+    <div style="flex: 1; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; position: relative;">
+      <div style="background-color: #f1f5f9; padding: 6px 12px; font-size: 10px; font-weight: 700; color: #888888; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #e0e0e0; margin: -16px -16px 12px -16px;">From</div>
+      <div style="font-size: 12px; font-weight: 700; color: #192a45; margin-bottom: 4px;">LR Consulting W.L.L</div>
+      <div style="font-size: 10px; color: #666666; line-height: 1.6;">
         Bldg. 40, Road 1701, Block 317<br>
         Diplomatic Area<br>
         Kingdom of Bahrain<br>
@@ -91,11 +98,10 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         +973 3400 8825
       </div>
     </div>
-    <!-- BILL TO -->
-    <div style="flex: 1;">
-      <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Bill To</div>
-      <div style="font-size: 14px; font-weight: 700; color: #1a2332; margin-bottom: 4px;">ECODISTRIB</div>
-      <div style="font-size: 12.5px; color: #4b5563; line-height: 1.7;">
+    <div style="flex: 1; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; position: relative;">
+      <div style="background-color: #f1f5f9; padding: 6px 12px; font-size: 10px; font-weight: 700; color: #888888; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #e0e0e0; margin: -16px -16px 12px -16px;">Bill To</div>
+      <div style="font-size: 12px; font-weight: 700; color: #192a45; margin-bottom: 4px;">ECODISTRIB</div>
+      <div style="font-size: 10px; color: #666666; line-height: 1.6;">
         29 Rue Pradier<br>
         92410 Ville-d'Avray<br>
         France<br>
@@ -104,85 +110,90 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     </div>
   </div>
 
-  <!-- ===== TABLE ===== -->
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
-    <thead>
-      <tr style="background: #f3f4f6;">
-        <th style="text-align: left; padding: 12px 16px; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #e5e7eb;">Description</th>
-        <th style="text-align: center; padding: 12px 16px; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #e5e7eb; width: 80px;">Qty</th>
-        <th style="text-align: right; padding: 12px 16px; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #e5e7eb; width: 130px;">Unit Price</th>
-        <th style="text-align: right; padding: 12px 16px; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #e5e7eb; width: 130px;">Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="padding: 16px; font-size: 13px; color: #1a2332; border-bottom: 1px solid #e5e7eb;">Commercial advisory services</td>
-        <td style="padding: 16px; font-size: 13px; color: #1a2332; text-align: center; border-bottom: 1px solid #e5e7eb;">1</td>
-        <td style="padding: 16px; font-size: 13px; color: #1a2332; text-align: right; border-bottom: 1px solid #e5e7eb;">${formattedAmount}</td>
-        <td style="padding: 16px; font-size: 13px; color: #1a2332; text-align: right; border-bottom: 1px solid #e5e7eb;">${formattedAmount}</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- ===== 4. SERVICES PROVIDED ===== -->
+  <div style="margin-bottom: 4px;">
+    <div style="font-size: 13px; font-weight: 700; color: #192a45; margin-bottom: 8px;">Services Provided</div>
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
+      <thead>
+        <tr style="background-color: #f1f5f9;">
+          <th style="text-align: left; padding: 10px; font-size: 11px; font-weight: 700; color: #666666; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;">Description</th>
+          <th style="text-align: center; padding: 10px; font-size: 11px; font-weight: 700; color: #666666; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; width: 60px;">Qty</th>
+          <th style="text-align: right; padding: 10px; font-size: 11px; font-weight: 700; color: #666666; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; width: 110px;">Unit Price</th>
+          <th style="text-align: right; padding: 10px; font-size: 11px; font-weight: 700; color: #666666; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #e0e0e0; width: 110px;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 10px; font-size: 11px; color: #2c3e50; border-right: 1px solid #e0e0e0;">Commercial advisory services</td>
+          <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: center; border-right: 1px solid #e0e0e0;">1</td>
+          <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: right; border-right: 1px solid #e0e0e0;">${formattedAmount}</td>
+          <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: right;">${formattedAmount}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <!-- ===== TOTALS ===== -->
-  <div style="display: flex; justify-content: flex-end; margin-bottom: 32px;">
-    <div style="width: 300px;">
-      <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px;">
-        <span style="color: #6b7280;">Subtotal</span>
-        <span style="font-weight: 600; color: #1a2332;">${formattedAmount}</span>
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
+    <div style="width: 280px;">
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 10px;">
+        <span style="color: #666666;">Subtotal</span>
+        <span style="font-weight: 600; color: #2c3e50;">${formattedAmount}</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; border-bottom: 1px solid #e5e7eb;">
-        <span style="color: #6b7280;">VAT (0%)</span>
-        <span style="font-weight: 600; color: #1a2332;">${formatEuro(0)}</span>
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 10px; border-bottom: 1px solid #e0e0e0;">
+        <span style="color: #666666;">VAT (0%)</span>
+        <span style="font-weight: 600; color: #2c3e50;">${formattedZero}</span>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; margin-top: 8px; background: #1a2332; border-radius: 8px;">
-        <span style="font-size: 12px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount Due</span>
-        <span style="font-size: 20px; font-weight: 800; color: #ffffff;">${formattedAmount}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; margin-top: 6px; background: #192a45; border-radius: 4px; width: 100%;">
+        <span style="font-size: 13px; font-weight: 700; color: #ffffff; white-space: nowrap;">Total Amount Due</span>
+        <span style="font-size: 22px; font-weight: 700; color: #ffffff; line-height: 1; white-space: nowrap;">${formattedAmount}</span>
       </div>
     </div>
   </div>
 
-  <!-- ===== VAT NOTE ===== -->
-  <div style="font-size: 11px; color: #6b7280; font-style: italic; margin-bottom: 32px; padding: 10px 14px; background: #f9fafb; border-radius: 6px; border-left: 3px solid #e5e7eb;">
+  <!-- ===== 5. VAT NOTE ===== -->
+  <div style="font-size: 10px; color: #888888; font-style: italic; margin-bottom: 12px; text-align: right;">
     VAT not applicable - Services provided outside Bahrain
   </div>
 
-  <!-- ===== PAYMENT INFO ===== -->
-  <div style="margin-bottom: 32px;">
-    <div style="font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Payment Information</div>
-    <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px;">
-      <table style="width: 100%; border-collapse: collapse;">
-        <tr>
-          <td style="padding: 4px 0; font-size: 12.5px; color: #6b7280; width: 140px;">Bank Name</td>
-          <td style="padding: 4px 0; font-size: 12.5px; font-weight: 600; color: #1a2332;">Al Salam Bank</td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 0; font-size: 12.5px; color: #6b7280;">Account Name</td>
-          <td style="padding: 4px 0; font-size: 12.5px; font-weight: 600; color: #1a2332;">LR CONSULTING W.L.L</td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 0; font-size: 12.5px; color: #6b7280;">IBAN</td>
-          <td style="padding: 4px 0; font-size: 12.5px; font-weight: 600; color: #1a2332;">BH32ALSA00387049100101</td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 0; font-size: 12.5px; color: #6b7280;">SWIFT Code</td>
-          <td style="padding: 4px 0; font-size: 12.5px; font-weight: 600; color: #1a2332;">ALSABHBM</td>
-        </tr>
-      </table>
+  <!-- ===== 6. PAYMENT INFORMATION ===== -->
+  <div style="margin-bottom: 12px;">
+    <div style="border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden;">
+      <div style="background-color: #f1f5f9; padding: 8px 16px; font-weight: 700; font-size: 12px; color: #192a45; border-bottom: 1px solid #e0e0e0;">PAYMENT INFORMATION</div>
+      <div style="display: flex; border-bottom: 1px solid #e0e0e0;">
+        <div style="flex: 1; padding: 10px 14px; border-right: 1px solid #e0e0e0;">
+          <div class="label" style="margin-bottom: 3px;">Bank</div>
+          <div style="font-size: 12px; font-weight: 600; color: #192a45;">Al Salam Bank</div>
+        </div>
+        <div style="flex: 1; padding: 10px 14px;">
+          <div class="label" style="margin-bottom: 3px;">Account Name</div>
+          <div style="font-size: 12px; font-weight: 600; color: #192a45;">LR CONSULTING W.L.L</div>
+        </div>
+      </div>
+      <div style="display: flex;">
+        <div style="flex: 1; padding: 10px 14px; border-right: 1px solid #e0e0e0;">
+          <div class="label" style="margin-bottom: 3px;">IBAN</div>
+          <div style="font-size: 12px; font-weight: 600; color: #192a45;">BH32ALSA00387049100101</div>
+        </div>
+        <div style="flex: 1; padding: 10px 14px;">
+          <div class="label" style="margin-bottom: 3px;">SWIFT/BIC</div>
+          <div style="font-size: 12px; font-weight: 600; color: #192a45;">ALSABHBM</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== THANK YOU ===== -->
-  <div style="text-align: center; font-size: 15px; font-style: italic; color: #6b7280; margin-bottom: 24px; flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 24px;">
+  <!-- ===== 7. THANK YOU ===== -->
+  <div style="text-align: center; font-size: 14px; font-style: italic; color: #888888; flex-grow: 1; display: flex; align-items: center; justify-content: center;">
     Thank you for your business.
   </div>
 
-  <!-- ===== FOOTER ===== -->
-  <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; text-align: center;">
-    <div style="font-size: 11px; color: #9ca3af; line-height: 1.8;">
-      <span style="font-weight: 600;">LR Consulting W.L.L</span> &nbsp;·&nbsp; C.R. Number: 190710 - 1<br>
-      Bldg. 40, Road 1701, Block 317, Diplomatic Area, Kingdom of Bahrain<br>
-      ladislas2005@gmail.com &nbsp;·&nbsp; +973 3400 8825
+  <!-- ===== 8. FOOTER ===== -->
+  <div style="border-top: 2px solid #192a45; padding-top: 12px; text-align: center;">
+    <div style="font-size: 12px; font-weight: 700; color: #192a45; margin-bottom: 2px;">LR Consulting W.L.L</div>
+    <div style="font-size: 9px; color: #888888; line-height: 1.6;">
+      C.R. Number: 190710 - 1 &nbsp;|&nbsp; Bldg. 40, Road 1701, Block 317, Diplomatic Area, Kingdom of Bahrain<br>
+      +973 3400 8825 &nbsp;|&nbsp; ladislas2005@gmail.com
     </div>
   </div>
 

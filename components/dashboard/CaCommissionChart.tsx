@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from 'recharts'
@@ -13,8 +14,7 @@ interface Props {
 }
 
 export default function CaCommissionChart({ commissions, primes }: Props) {
-  // Robuste : String() pour comparer les IDs, Number() || 0 pour les valeurs
-  const data = primes.map(prime => {
+  const data = useMemo(() => primes.map(prime => {
     const matched = commissions.filter(c => String(c.prime_id) === String(prime.id))
     return {
       name:       `${prime.icon} ${prime.name}`,
@@ -22,7 +22,7 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
       commission: matched.reduce((s, c) => s + (Number(c.commission) || 0), 0),
       color:      prime.color,
     }
-  }).filter(d => d.ca > 0)
+  }).filter(d => d.ca > 0), [commissions, primes])
 
   const tickFormatter = (v: number) =>
     v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
