@@ -49,7 +49,7 @@ function ClientCard({
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-semibold text-txt truncate">{client.name}</h3>
           {client.siren && (
-            <p className="text-xs text-txt2 mt-0.5">SIREN : {client.siren}</p>
+            <p className="text-xs text-txt2 mt-0.5">SIRET : {client.siren}</p>
           )}
           {client.address && (
             <p className="text-xs text-txt3 mt-0.5 truncate">{client.address}</p>
@@ -332,27 +332,27 @@ export default function ClientsPage() {
       >
         <div className="flex flex-col gap-4">
           <Input
-            label="Nom *"
-            placeholder="Nom du client"
+            label="Raison Sociale *"
+            placeholder="ex : ECODISTRIB"
             value={formName}
             onChange={(e) => setFormName(e.target.value)}
           />
           <Input
-            label="SIREN"
-            placeholder="123 456 789"
+            label="SIRET"
+            placeholder="ex : 903 879 492 00012"
             value={formSiren}
             onChange={(e) => setFormSiren(e.target.value)}
           />
           <Input
-            label="Adresse"
-            placeholder="Adresse complète"
+            label="Adresse Siège Social"
+            placeholder="ex : 29 Rue Pradier, 92410 Ville-d'Avray"
             value={formAddress}
             onChange={(e) => setFormAddress(e.target.value)}
           />
           <Input
-            label="Email"
+            label="Mail"
             type="email"
-            placeholder="contact@example.com"
+            placeholder="ex : contact@client.eu"
             value={formEmail}
             onChange={(e) => setFormEmail(e.target.value)}
           />
