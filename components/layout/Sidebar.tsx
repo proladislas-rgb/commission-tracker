@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import InlineEdit from '@/components/ui/InlineEdit'
+import ClientSelector from '@/components/clients/ClientSelector'
 import { supabase } from '@/lib/supabase'
 import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
 import type { User, ActivityLog } from '@/lib/types'
@@ -12,6 +13,11 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   '/dashboard': (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+  ),
+  '/dashboard/clients': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
     </svg>
   ),
   '/dashboard/invoices': (
@@ -33,6 +39,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
 
 const NAV_ITEMS = [
   { label: 'Dashboard',    href: '/dashboard' },
+  { label: 'Clients',      href: '/dashboard/clients' },
   { label: 'Facturation',  href: '/dashboard/invoices' },
   { label: 'Drive',        href: '/dashboard/drive' },
   { label: 'Email',        href: '/dashboard/email' },
@@ -168,13 +175,14 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
         )}
         {!collapsed && (
           <>
-            <div className="text-[11px] text-txt3 mt-1">
-              Client : <span className="text-txt2 font-medium">ECODISTRIB</span>
-            </div>
+            <ClientSelector collapsed={false} />
             <div className="text-[11px] text-txt3 mt-0.5">
               {formatDate(new Date().toISOString())}
             </div>
           </>
+        )}
+        {collapsed && (
+          <ClientSelector collapsed={true} />
         )}
       </div>
 
