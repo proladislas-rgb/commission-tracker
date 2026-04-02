@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 interface DriveFile {
   id: string
   name: string
@@ -10,6 +12,7 @@ interface DriveFile {
 
 interface DriveFileRowProps {
   file: DriveFile
+  onDelete?: () => void
 }
 
 const TYPE_STYLES: Record<string, { color: string; label: string }> = {
@@ -48,8 +51,22 @@ function formatDate(dateStr: string): string {
   }).format(new Date(dateStr))
 }
 
-export default function DriveFileRow({ file }: DriveFileRowProps) {
+export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const style = getTypeStyle(file.mimeType)
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/drive/delete?fileId=${file.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Échec de la suppression')
+      onDelete?.()
+    } catch {
+      setDeleting(false)
+      setConfirmDelete(false)
+    }
+  }
 
   const openInDrive = () => {
     window.open(`https://drive.google.com/file/d/${file.id}/view`, '_blank')
@@ -129,6 +146,29 @@ export default function DriveFileRow({ file }: DriveFileRowProps) {
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </button>
+
+          {/* Supprimer */}
+          {!confirmDelete ? (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+              title="Supprimer"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+            </button>
+          ) : (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50"
+              style={{ backgroundColor: 'rgba(244,63,94,0.15)', color: '#f43f5e' }}
+            >
+              {deleting ? '...' : 'Confirmer'}
+            </button>
+          )}
         </div>
       </td>
     </tr>

@@ -41,7 +41,6 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   const {
     clients,
     loading,
-    error: _error,
     reload,
     add,
     update,
@@ -66,17 +65,20 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // Auto-select fallback when clients load or selected client disappears
+  const needsFallback = !loading && (
+    (clients.length === 0 && selectedClientId !== null) ||
+    (clients.length > 0 && !clients.some((c) => c.id === selectedClientId))
+  )
+  const fallbackId = needsFallback
+    ? (clients.length === 0 ? null : pickFallbackClient(clients))
+    : undefined
+
   useEffect(() => {
-    if (loading) return
-    if (clients.length === 0) {
-      if (selectedClientId !== null) setSelectedClientId(null)
-      return
+    if (fallbackId !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync fallback selection when external client data changes
+      setSelectedClientId(fallbackId)
     }
-    const exists = clients.some((c) => c.id === selectedClientId)
-    if (!exists) {
-      setSelectedClientId(pickFallbackClient(clients))
-    }
-  }, [clients, loading, selectedClientId, setSelectedClientId])
+  }, [fallbackId, setSelectedClientId])
 
   const pinnedClients = useMemo(
     () => clients.filter((c) => c.pinned),

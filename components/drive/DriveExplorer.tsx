@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import DriveFileRow from './DriveFileRow'
 
 interface DriveFile {
@@ -24,6 +24,11 @@ export default function DriveExplorer() {
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([
     { id: 'root', name: 'Mon Drive' },
   ])
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null)
+  const [confirmDeleteFolderId, setConfirmDeleteFolderId] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentFolderId = breadcrumb[breadcrumb.length - 1].id
 
@@ -58,6 +63,52 @@ export default function DriveExplorer() {
     setBreadcrumb(prev => prev.slice(0, index + 1))
   }
 
+  const handleDeleteFolder = async (folderId: string) => {
+    setDeletingFolderId(folderId)
+    try {
+      const res = await fetch(`/api/drive/delete?fileId=${folderId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Échec de la suppression')
+      await fetchFiles(currentFolderId)
+    } catch {
+      // silently fail
+    } finally {
+      setDeletingFolderId(null)
+      setConfirmDeleteFolderId(null)
+    }
+  }
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    setUploadError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch(`/api/drive/upload?folderId=${currentFolderId}`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const data = await res.json() as { error: string }
+        throw new Error(data.error)
+      }
+
+      await fetchFiles(currentFolderId)
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Erreur lors de l\'upload')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   if (error === 'not_connected') {
     return null // parent handles this
   }
@@ -84,7 +135,42 @@ export default function DriveExplorer() {
             </div>
           ))}
         </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleUpload}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: '#8b5cf6',
+              color: '#f0eef8',
+              borderRadius: '8px',
+              padding: '7px 14px',
+              fontSize: '13px',
+              fontWeight: 500,
+            }}
+            onMouseEnter={e => {
+              if (!uploading) e.currentTarget.style.backgroundColor = '#a78bfa'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.backgroundColor = '#8b5cf6'
+            }}
+          >
+            {uploading ? 'Upload en cours...' : 'Upload vers Drive'}
+          </button>
+        </div>
       </div>
+
+      {/* Upload error */}
+      {uploadError && (
+        <p className="text-xs mb-4" style={{ color: '#8b85a8' }}>{uploadError}</p>
+      )}
 
       {/* Loading */}
       {loading && (
@@ -110,10 +196,9 @@ export default function DriveExplorer() {
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {folders.map(folder => (
-                  <button
+                  <div
                     key={folder.id}
-                    onClick={() => navigateToFolder(folder)}
-                    className="text-left rounded-xl p-4 transition-all duration-200 cursor-pointer group"
+                    className="relative text-left rounded-xl p-4 transition-all duration-200 group"
                     style={{
                       backgroundColor: 'rgba(139,92,246,0.04)',
                       border: '1px solid rgba(139,92,246,0.08)',
@@ -127,23 +212,54 @@ export default function DriveExplorer() {
                       e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.04)'
                       e.currentTarget.style.borderColor = 'rgba(139,92,246,0.08)'
                       e.currentTarget.style.boxShadow = 'none'
+                      setConfirmDeleteFolderId(null)
                     }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: 'rgba(245,158,11,0.12)' }}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
-                          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-                        </svg>
+                    <button
+                      onClick={() => navigateToFolder(folder)}
+                      className="w-full text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: 'rgba(245,158,11,0.12)' }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
+                            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm text-txt font-medium truncate">{folder.name}</p>
+                          <p className="text-[11px] text-txt3">Dossier</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm text-txt font-medium truncate">{folder.name}</p>
-                        <p className="text-[11px] text-txt3">Dossier</p>
-                      </div>
+                    </button>
+
+                    {/* Bouton supprimer dossier */}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      {confirmDeleteFolderId === folder.id ? (
+                        <button
+                          onClick={() => handleDeleteFolder(folder.id)}
+                          disabled={deletingFolderId === folder.id}
+                          className="px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50"
+                          style={{ backgroundColor: 'rgba(244,63,94,0.15)', color: '#f43f5e' }}
+                        >
+                          {deletingFolderId === folder.id ? '...' : 'Confirmer'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDeleteFolderId(folder.id)}
+                          className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+                          title="Supprimer"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -181,7 +297,7 @@ export default function DriveExplorer() {
                   </thead>
                   <tbody>
                     {files.map(file => (
-                      <DriveFileRow key={file.id} file={file} />
+                      <DriveFileRow key={file.id} file={file} onDelete={() => fetchFiles(currentFolderId)} />
                     ))}
                   </tbody>
                 </table>
