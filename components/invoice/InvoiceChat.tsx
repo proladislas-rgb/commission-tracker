@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback, type FormEvent } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useClientContext } from '@/hooks/useClientContext'
 import { useInvoiceChat } from '@/hooks/useInvoiceChat'
 import { avatarInitials } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -9,6 +10,7 @@ import InvoicePreview from './InvoicePreview'
 
 export default function InvoiceChat() {
   const { user } = useAuth()
+  const { selectedClient } = useClientContext()
   const { messages, sendMessage, loading } = useInvoiceChat()
   const [input, setInput] = useState('')
   const [associeId, setAssocieId] = useState<string | null>(null)
@@ -40,7 +42,10 @@ export default function InvoiceChat() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!input.trim() || loading) return
-    sendMessage(input)
+    const clientInfo = selectedClient
+      ? `\n[Client: ${selectedClient.name}${selectedClient.siren ? `, SIREN: ${selectedClient.siren}` : ''}${selectedClient.address ? `, Adresse: ${selectedClient.address}` : ''}]`
+      : ''
+    sendMessage(input + clientInfo)
     setInput('')
   }
 
