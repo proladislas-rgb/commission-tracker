@@ -75,6 +75,15 @@ export function useClients() {
       if (err) throw err
       const result = inserted as Client
       setClients(prev => prev.map(c => c.id === optimisticId ? result : c))
+
+      // Auto-create chat channel for this client
+      const slug = result.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      await supabase.from('channels').insert({
+        name: slug,
+        type: 'client',
+        client_id: result.id,
+      })
+
       return result
     } catch (e) {
       setClients(prev => prev.filter(c => c.id !== optimisticId))

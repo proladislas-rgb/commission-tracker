@@ -7,7 +7,7 @@ import InlineEdit from '@/components/ui/InlineEdit'
 import ClientSelector from '@/components/clients/ClientSelector'
 import { supabase } from '@/lib/supabase'
 import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
-import type { User, ActivityLog } from '@/lib/types'
+import type { User, ActivityLog, Channel } from '@/lib/types'
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   '/dashboard': (
@@ -35,6 +35,14 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
     </svg>
   ),
+  '/dashboard/chat': (
+    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 10a2 2 0 01-2 2H5l-3 2V4a2 2 0 012-2h8a2 2 0 012 2v6z"/>
+      <circle cx="5.5" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
+      <circle cx="8" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
+      <circle cx="10.5" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
+    </svg>
+  ),
 }
 
 const NAV_ITEMS = [
@@ -43,6 +51,7 @@ const NAV_ITEMS = [
   { label: 'Facturation',  href: '/dashboard/invoices' },
   { label: 'Drive',        href: '/dashboard/drive' },
   { label: 'Email',        href: '/dashboard/email' },
+  { label: 'Chat',         href: '/dashboard/chat' },
 ]
 
 interface SidebarProps {
@@ -60,6 +69,46 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [activityLogs, setActivityLogs] = useState<(ActivityLog & { user?: User })[]>([])
+  const [chatUnreadCount, setChatUnreadCount] = useState(0)
+
+  // Chat unread badge
+  useEffect(() => {
+    const userId = user?.id
+    if (!userId) return
+
+    async function fetchUnread() {
+      try {
+        const { data: chans } = await supabase.from('channels').select('id')
+        if (!chans) return
+        let total = 0
+        for (const ch of chans as Channel[]) {
+          const lastRead = localStorage.getItem(`chat_read_${ch.id}`)
+          let query = supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('channel_id', ch.id)
+            .neq('user_id', userId)
+          if (lastRead) {
+            query = query.gt('created_at', lastRead)
+          }
+          const { count } = await query
+          total += Number(count) || 0
+        }
+        setChatUnreadCount(total)
+      } catch {
+        // silencieux
+      }
+    }
+
+    fetchUnread()
+    const channel = supabase.channel('sidebar-chat-unread')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+        fetchUnread()
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user?.id])
   const loadUsers = useCallback(async () => {
     try {
       const { data } = await supabase
@@ -223,9 +272,31 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                   color: isActive ? '#a78bfa' : '#8b85a8',
                   filter: isActive ? 'drop-shadow(0 0 4px rgba(139,92,246,0.3))' : 'none',
                   transition: 'all 0.2s ease',
+                  position: 'relative',
                 }}
               >
                 {NAV_ICONS[item.href]}
+                {item.href === '/dashboard/chat' && chatUnreadCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '2px',
+                    background: '#f43f5e',
+                    color: '#ffffff',
+                    fontSize: '8px',
+                    fontWeight: 700,
+                    minWidth: '15px',
+                    height: '15px',
+                    borderRadius: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 3px',
+                    border: '1.5px solid #06050e',
+                  }}>
+                    {chatUnreadCount}
+                  </span>
+                )}
               </span>
               {!collapsed && <span>{item.label}</span>}
             </button>

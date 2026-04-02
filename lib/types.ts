@@ -95,6 +95,28 @@ export interface ActivityLog {
   user?: User
 }
 
+export interface Channel {
+  id: string
+  name: string
+  type: 'general' | 'client'
+  client_id: string | null
+  created_at: string
+}
+
+export interface Message {
+  id: string
+  channel_id: string
+  user_id: string
+  content: string | null
+  file_url: string | null
+  file_name: string | null
+  file_size: string | null
+  file_type: string | null
+  reactions: Record<string, string[]>
+  created_at: string
+  user?: User
+}
+
 export interface AuthUser {
   id: string
   username: string
