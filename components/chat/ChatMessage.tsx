@@ -56,22 +56,21 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
 
   return (
     <div
-      className="relative group"
-      style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', flexDirection: isOwn ? 'row-reverse' : 'row' }}
+      style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', flexDirection: isOwn ? 'row-reverse' : 'row' }}
       onMouseEnter={() => setShowPicker(true)}
       onMouseLeave={() => setShowPicker(false)}
     >
-      {/* Avatar */}
+      {/* Avatar — 24px, compact */}
       {showAvatar ? (
-        <div style={{ width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 500, flexShrink: 0, backgroundColor: avatarBg, color: avatarColor }}>
+        <div style={{ width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 600, flexShrink: 0, backgroundColor: avatarBg, color: avatarColor, marginTop: '2px' }}>
           {initial}
         </div>
       ) : (
-        <div style={{ width: '28px', flexShrink: 0 }} />
+        <div style={{ width: '24px', flexShrink: 0 }} />
       )}
 
       {/* Content */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start', maxWidth: '65%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start', maxWidth: '65%', minWidth: 0 }}>
         {/* Name */}
         {showAvatar && (
           <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '10px', fontWeight: 500, color: nameColor, marginBottom: '2px' }}>
@@ -80,66 +79,63 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         )}
 
         {/* Bubble */}
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              backgroundColor: isOwn ? (isFile ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.15)') : '#16142a',
-              border: `0.5px solid ${isOwn ? 'rgba(139,92,246,0.25)' : (isFile ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.12)')}`,
-              borderRadius: '10px',
-              padding: isFile ? '8px 10px' : '8px 12px',
-            }}
-            onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-            onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(139,92,246,0.2)' : 'rgba(99,102,241,0.15)' }}
-          >
-            {isFile ? (
-              <a
-                href={message.file_url ?? '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}
-              >
-                <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
-                  {fileStyle.label}
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <p style={{ color: '#f0eef8', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
-                  <p style={{ color: '#8b85a8', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
-                </div>
-              </a>
-            ) : (
-              <p style={{ color: '#f0eef8', fontSize: '13px', lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif', margin: 0, wordBreak: 'break-word' }}>
-                {message.content}
-              </p>
-            )}
-          </div>
-
-          {/* Reaction toolbar on hover */}
-          {showPicker && (
-            <div style={{
-              position: 'absolute',
-              top: '-18px',
-              right: isOwn ? undefined : '0',
-              left: isOwn ? '0' : undefined,
-              backgroundColor: '#16142a',
-              border: '0.5px solid rgba(99,102,241,0.15)',
-              borderRadius: '8px',
-              padding: '4px 8px',
-              display: 'flex',
-              gap: '6px',
-              zIndex: 10,
-            }}>
-              {QUICK_EMOJIS.map(emoji => (
-                <button
-                  key={emoji}
-                  onClick={() => onReaction(message.id, emoji)}
-                  style={{ fontSize: '16px', cursor: 'pointer', background: 'none', border: 'none', padding: 0, lineHeight: 1 }}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+        <div
+          style={{
+            backgroundColor: isOwn ? (isFile ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.15)') : '#16142a',
+            border: `0.5px solid ${isOwn ? 'rgba(139,92,246,0.25)' : (isFile ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.12)')}`,
+            borderRadius: '10px',
+            padding: isFile ? '8px 10px' : '8px 12px',
+          }}
+          onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
+          onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(139,92,246,0.2)' : 'rgba(99,102,241,0.15)' }}
+        >
+          {isFile ? (
+            <a
+              href={message.file_url ?? '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}
+            >
+              <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
+                {fileStyle.label}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ color: '#f0eef8', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
+                <p style={{ color: '#8b85a8', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
+              </div>
+            </a>
+          ) : (
+            <p style={{ color: '#f0eef8', fontSize: '13px', lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif', margin: 0, wordBreak: 'break-word' }}>
+              {message.content}
+            </p>
           )}
         </div>
+
+        {/* Emoji toolbar — BELOW the bubble, visible on hover */}
+        {showPicker && (
+          <div style={{
+            backgroundColor: '#16142a',
+            border: '0.5px solid rgba(99,102,241,0.15)',
+            borderRadius: '8px',
+            padding: '3px 5px',
+            display: 'inline-flex',
+            gap: '2px',
+            marginTop: '3px',
+            zIndex: 10,
+          }}>
+            {QUICK_EMOJIS.map(emoji => (
+              <button
+                key={emoji}
+                onClick={() => onReaction(message.id, emoji)}
+                style={{ fontSize: '16px', cursor: 'pointer', background: 'none', border: 'none', padding: '2px 4px', lineHeight: 1, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.2)' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Reactions */}
         {hasReactions && (
@@ -188,7 +184,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         )}
 
         {/* Timestamp */}
-        <span style={{ color: '#4a4466', fontSize: '9px', marginTop: '3px', textAlign: 'right', fontFamily: 'DM Sans, sans-serif' }}>
+        <span style={{ color: '#4a4466', fontSize: '9px', marginTop: '3px', fontFamily: 'DM Sans, sans-serif' }}>
           {formatTime(message.created_at)}
         </span>
       </div>
