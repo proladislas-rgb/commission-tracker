@@ -74,6 +74,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
         status:        form.status,
         commission_id: null,
         created_by:    userId,
+        client_id:     null as string | null,
       })
       setShowModal(false)
       setForm({ date: new Date().toISOString().slice(0, 10), montant: '', label: '', status: 'en_attente' })

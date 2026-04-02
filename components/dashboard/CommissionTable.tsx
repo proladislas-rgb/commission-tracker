@@ -123,6 +123,7 @@ export default function CommissionTable({
         notes:      form.notes || null,
         user_id:    userId,
         created_by: userId,
+        client_id:  null as string | null,
       }
       if (editId) {
         await onUpdate(editId, payload)

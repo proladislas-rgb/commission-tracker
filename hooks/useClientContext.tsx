@@ -21,8 +21,8 @@ interface ClientContextValue {
   selectedClient: Client | null
   setSelectedClientId: (id: string | null) => void
   clientsLoading: boolean
-  addClient: (data: Omit<Client, 'id' | 'created_at' | 'created_by'>) => Promise<Client>
-  updateClient: (id: string, data: Partial<Omit<Client, 'id' | 'created_at' | 'created_by'>>) => Promise<void>
+  addClient: (data: { name: string; siren?: string; address?: string; email?: string; color?: string; created_by: string }) => Promise<Client>
+  updateClient: (id: string, data: { name?: string; siren?: string; address?: string; email?: string; color?: string }) => Promise<void>
   togglePinClient: (id: string) => Promise<void>
   removeClient: (id: string) => Promise<void>
   reloadClients: () => Promise<void>

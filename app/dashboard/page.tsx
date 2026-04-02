@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useClientContext } from '@/hooks/useClientContext'
 import { useCommissions } from '@/hooks/useCommissions'
 import { usePaiements } from '@/hooks/usePaiements'
 import { useSommesDues } from '@/hooks/useSommesDues'
@@ -22,6 +23,7 @@ import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityActio
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { selectedClientId, selectedClient } = useClientContext()
   const [associe, setAssociate] = useState<User | null>(null)
   const [primes, setPrimes]     = useState<Prime[]>([])
 
@@ -42,13 +44,15 @@ export default function DashboardPage() {
 
   const loadPrimes = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from('primes').select('*')
+      let query = supabase.from('primes').select('*')
+      if (selectedClientId) query = query.eq('client_id', selectedClientId)
+      const { data, error } = await query
       if (error) throw error
       setPrimes(data ?? [])
     } catch {
       // erreur silencieuse, garde le state actuel
     }
-  }, [])
+  }, [selectedClientId])
 
   useEffect(() => {
     loadAssociate()
@@ -82,9 +86,9 @@ export default function DashboardPage() {
   // Garde-fou de cohérence : vérification toutes les 10s
   const associeId = associe?.id
 
-  const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId)
-  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId)
-  const { sommesDues, add: addSommeDue, updateStatus: updateSommeDueStatus, remove: removeSommeDue } = useSommesDues(associeId)
+  const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId, selectedClientId ?? undefined)
+  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId, selectedClientId ?? undefined)
+  const { sommesDues, add: addSommeDue, updateStatus: updateSommeDueStatus, remove: removeSommeDue } = useSommesDues(selectedClientId ?? undefined)
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -122,7 +126,7 @@ export default function DashboardPage() {
   }
 
   async function handleAddCommission(data: Omit<Commission, 'id' | 'created_at' | 'updated_at'>) {
-    const inserted = await addCommission(data)
+    const inserted = await addCommission({ ...data, client_id: selectedClientId })
     const prime = primes.find(p => p.id === data.prime_id)
     await logActivity('create', 'commission', inserted.id,
       `${user!.display_name} a ajouté une commission ${prime?.name ?? data.prime_id} de ${new Intl.NumberFormat('fr-FR').format(data.ca)} €`)
@@ -149,7 +153,7 @@ export default function DashboardPage() {
     const id = slugifyPrimeName(data.name)
     const { data: newPrime, error } = await supabase
       .from('primes')
-      .insert({ id, name: data.name, color: data.color, icon: data.icon, active: true })
+      .insert({ id, name: data.name, color: data.color, icon: data.icon, active: true, client_id: selectedClientId })
       .select()
       .single()
     if (error) throw new Error(error.message)
@@ -168,7 +172,7 @@ export default function DashboardPage() {
     const id = slugifyPrimeName(primeData.name)
     const { data: newPrime, error: primeError } = await supabase
       .from('primes')
-      .insert({ id, name: primeData.name, color: primeData.color, icon: primeData.icon, active: true })
+      .insert({ id, name: primeData.name, color: primeData.color, icon: primeData.icon, active: true, client_id: selectedClientId })
       .select()
       .single()
     if (primeError) throw new Error(primeError.message)
@@ -185,6 +189,7 @@ export default function DashboardPage() {
       notes:      null,
       user_id:    associeId ?? user!.id,
       created_by: user!.id,
+      client_id:  selectedClientId,
     }
     await addCommission(commPayload)
 
@@ -204,7 +209,7 @@ export default function DashboardPage() {
   }
 
   const handleAddPaiement = useCallback(async (data: Omit<Paiement, 'id' | 'created_at'>) => {
-    await addPaiement(data)
+    await addPaiement({ ...data, client_id: selectedClientId })
     try {
       await supabase.from('activity_log').insert({
         user_id:     data.created_by,
@@ -216,7 +221,7 @@ export default function DashboardPage() {
     } catch {
       // log silencieux
     }
-  }, [addPaiement])
+  }, [addPaiement, selectedClientId])
 
   const handleDeletePaiement = useCallback(async (id: string) => {
     const paiement = paiements.find(p => p.id === id)
@@ -247,6 +252,18 @@ export default function DashboardPage() {
   }
 
   if (!user) return null
+
+  if (!selectedClient) {
+    return (
+      <>
+        <Header associe={associe} primesCount={0} onRenameAssociate={handleRenameAssociate} onMobileMenuOpen={() => {}} />
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-txt2 text-lg mb-2">Aucun client sélectionné</p>
+          <p className="text-txt3 text-sm">Sélectionnez un client dans la sidebar ou créez-en un depuis la page Clients.</p>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
