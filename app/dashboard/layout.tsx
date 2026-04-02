@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import AppShell from '@/components/layout/AppShell'
+import { ClientProvider } from '@/hooks/useClientContext'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@/lib/types'
 
@@ -71,8 +72,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) return null
 
   return (
-    <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
-      {children}
-    </AppShell>
+    <ClientProvider>
+      <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
+        {children}
+      </AppShell>
+    </ClientProvider>
   )
 }
