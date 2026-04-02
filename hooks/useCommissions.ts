@@ -14,7 +14,7 @@ function normalizeCommission<T extends Record<string, unknown>>(row: T): T {
   }
 }
 
-export function useCommissions(userId?: string) {
+export function useCommissions(userId?: string, clientId?: string) {
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [loading, setLoading]         = useState(true)
   const [error, setError]             = useState<string | null>(null)
@@ -29,6 +29,7 @@ export function useCommissions(userId?: string) {
         .order('created_at', { ascending: false })
 
       if (userId) query = query.eq('user_id', userId)
+      if (clientId) query = query.eq('client_id', clientId)
 
       const { data, error: err } = await query
       if (err) throw err
@@ -39,7 +40,7 @@ export function useCommissions(userId?: string) {
     } finally {
       setLoading(false)
     }
-  }, [userId])
+  }, [userId, clientId])
 
   useEffect(() => { load() }, [load])
 

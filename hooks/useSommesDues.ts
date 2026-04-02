@@ -9,7 +9,7 @@ function normalize<T extends Record<string, unknown>>(row: T): T {
   return { ...row, montant: Number(row.montant) || 0 }
 }
 
-export function useSommesDues(createdBy?: string) {
+export function useSommesDues(clientId?: string) {
   const [sommesDues, setSommesDues] = useState<SommeDue[]>([])
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState<string | null>(null)
@@ -18,10 +18,12 @@ export function useSommesDues(createdBy?: string) {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: err } = await supabase
+      let query = supabase
         .from('sommes_dues')
         .select('*')
         .order('created_at', { ascending: false })
+      if (clientId) query = query.eq('client_id', clientId)
+      const { data, error: err } = await query
       if (err) throw err
       setSommesDues((data ?? []).map(r => normalize(r)) as SommeDue[])
     } catch (e) {
@@ -29,7 +31,7 @@ export function useSommesDues(createdBy?: string) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [clientId])
 
   useEffect(() => { load() }, [load])
 

@@ -12,7 +12,7 @@ function normalizePaiement<T extends Record<string, unknown>>(row: T): T {
   }
 }
 
-export function usePaiements(createdBy?: string) {
+export function usePaiements(createdBy?: string, clientId?: string) {
   const [paiements, setPaiements] = useState<Paiement[]>([])
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
@@ -27,6 +27,7 @@ export function usePaiements(createdBy?: string) {
         .order('date', { ascending: false })
 
       if (createdBy) query = query.eq('created_by', createdBy)
+      if (clientId) query = query.eq('client_id', clientId)
 
       const { data, error: err } = await query
       if (err) throw err
@@ -37,7 +38,7 @@ export function usePaiements(createdBy?: string) {
     } finally {
       setLoading(false)
     }
-  }, [createdBy])
+  }, [createdBy, clientId])
 
   useEffect(() => { load() }, [load])
 
