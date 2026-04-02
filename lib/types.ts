@@ -25,6 +25,7 @@ export interface Commission {
   created_at: string
   updated_at: string
   created_by: string
+  client_id: string | null
   prime?: Prime
   user?: User
 }
@@ -39,6 +40,7 @@ export interface Paiement {
   status: PaiementStatus
   commission_id: string | null
   created_by: string
+  client_id: string | null
   created_at: string
 }
 
@@ -48,6 +50,7 @@ export interface Prime {
   color: string
   icon: string
   active: boolean
+  client_id: string | null
   created_at?: string
 }
 
@@ -58,6 +61,19 @@ export interface SommeDue {
   label: string
   montant: number
   status: SommeDueStatus
+  created_by: string
+  client_id: string | null
+  created_at: string
+}
+
+export interface Client {
+  id: string
+  name: string
+  siren: string | null
+  address: string | null
+  email: string | null
+  color: string
+  pinned: boolean
   created_by: string
   created_at: string
 }
