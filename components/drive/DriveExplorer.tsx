@@ -126,7 +126,7 @@ export default function DriveExplorer() {
                 onClick={() => navigateToBreadcrumb(i)}
                 className={`transition-colors cursor-pointer ${
                   i === breadcrumb.length - 1
-                    ? 'text-[#8b5cf6] font-medium'
+                    ? 'text-[#818cf8] font-medium'
                     : 'text-txt2 hover:text-txt'
                 }`}
               >
@@ -148,18 +148,18 @@ export default function DriveExplorer() {
             disabled={uploading}
             className="transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: '#8b5cf6',
-              color: '#f0eef8',
+              backgroundColor: '#6366f1',
+              color: '#e8edf5',
               borderRadius: '8px',
               padding: '7px 14px',
               fontSize: '13px',
               fontWeight: 500,
             }}
             onMouseEnter={e => {
-              if (!uploading) e.currentTarget.style.backgroundColor = '#a78bfa'
+              if (!uploading) e.currentTarget.style.backgroundColor = '#818cf8'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.backgroundColor = '#8b5cf6'
+              e.currentTarget.style.backgroundColor = '#6366f1'
             }}
           >
             {uploading ? 'Upload en cours...' : 'Upload vers Drive'}
@@ -169,7 +169,7 @@ export default function DriveExplorer() {
 
       {/* Upload error */}
       {uploadError && (
-        <p className="text-xs mb-4" style={{ color: '#8b85a8' }}>{uploadError}</p>
+        <p className="text-xs mb-4" style={{ color: '#8898aa' }}>{uploadError}</p>
       )}
 
       {/* Loading */}
@@ -178,7 +178,7 @@ export default function DriveExplorer() {
           <div className="flex items-center gap-3">
             <div
               className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-              style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }}
+              style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }}
             />
             <span className="text-sm text-txt2">Chargement...</span>
           </div>
@@ -200,17 +200,17 @@ export default function DriveExplorer() {
                     key={folder.id}
                     className="relative text-left rounded-xl p-4 transition-all duration-200 group"
                     style={{
-                      backgroundColor: 'rgba(139,92,246,0.04)',
-                      border: '1px solid rgba(139,92,246,0.08)',
+                      backgroundColor: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)',
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.08)'
-                      e.currentTarget.style.borderColor = 'rgba(139,92,246,0.2)'
-                      e.currentTarget.style.boxShadow = '0 0 20px rgba(139,92,246,0.08)'
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+                      e.currentTarget.style.boxShadow = 'none'
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.04)'
-                      e.currentTarget.style.borderColor = 'rgba(139,92,246,0.08)'
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
                       e.currentTarget.style.boxShadow = 'none'
                       setConfirmDeleteFolderId(null)
                     }}
@@ -252,7 +252,7 @@ export default function DriveExplorer() {
                           className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
                           title="Supprimer"
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
                             <polyline points="3 6 5 6 21 6" />
                             <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
@@ -274,13 +274,13 @@ export default function DriveExplorer() {
               <div
                 className="rounded-xl overflow-hidden"
                 style={{
-                  border: '1px solid rgba(139,92,246,0.08)',
-                  backgroundColor: 'rgba(139,92,246,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  backgroundColor: 'rgba(255,255,255,0.01)',
                 }}
               >
                 <table className="w-full">
                   <thead>
-                    <tr style={{ backgroundColor: 'rgba(139,92,246,0.06)' }}>
+                    <tr style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
                       <th className="text-left py-2.5 px-4 text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold">
                         Nom
                       </th>
@@ -308,7 +308,7 @@ export default function DriveExplorer() {
           {/* Vide */}
           {folders.length === 0 && files.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4a4466" strokeWidth="1.5" className="mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3d4f63" strokeWidth="1.5" className="mb-4">
                 <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
               </svg>
               <p className="text-sm text-txt2">Ce dossier est vide</p>

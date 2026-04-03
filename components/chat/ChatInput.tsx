@@ -40,15 +40,15 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled }: 
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderTop: '0.5px solid rgba(99,102,241,0.1)', backgroundColor: '#0e0d1a' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderTop: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: '#0f1117' }}>
       <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
 
       {/* Trombone */}
       <button
         onClick={() => fileInputRef.current?.click()}
-        style={{ background: 'transparent', border: 'none', color: '#8b85a8', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
-        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.1)'; e.currentTarget.style.color = '#a78bfa' }}
-        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8b85a8' }}
+        style={{ background: 'transparent', border: 'none', color: '#8898aa', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#818cf8' }}
+        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8898aa' }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
@@ -66,16 +66,15 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled }: 
         className="outline-none"
         style={{
           flex: 1,
-          backgroundColor: '#16142a',
-          border: '0.5px solid rgba(99,102,241,0.15)',
+          backgroundColor: '#151a24',
+          border: '0.5px solid rgba(255,255,255,0.08)',
           borderRadius: '8px',
           padding: '8px 12px',
-          color: '#f0eef8',
+          color: '#e8edf5',
           fontSize: '12px',
-          fontFamily: 'DM Sans, sans-serif',
         }}
-        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.15)' }}
+        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
       />
 
       {/* Envoyer */}
@@ -84,18 +83,17 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled }: 
         disabled={!text.trim() || disabled}
         className="disabled:opacity-40 disabled:cursor-not-allowed"
         style={{
-          backgroundColor: '#8b5cf6',
+          backgroundColor: '#6366f1',
           border: 'none',
           borderRadius: '8px',
           padding: '7px 14px',
-          color: '#f0eef8',
+          color: '#e8edf5',
           fontSize: '12px',
           fontWeight: 500,
-          fontFamily: 'Space Grotesk, sans-serif',
           cursor: 'pointer',
         }}
-        onMouseEnter={e => { if (text.trim()) e.currentTarget.style.backgroundColor = '#7c3aed' }}
-        onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#8b5cf6' }}
+        onMouseEnter={e => { if (text.trim()) e.currentTarget.style.backgroundColor = '#818cf8' }}
+        onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#6366f1' }}
       >
         Envoyer
       </button>

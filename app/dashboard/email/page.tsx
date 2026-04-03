@@ -56,7 +56,6 @@ function EmailPageContent() {
       <div className="px-6 md:px-10 pt-6 pb-4">
         <h1
           className="text-2xl font-bold text-txt mb-1"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Email
         </h1>
@@ -71,7 +70,7 @@ function EmailPageContent() {
           <div className="flex items-center gap-3">
             <div
               className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-              style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }}
+              style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }}
             />
             <span className="text-sm text-txt2">Vérification de la connexion Gmail...</span>
           </div>
@@ -90,7 +89,7 @@ function EmailPageContent() {
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-txt mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h2 className="text-lg font-semibold text-txt mb-2">
             Connectez Gmail
           </h2>
           <p className="text-sm text-txt2 mb-6 text-center max-w-md">
@@ -101,7 +100,7 @@ function EmailPageContent() {
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-200"
             style={{
               background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-              boxShadow: '0 4px 15px rgba(139,92,246,0.3)',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -118,7 +117,7 @@ function EmailPageContent() {
       {connected === true && (
         <div
           className="flex-1 flex flex-col mx-6 md:mx-10 mb-6 overflow-hidden rounded-xl"
-          style={{ border: '1px solid rgba(139,92,246,0.08)' }}
+          style={{ border: '1px solid rgba(255,255,255,0.05)' }}
         >
           <EmailComposer initialAttachments={initialAttachments} />
         </div>
@@ -133,7 +132,7 @@ export default function EmailPage() {
       <div className="flex items-center justify-center h-screen">
         <div
           className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-          style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }}
+          style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }}
         />
       </div>
     }>

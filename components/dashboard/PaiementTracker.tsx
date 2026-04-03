@@ -102,29 +102,29 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
           <div
             key={item.label}
             className="rounded-[20px] p-4 min-h-[80px] relative overflow-hidden transition-shadow duration-300"
-            style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}
+            style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}88)` }} />
             <p className="text-[10px] uppercase tracking-[0.9px] font-medium mb-1" style={{ color: item.color }}>
               {item.label}
             </p>
-            <p className="text-lg font-bold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(item.value)}</p>
+            <p className="text-lg font-bold text-txt">{formatCurrency(item.value)}</p>
           </div>
         ))}
       </div>
 
       {/* Barre de progression */}
-      <div className="rounded-card p-4 mb-4 min-h-[80px]" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+      <div className="rounded-card p-4 mb-4 min-h-[80px]" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex justify-between text-xs text-txt2 mb-2">
           <span>Progression encaissement</span>
-          <span className="font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{progress.toFixed(1)}%</span>
+          <span className="font-semibold text-txt">{progress.toFixed(1)}%</span>
         </div>
         <div className="h-2 bg-raised rounded-full overflow-hidden">
           <div
             className="h-full rounded-full will-change-transform"
             style={{
               width: mounted ? `${progress}%` : '0%',
-              background: 'linear-gradient(90deg, #8b5cf6, #6366f1, #10b981)',
+              background: 'linear-gradient(90deg, #6366f1, #10b981)',
               transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
@@ -137,19 +137,19 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
       {/* Graphique */}
       {chartData.length > 0 && (
-        <div className="rounded-card p-4 mb-4 min-h-[220px]" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+        <div className="rounded-card p-4 mb-4 min-h-[220px]" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
           <ResponsiveContainer width="100%" height={180}>
             <ComposedChart data={chartData} margin={{ left: 0, right: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.06)" />
-              <XAxis dataKey="date" tick={{ fill: '#8b85a8', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#8b85a8', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="date" tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={CHART_TOOLTIP_STYLE}
                 formatter={(value) => formatCurrency(Number(value))}
-                labelStyle={{ color: '#f0eef8' }}
-                itemStyle={{ color: '#8b85a8' }}
+                labelStyle={{ color: '#e8edf5' }}
+                itemStyle={{ color: '#8898aa' }}
               />
               <Bar dataKey="montant" name="Montant" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               <Line dataKey="cumul" name="Cumul" stroke="#10b981" strokeWidth={2} dot={false} />
@@ -160,10 +160,10 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
       {/* Liste paiements */}
       {paiements.length > 0 && (
-        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ backgroundColor: 'rgba(139,92,246,0.04)' }}>
+              <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
                 {['Date', 'Libellé', 'Montant', 'Statut', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-2.5 text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold">
                     {h}
@@ -173,10 +173,10 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
             </thead>
             <tbody>
               {paiements.map(p => (
-                <tr key={p.id} className="border-t border-[rgba(139,92,246,0.06)] hover:bg-[rgba(139,92,246,0.06)] transition-colors duration-300 even:bg-[rgba(139,92,246,0.02)]">
+                <tr key={p.id} className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.04)] transition-colors duration-300 even:bg-[rgba(255,255,255,0.01)]">
                   <td className="px-4 py-2.5 text-txt2">{formatDate(p.date)}</td>
                   <td className="px-4 py-2.5 text-txt">{p.label}</td>
-                  <td className="px-4 py-2.5 font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(Number(p.montant))}</td>
+                  <td className="px-4 py-2.5 font-semibold text-txt">{formatCurrency(Number(p.montant))}</td>
                   <td className="px-4 py-2.5">
                     <select
                       value={p.status}

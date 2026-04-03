@@ -49,10 +49,10 @@ export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, o
       </div>
 
       {sommesDues.length > 0 && (
-        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ backgroundColor: 'rgba(139,92,246,0.04)' }}>
+              <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
                 {['Libellé', 'Montant', 'Statut', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-2.5 text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold">
                     {h}
@@ -62,9 +62,9 @@ export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, o
             </thead>
             <tbody>
               {sommesDues.map((s, index) => (
-                <tr key={s.id || `somme-${index}`} className="border-t border-[rgba(139,92,246,0.06)] hover:bg-[rgba(139,92,246,0.06)] transition-colors duration-300 even:bg-[rgba(139,92,246,0.02)]">
+                <tr key={s.id || `somme-${index}`} className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.04)] transition-colors duration-300 even:bg-[rgba(255,255,255,0.01)]">
                   <td className="px-4 py-2.5 text-txt">{s.label}</td>
-                  <td className="px-4 py-2.5 font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{formatCurrency(Number(s.montant))}</td>
+                  <td className="px-4 py-2.5 font-semibold text-txt">{formatCurrency(Number(s.montant))}</td>
                   <td className="px-4 py-2.5">
                     <select
                       value={s.status}
@@ -110,7 +110,7 @@ export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, o
       )}
 
       {sommesDues.length === 0 && (
-        <div className="rounded-card p-6 text-center text-txt3 text-sm" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
+        <div className="rounded-card p-6 text-center text-txt3 text-sm" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
           Aucun montant à percevoir
         </div>
       )}

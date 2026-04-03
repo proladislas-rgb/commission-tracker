@@ -29,7 +29,6 @@ export default function DrivePage() {
       <div className="mb-8">
         <h1
           className="text-2xl font-bold text-txt mb-1"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Google Drive
         </h1>
@@ -44,7 +43,7 @@ export default function DrivePage() {
           <div className="flex items-center gap-3">
             <div
               className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-              style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }}
+              style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }}
             />
             <span className="text-sm text-txt2">Vérification de la connexion Google...</span>
           </div>
@@ -56,13 +55,13 @@ export default function DrivePage() {
         <div className="flex flex-col items-center justify-center py-20">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-            style={{ backgroundColor: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)' }}
+            style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.5">
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-txt mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h2 className="text-lg font-semibold text-txt mb-2">
             Connectez votre Google Drive
           </h2>
           <p className="text-sm text-txt2 mb-6 text-center max-w-md">
@@ -73,14 +72,14 @@ export default function DrivePage() {
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-200"
             style={{
               background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-              boxShadow: '0 4px 15px rgba(139,92,246,0.3)',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.boxShadow = '0 4px 25px rgba(139,92,246,0.5)'
+              e.currentTarget.style.boxShadow = '0 4px 25px rgba(0,0,0,0.5)'
               e.currentTarget.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(139,92,246,0.3)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.4)'
               e.currentTarget.style.transform = 'translateY(0)'
             }}
           >

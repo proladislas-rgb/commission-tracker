@@ -27,8 +27,8 @@ function getTypeColor(mimeType: string): string {
   if (mimeType.includes('pdf')) return '#f43f5e'
   if (mimeType.includes('document') || mimeType.includes('word')) return '#38bdf8'
   if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '#10b981'
-  if (mimeType.includes('image')) return '#8b5cf6'
-  return '#8b85a8'
+  if (mimeType.includes('image')) return '#818cf8'
+  return '#8898aa'
 }
 
 export default function EmailComposer({ initialAttachments = [], onSent }: EmailComposerProps) {
@@ -141,10 +141,9 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(139,92,246,0.08)' }}>
+      <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <h2
           className="text-base font-semibold text-txt"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Nouveau message
         </h2>
@@ -164,11 +163,11 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
             placeholder="email@exemple.com"
             className="w-full px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none transition-all duration-200"
             style={{
-              backgroundColor: 'rgba(139,92,246,0.04)',
-              border: '1px solid rgba(139,92,246,0.1)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.07)',
             }}
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.1)' }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)' }}
           />
         </div>
 
@@ -184,11 +183,11 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
             placeholder="Objet de l'email"
             className="w-full px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none transition-all duration-200"
             style={{
-              backgroundColor: 'rgba(139,92,246,0.04)',
-              border: '1px solid rgba(139,92,246,0.1)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.07)',
             }}
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.1)' }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)' }}
           />
         </div>
 
@@ -203,12 +202,12 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
             placeholder="Rédigez votre message..."
             className="w-full flex-1 px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none resize-none transition-all duration-200"
             style={{
-              backgroundColor: 'rgba(139,92,246,0.04)',
-              border: '1px solid rgba(139,92,246,0.1)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.07)',
               minHeight: '300px',
             }}
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.1)' }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)' }}
           />
         </div>
 
@@ -224,8 +223,8 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
                   key={`${att.fileName}-${i}`}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs"
                   style={{
-                    backgroundColor: 'rgba(139,92,246,0.06)',
-                    border: '1px solid rgba(139,92,246,0.12)',
+                    backgroundColor: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.07)',
                   }}
                 >
                   {/* Icône type */}
@@ -261,7 +260,7 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
                     onClick={() => removeAttachment(i)}
                     className="p-0.5 rounded hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18" />
                       <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
@@ -335,21 +334,21 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
       {/* Footer */}
       <div
         className="px-6 py-3 flex items-center gap-3"
-        style={{ borderTop: '1px solid rgba(139,92,246,0.08)' }}
+        style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
       >
         <button
           onClick={handleSend}
           disabled={sending}
           className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 cursor-pointer disabled:opacity-50"
           style={{
-            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-            boxShadow: '0 2px 10px rgba(139,92,246,0.3)',
+            background: 'linear-gradient(135deg, #6366f1, #818cf8)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
           }}
           onMouseEnter={e => {
-            if (!sending) e.currentTarget.style.boxShadow = '0 4px 20px rgba(139,92,246,0.5)'
+            if (!sending) e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)'
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.boxShadow = '0 2px 10px rgba(139,92,246,0.3)'
+            e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)'
           }}
         >
           {sending ? (
@@ -373,7 +372,7 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
 
         <button
           onClick={reset}
-          className="px-4 py-2 rounded-lg text-sm text-txt2 hover:text-txt hover:bg-[rgba(139,92,246,0.06)] transition-all duration-200 cursor-pointer"
+          className="px-4 py-2 rounded-lg text-sm text-txt2 hover:text-txt hover:bg-[rgba(255,255,255,0.04)] transition-all duration-200 cursor-pointer"
         >
           Annuler
         </button>

@@ -12,10 +12,10 @@ const FILE_ICON_STYLES: Record<string, { bg: string; color: string; label: strin
 }
 
 function getFileStyle(mimeType: string | null): { bg: string; color: string; label: string } {
-  if (!mimeType) return { bg: 'rgba(139,92,246,0.15)', color: '#8b85a8', label: 'FILE' }
+  if (!mimeType) return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
   if (FILE_ICON_STYLES[mimeType]) return FILE_ICON_STYLES[mimeType]
   if (mimeType.startsWith('image/')) return { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', label: 'IMG' }
-  return { bg: 'rgba(139,92,246,0.15)', color: '#8b85a8', label: 'FILE' }
+  return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
 }
 
 function formatFileSize(bytes: string | null): string {
@@ -45,9 +45,9 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
   const initial = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
   const isAdmin = user?.role === 'admin'
-  const avatarBg = isAdmin ? 'rgba(139,92,246,0.25)' : 'rgba(56,189,248,0.25)'
-  const avatarColor = isAdmin ? '#a78bfa' : '#38bdf8'
-  const nameColor = isAdmin ? '#a78bfa' : '#38bdf8'
+  const avatarBg = isAdmin ? 'rgba(255,255,255,0.15)' : 'rgba(56,189,248,0.25)'
+  const avatarColor = isAdmin ? '#818cf8' : '#38bdf8'
+  const nameColor = isAdmin ? '#818cf8' : '#38bdf8'
 
   const isFile = !!message.file_url
   const fileStyle = getFileStyle(message.file_type)
@@ -73,7 +73,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start', maxWidth: '65%', minWidth: 0 }}>
         {/* Name */}
         {showAvatar && (
-          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '10px', fontWeight: 500, color: nameColor, marginBottom: '2px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 500, color: nameColor, marginBottom: '2px' }}>
             {displayName}
           </span>
         )}
@@ -81,13 +81,13 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         {/* Bubble */}
         <div
           style={{
-            backgroundColor: isOwn ? (isFile ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.15)') : '#16142a',
-            border: `0.5px solid ${isOwn ? 'rgba(139,92,246,0.25)' : (isFile ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.12)')}`,
+            backgroundColor: isOwn ? (isFile ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)') : '#151a24',
+            border: `0.5px solid ${isOwn ? 'rgba(255,255,255,0.15)' : (isFile ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.07)')}`,
             borderRadius: '10px',
             padding: isFile ? '8px 10px' : '8px 12px',
           }}
-          onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)' }}
-          onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(139,92,246,0.2)' : 'rgba(99,102,241,0.15)' }}
+          onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+          onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)' }}
         >
           {isFile ? (
             <a
@@ -100,12 +100,12 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                 {fileStyle.label}
               </div>
               <div style={{ minWidth: 0 }}>
-                <p style={{ color: '#f0eef8', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
-                <p style={{ color: '#8b85a8', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
+                <p style={{ color: '#e8edf5', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
+                <p style={{ color: '#8898aa', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
               </div>
             </a>
           ) : (
-            <p style={{ color: '#f0eef8', fontSize: '13px', lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif', margin: 0, wordBreak: 'break-word' }}>
+            <p style={{ color: '#e8edf5', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
               {message.content}
             </p>
           )}
@@ -114,8 +114,8 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         {/* Emoji toolbar — BELOW the bubble, visible on hover */}
         {showPicker && (
           <div style={{
-            backgroundColor: '#16142a',
-            border: '0.5px solid rgba(99,102,241,0.15)',
+            backgroundColor: '#151a24',
+            border: '0.5px solid rgba(255,255,255,0.08)',
             borderRadius: '8px',
             padding: '3px 5px',
             display: 'inline-flex',
@@ -128,7 +128,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                 key={emoji}
                 onClick={() => onReaction(message.id, emoji)}
                 style={{ fontSize: '16px', cursor: 'pointer', background: 'none', border: 'none', padding: '2px 4px', lineHeight: 1, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.2)' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)' }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
               >
                 {emoji}
@@ -150,17 +150,17 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '3px',
-                    backgroundColor: isActive ? 'rgba(139,92,246,0.18)' : 'rgba(99,102,241,0.08)',
-                    border: `0.5px solid ${isActive ? 'rgba(139,92,246,0.3)' : 'rgba(99,102,241,0.15)'}`,
+                    backgroundColor: isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)',
+                    border: `0.5px solid ${isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'}`,
                     borderRadius: '20px',
                     padding: '3px 8px',
                     cursor: 'pointer',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = isActive ? 'rgba(139,92,246,0.25)' : 'rgba(99,102,241,0.15)' }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = isActive ? 'rgba(139,92,246,0.18)' : 'rgba(99,102,241,0.08)' }}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = isActive ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)' }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)' }}
                 >
                   <span style={{ fontSize: '15px', lineHeight: 1 }}>{emoji}</span>
-                  <span style={{ fontSize: '11px', color: isActive ? '#a78bfa' : '#8b85a8', marginLeft: '2px' }}>{userIds.length}</span>
+                  <span style={{ fontSize: '11px', color: isActive ? '#818cf8' : '#8898aa', marginLeft: '2px' }}>{userIds.length}</span>
                 </button>
               )
             })}
@@ -168,15 +168,15 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
               onClick={() => setShowPicker(true)}
               style={{
                 background: 'transparent',
-                border: '0.5px dashed rgba(99,102,241,0.2)',
+                border: '0.5px dashed rgba(255,255,255,0.12)',
                 borderRadius: '20px',
                 padding: '3px 8px',
                 fontSize: '12px',
-                color: '#4a4466',
+                color: '#3d4f63',
                 cursor: 'pointer',
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)'; e.currentTarget.style.color = '#8b85a8' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; e.currentTarget.style.color = '#4a4466' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#8898aa' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#3d4f63' }}
             >
               +
             </button>
@@ -184,7 +184,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         )}
 
         {/* Timestamp */}
-        <span style={{ color: '#4a4466', fontSize: '9px', marginTop: '3px', fontFamily: 'DM Sans, sans-serif' }}>
+        <span style={{ color: '#3d4f63', fontSize: '9px', marginTop: '3px' }}>
           {formatTime(message.created_at)}
         </span>
       </div>

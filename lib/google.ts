@@ -12,7 +12,7 @@ const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
 ]
 
-export interface GoogleTokens {
+interface GoogleTokens {
   access_token: string
   refresh_token?: string
   expires_in: number

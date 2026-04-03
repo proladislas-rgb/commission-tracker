@@ -39,7 +39,7 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
       return `<tr>
         <td style="padding:10px 14px;border-bottom:1px solid #e5e7eb">${formatDate(p.date)}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #e5e7eb">${p.label}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:'Space Grotesk',monospace;font-weight:600">${formatCurrency(Number(p.montant))}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-weight:600">${formatCurrency(Number(p.montant))}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #e5e7eb"><span style="background:${statusColor}18;color:${statusColor};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${statusLabel}</span></td>
       </tr>`
     }).join('')
@@ -50,32 +50,31 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
 <meta charset="UTF-8">
 <title>Récapitulatif Commissions — LR Consulting</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; color:#1e293b; background:#fff; padding:40px; }
-  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; padding-bottom:24px; border-bottom:2px solid #8b5cf6; }
-  .logo { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:#8b5cf6; }
+  body { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#1e293b; background:#fff; padding:40px; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; padding-bottom:24px; border-bottom:2px solid #6366f1; }
+  .logo { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size:20px; font-weight:700; color:#6366f1; }
   .logo-sub { font-size:12px; color:#64748b; margin-top:4px; }
   .meta { text-align:right; font-size:13px; color:#64748b; }
   .meta strong { color:#1e293b; }
-  h1 { font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:6px; color:#0f172a; }
+  h1 { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size:22px; font-weight:700; margin-bottom:6px; color:#0f172a; }
   .subtitle { font-size:14px; color:#64748b; margin-bottom:28px; }
   .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
   .kpi { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px; position:relative; overflow:hidden; }
   .kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-  .kpi-violet::before { background:linear-gradient(90deg,#8b5cf6,#6366f1); }
+  .kpi-violet::before { background:linear-gradient(90deg,#6366f1,#818cf8); }
   .kpi-amber::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
   .kpi-green::before { background:linear-gradient(90deg,#22c55e,#16a34a); }
   .kpi-rose::before { background:linear-gradient(90deg,#f43f5e,#e11d48); }
   .kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; font-weight:600; margin-bottom:6px; }
-  .kpi-value { font-family:'Space Grotesk',monospace; font-size:22px; font-weight:700; color:#0f172a; }
+  .kpi-value { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size:22px; font-weight:700; color:#0f172a; }
   table { width:100%; border-collapse:collapse; margin-bottom:24px; }
   thead th { padding:10px 14px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; font-weight:600; background:#f8fafc; border-bottom:2px solid #e2e8f0; }
   thead th:nth-child(3) { text-align:right; }
-  .totals { display:flex; justify-content:flex-end; gap:32px; padding:16px 0; border-top:2px solid #8b5cf6; margin-top:8px; }
+  .totals { display:flex; justify-content:flex-end; gap:32px; padding:16px 0; border-top:2px solid #6366f1; margin-top:8px; }
   .total-item { text-align:right; }
   .total-label { font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; }
-  .total-value { font-family:'Space Grotesk',monospace; font-size:20px; font-weight:700; }
+  .total-value { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size:20px; font-weight:700; }
   .footer { margin-top:40px; padding-top:20px; border-top:1px solid #e2e8f0; font-size:11px; color:#94a3b8; text-align:center; }
   @media print { body { padding:20px; } .kpis { gap:10px; } }
 </style>
@@ -177,8 +176,8 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
           pointerEvents: open ? 'auto' : 'none',
           transition: 'opacity 0.2s ease',
           zIndex: 50,
-          background: '#16142a',
-          border: '1px solid rgba(139,92,246,0.15)',
+          background: '#151a24',
+          border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '12px',
           padding: '8px',
           minWidth: '200px',
@@ -189,7 +188,7 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
           onClick={handleExportPDF}
           className="w-full flex items-center gap-3 rounded-[8px] cursor-pointer transition-colors duration-200 text-left"
           style={{ padding: '10px 14px' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.08)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
           onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
         >
           <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(239,68,68,0.1)' }}>
@@ -210,7 +209,7 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
           onClick={handleExportCSV}
           className="w-full flex items-center gap-3 rounded-[8px] cursor-pointer transition-colors duration-200 text-left"
           style={{ padding: '10px 14px' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.08)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
           onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
         >
           <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.1)' }}>

@@ -24,8 +24,8 @@ export default function RepartitionChart({ commissions, primes }: Props) {
   }).filter(d => d.value > 0), [commissions, primes])
 
   return (
-    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
-      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         Répartition CA par prime
       </h3>
       {data.length === 0 ? (
@@ -49,11 +49,11 @@ export default function RepartitionChart({ commissions, primes }: Props) {
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
-              labelStyle={{ color: '#f0eef8' }}
-              itemStyle={{ color: '#8b85a8' }}
+              labelStyle={{ color: '#e8edf5' }}
+              itemStyle={{ color: '#8898aa' }}
             />
             <Legend
-              formatter={(value) => <span style={{ color: '#8b85a8', fontSize: 12 }}>{value}</span>}
+              formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>}
             />
           </PieChart>
         </ResponsiveContainer>

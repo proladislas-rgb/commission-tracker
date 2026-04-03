@@ -70,8 +70,8 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
         style={{
           width: '560px',
           maxHeight: '500px',
-          backgroundColor: '#0e0d1a',
-          border: '1px solid rgba(139,92,246,0.15)',
+          backgroundColor: '#0f1117',
+          border: '1px solid rgba(255,255,255,0.08)',
           boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
           animation: 'modalIn 0.2s ease',
         }}
@@ -80,10 +80,10 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-3.5"
-          style={{ borderBottom: '1px solid rgba(139,92,246,0.1)' }}
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
         >
           <div>
-            <h3 className="text-sm font-semibold text-txt" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <h3 className="text-sm font-semibold text-txt">
               Choisir un fichier Drive
             </h3>
             <div className="flex items-center gap-1 mt-1 text-xs">
@@ -93,7 +93,7 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
                   <button
                     onClick={() => navigateToBreadcrumb(i)}
                     className={`cursor-pointer transition-colors ${
-                      i === breadcrumb.length - 1 ? 'text-[#8b5cf6]' : 'text-txt3 hover:text-txt2'
+                      i === breadcrumb.length - 1 ? 'text-[#818cf8]' : 'text-txt3 hover:text-txt2'
                     }`}
                   >
                     {item.name}
@@ -104,9 +104,9 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -119,7 +119,7 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
             <div className="flex items-center justify-center py-12">
               <div
                 className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }}
+                style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }}
               />
             </div>
           ) : (
@@ -129,7 +129,7 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
                 <button
                   key={folder.id}
                   onClick={() => navigateToFolder(folder)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer hover:bg-[rgba(139,92,246,0.06)]"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.04)]"
                 >
                   <div
                     className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
@@ -140,7 +140,7 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
                     </svg>
                   </div>
                   <span className="text-sm text-txt truncate">{folder.name}</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a4466" strokeWidth="2" className="ml-auto flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3d4f63" strokeWidth="2" className="ml-auto flex-shrink-0">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </button>
@@ -151,7 +151,7 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
                 <button
                   key={file.id}
                   onClick={() => onSelect({ fileId: file.id, fileName: file.name, mimeType: file.mimeType })}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer hover:bg-[rgba(139,92,246,0.06)]"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer hover:bg-[rgba(255,255,255,0.04)]"
                 >
                   <div
                     className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 text-[9px] font-bold"
@@ -159,11 +159,11 @@ export default function DriveFilePicker({ onSelect, onClose }: DriveFilePickerPr
                       backgroundColor: file.mimeType.includes('pdf') ? 'rgba(244,63,94,0.12)' :
                         file.mimeType.includes('document') ? 'rgba(56,189,248,0.12)' :
                         file.mimeType.includes('spreadsheet') ? 'rgba(16,185,129,0.12)' :
-                        'rgba(139,133,168,0.12)',
+                        'rgba(136,152,170,0.12)',
                       color: file.mimeType.includes('pdf') ? '#f43f5e' :
                         file.mimeType.includes('document') ? '#38bdf8' :
                         file.mimeType.includes('spreadsheet') ? '#10b981' :
-                        '#8b85a8',
+                        '#8898aa',
                     }}
                   >
                     {file.mimeType.includes('pdf') ? 'PDF' :

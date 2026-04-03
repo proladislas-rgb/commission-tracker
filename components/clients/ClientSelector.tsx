@@ -33,7 +33,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
         <button
           onClick={() => setOpen((v) => !v)}
           className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
-          style={{ background: open ? 'rgba(139,92,246,0.08)' : 'transparent' }}
+          style={{ background: open ? 'rgba(255,255,255,0.05)' : 'transparent' }}
           title={selectedClient?.name ?? 'Sélectionner un client'}
         >
           <span
@@ -47,7 +47,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
             className="absolute left-full ml-2 top-0 z-50 min-w-[200px] py-1 rounded-lg border shadow-xl"
             style={{
               background: '#0f1117',
-              borderColor: 'rgba(139,92,246,0.2)',
+              borderColor: 'rgba(255,255,255,0.12)',
             }}
           >
             {pinnedClients.map((client) => (
@@ -62,12 +62,12 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
                   color: client.id === selectedClient?.id ? '#e8edf5' : '#8898aa',
                   background:
                     client.id === selectedClient?.id
-                      ? 'rgba(139,92,246,0.08)'
+                      ? 'rgba(255,255,255,0.05)'
                       : 'transparent',
                 }}
                 onMouseEnter={(e) => {
                   if (client.id !== selectedClient?.id) {
-                    e.currentTarget.style.background = 'rgba(139,92,246,0.08)'
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -85,7 +85,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
             ))}
             <div
               className="border-t my-1"
-              style={{ borderColor: 'rgba(139,92,246,0.12)' }}
+              style={{ borderColor: 'rgba(255,255,255,0.07)' }}
             />
             <button
               onClick={() => {
@@ -95,7 +95,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
               className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
               style={{ color: '#6366f1' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(139,92,246,0.08)'
+                e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
@@ -116,9 +116,9 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors"
         style={{
-          background: open ? 'rgba(139,92,246,0.08)' : 'transparent',
+          background: open ? 'rgba(255,255,255,0.05)' : 'transparent',
           border: '1px solid',
-          borderColor: open ? 'rgba(139,92,246,0.3)' : 'rgba(139,92,246,0.2)',
+          borderColor: open ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.12)',
         }}
       >
         <span className="text-xs font-medium shrink-0" style={{ color: '#8898aa' }}>
@@ -159,7 +159,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           className="absolute left-0 right-0 top-full mt-1 z-50 py-1 rounded-lg border shadow-xl"
           style={{
             background: '#0f1117',
-            borderColor: 'rgba(139,92,246,0.2)',
+            borderColor: 'rgba(255,255,255,0.12)',
           }}
         >
           {pinnedClients.map((client) => (
@@ -174,12 +174,12 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
                 color: client.id === selectedClient?.id ? '#e8edf5' : '#8898aa',
                 background:
                   client.id === selectedClient?.id
-                    ? 'rgba(139,92,246,0.08)'
+                    ? 'rgba(255,255,255,0.05)'
                     : 'transparent',
               }}
               onMouseEnter={(e) => {
                 if (client.id !== selectedClient?.id) {
-                  e.currentTarget.style.background = 'rgba(139,92,246,0.08)'
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
                 }
               }}
               onMouseLeave={(e) => {
@@ -197,7 +197,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           ))}
           <div
             className="border-t my-1"
-            style={{ borderColor: 'rgba(139,92,246,0.12)' }}
+            style={{ borderColor: 'rgba(255,255,255,0.07)' }}
           />
           <button
             onClick={() => {
@@ -207,7 +207,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
             className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
             style={{ color: '#6366f1' }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(139,92,246,0.08)'
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent'

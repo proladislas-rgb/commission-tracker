@@ -28,8 +28,8 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
     v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
 
   return (
-    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0e0d1a', border: '1px solid rgba(139,92,246,0.12)' }}>
-      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         CA vs Commissions par prime
       </h3>
       {data.length === 0 ? (
@@ -47,16 +47,16 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
                 <stop offset="100%" stopColor="#059669" stopOpacity={0.8} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.06)" />
-            <XAxis dataKey="name" tick={{ fill: '#8b85a8', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8b85a8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+            <XAxis dataKey="name" tick={{ fill: '#8898aa', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value) => formatCurrency(Number(value))}
-              labelStyle={{ color: '#f0eef8' }}
-              itemStyle={{ color: '#8b85a8' }}
+              labelStyle={{ color: '#e8edf5' }}
+              itemStyle={{ color: '#8898aa' }}
             />
-            <Legend formatter={(value) => <span style={{ color: '#8b85a8', fontSize: 12 }}>{value}</span>} />
+            <Legend formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>} />
             <Bar dataKey="ca" name="CA" fill="url(#barGradientCA)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="commission" name="Commission" fill="url(#barGradientComm)" radius={[4, 4, 0, 0]} />
           </BarChart>

@@ -58,14 +58,14 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center" style={{ height: '100vh', margin: '-32px -16px', backgroundColor: '#06050e' }}>
-        <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: 'transparent' }} />
+      <div className="flex items-center justify-center" style={{ height: '100vh', margin: '-32px -16px', backgroundColor: '#07080d' }}>
+        <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }} />
       </div>
     )
   }
 
   return (
-    <div className="flex overflow-hidden" style={{ height: '100vh', margin: '-32px -16px', backgroundColor: '#06050e' }}>
+    <div className="flex overflow-hidden" style={{ height: '100vh', margin: '-32px -16px', backgroundColor: '#07080d' }}>
       <ChatSidebar
         channels={channels}
         activeChannelId={activeChannelId}

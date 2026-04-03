@@ -20,7 +20,7 @@ const TYPE_STYLES: Record<string, { color: string; label: string }> = {
   'application/vnd.google-apps.document': { color: '#38bdf8', label: 'Doc' },
   'application/vnd.google-apps.spreadsheet': { color: '#10b981', label: 'Sheet' },
   'application/vnd.google-apps.presentation': { color: '#f59e0b', label: 'Slides' },
-  'image/': { color: '#8b5cf6', label: 'Image' },
+  'image/': { color: '#818cf8', label: 'Image' },
   'video/': { color: '#f43f5e', label: 'Vidéo' },
 }
 
@@ -29,7 +29,7 @@ function getTypeStyle(mimeType: string): { color: string; label: string } {
   for (const [prefix, style] of Object.entries(TYPE_STYLES)) {
     if (mimeType.startsWith(prefix)) return style
   }
-  return { color: '#8b85a8', label: 'Fichier' }
+  return { color: '#8898aa', label: 'Fichier' }
 }
 
 function formatSize(bytes: string | undefined): string {
@@ -79,7 +79,7 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
   return (
     <tr
       className="group transition-colors duration-150"
-      style={{ borderBottom: '1px solid rgba(139,92,246,0.06)' }}
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
     >
       {/* Nom + icône */}
       <td className="py-3 px-4">
@@ -110,10 +110,10 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
           {/* Ouvrir */}
           <button
             onClick={openInDrive}
-            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Ouvrir dans Drive"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
@@ -123,10 +123,10 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
           {/* Télécharger */}
           <button
             onClick={download}
-            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Télécharger"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -138,10 +138,10 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
             onClick={() => {
               window.location.href = `/dashboard/email?attach=${file.id}&name=${encodeURIComponent(file.name)}&mime=${encodeURIComponent(file.mimeType)}`
             }}
-            className="p-1.5 rounded-md hover:bg-[rgba(139,92,246,0.1)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Envoyer par email"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -154,7 +154,7 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
               className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
               title="Supprimer"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b85a8" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
               </svg>

@@ -36,8 +36,8 @@ function ClientCard({
       className="group relative rounded-card border p-4 transition-all duration-200 hover:border-indigo/40"
       style={{
         backgroundColor: '#151a24',
-        borderColor: isSelected ? 'rgba(99,102,241,0.5)' : 'rgba(61,79,99,0.25)',
-        boxShadow: isSelected ? '0 0 0 1px rgba(99,102,241,0.3)' : 'none',
+        borderColor: isSelected ? 'rgba(255,255,255,0.25)' : 'rgba(61,79,99,0.25)',
+        boxShadow: isSelected ? '0 0 0 1px rgba(255,255,255,0.12)' : 'none',
       }}
     >
       {/* Top row: color dot + name */}
@@ -66,7 +66,7 @@ function ClientCard({
           onClick={onSelect}
           className="rounded-btn px-2.5 py-1 text-xs font-medium transition-colors"
           style={{
-            background: isSelected ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.08)',
+            background: isSelected ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
             color: '#6366f1',
           }}
         >
@@ -229,7 +229,6 @@ export default function ClientsPage() {
         <div>
           <h1
             className="text-2xl font-bold text-txt"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Mes clients
           </h1>

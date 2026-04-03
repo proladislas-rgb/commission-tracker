@@ -254,13 +254,13 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                 justifyContent: collapsed ? 'center' : undefined,
                 fontSize: '13px',
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? '#f0eef8' : '#8b85a8',
-                backgroundColor: isActive ? 'rgba(139,92,246,0.1)' : 'transparent',
+                color: isActive ? '#e8edf5' : '#8898aa',
+                backgroundColor: isActive ? 'rgba(255,255,255,0.07)' : 'transparent',
                 transition: 'all 0.2s ease',
               }}
               title={collapsed ? item.label : undefined}
               onMouseEnter={e => {
-                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.06)'
+                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'
               }}
               onMouseLeave={e => {
                 if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'
@@ -269,8 +269,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
               <span
                 className="flex-shrink-0 flex items-center justify-center"
                 style={{
-                  color: isActive ? '#a78bfa' : '#8b85a8',
-                  filter: isActive ? 'drop-shadow(0 0 4px rgba(139,92,246,0.3))' : 'none',
+                  color: isActive ? '#a78bfa' : '#8898aa',
+                  filter: 'none',
                   transition: 'all 0.2s ease',
                   position: 'relative',
                 }}
@@ -292,7 +292,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '0 3px',
-                    border: '1.5px solid #06050e',
+                    border: '1.5px solid #07080d',
                   }}>
                     {chatUnreadCount}
                   </span>
@@ -321,7 +321,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           >
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
-              style={{ backgroundColor: u.avatar_color, border: '1px solid rgba(139,92,246,0.2)' }}
+              style={{ backgroundColor: u.avatar_color, border: '1px solid rgba(255,255,255,0.12)' }}
             >
               {avatarInitials(u.display_name)}
             </div>
@@ -420,7 +420,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
         style={{
           width: collapsed ? '60px' : '220px',
           transition: 'width 0.3s ease',
-          backgroundColor: '#08071a',
+          backgroundColor: '#0f1117',
         }}
       >
         {sidebarContent}
@@ -430,7 +430,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/60" onClick={onMobileClose} />
-          <aside className="absolute right-0 top-0 h-full border-l border-border" style={{ width: '220px', backgroundColor: '#08071a' }}>
+          <aside className="absolute right-0 top-0 h-full border-l border-border" style={{ width: '220px', backgroundColor: '#0f1117' }}>
             {sidebarContent}
           </aside>
         </div>
