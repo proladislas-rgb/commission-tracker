@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth'
 import { refreshGoogleToken } from '@/lib/google'
 
 interface StoredTokens {
@@ -14,6 +15,9 @@ const EXPORT_MIMES: Record<string, { mime: string; ext: string }> = {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await getSessionUser()
+  if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
+
   const fileId = request.nextUrl.searchParams.get('fileId')
   if (!fileId) {
     return NextResponse.json({ error: 'fileId requis' }, { status: 400 })

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth'
 import { refreshGoogleToken } from '@/lib/google'
 
 interface StoredTokens {
@@ -148,6 +149,9 @@ function buildMimeMessage(
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const session = await getSessionUser()
+  if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
+
   const result = await getTokens(request)
   if ('error' in result) {
     return NextResponse.json({ error: result.error }, { status: result.status })
@@ -164,6 +168,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { to, subject, body: htmlBody, attachments = [] } = payload
   if (!to || !subject || !htmlBody) {
     return NextResponse.json({ error: 'to, subject et body sont requis' }, { status: 400 })
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(to)) {
+    return NextResponse.json({ error: 'Adresse email destinataire invalide.' }, { status: 400 })
   }
 
   // Préparer les pièces jointes

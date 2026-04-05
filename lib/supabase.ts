@@ -7,9 +7,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   realtime: { params: { eventsPerSecond: 10 } },
 })
 
-// Client admin (server-side uniquement) — utilise la service role key si dispo,
-// sinon fallback sur anon pour la V1 sans RLS
+// Client admin (server-side uniquement) — bypass RLS via service_role key
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!serviceRoleKey && typeof window === 'undefined') {
+  console.warn('[supabase] SUPABASE_SERVICE_ROLE_KEY manquante — les opérations admin utilisent la clé anon (RLS appliqué)')
+}
 export const supabaseAdmin = createClient(
   supabaseUrl,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? supabaseAnonKey
+  serviceRoleKey ?? supabaseAnonKey
 )

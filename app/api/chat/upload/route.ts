@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const session = await getSessionUser()
+  if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
+
   let formData: FormData
   try {
     formData = await request.formData()
@@ -15,6 +19,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (!file || !channelId || !userId) {
     return NextResponse.json({ error: 'missing_fields' }, { status: 400 })
+  }
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 Mo
+  const ALLOWED_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'text/plain', 'text/csv',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ]
+
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json({ error: 'Fichier trop volumineux (max 10 Mo).' }, { status: 400 })
+  }
+
+  if (file.type && !ALLOWED_TYPES.includes(file.type)) {
+    return NextResponse.json({ error: 'Type de fichier non autorisé.' }, { status: 400 })
   }
 
   const timestamp = Date.now()

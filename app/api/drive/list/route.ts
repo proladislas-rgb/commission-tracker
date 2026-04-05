@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth'
 import { refreshGoogleToken } from '@/lib/google'
 
 interface StoredTokens {
@@ -19,6 +20,9 @@ interface DriveFile {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await getSessionUser()
+  if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
+
   const cookieStore = request.cookies
   const raw = cookieStore.get('google_tokens')?.value
 

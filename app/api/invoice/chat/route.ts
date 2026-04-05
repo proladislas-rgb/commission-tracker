@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { getSessionUser } from '@/lib/auth'
 import Anthropic from '@anthropic-ai/sdk'
 
 const SYSTEM_PROMPT = `Tu es l'assistant facturation de LR Consulting. Tu génères des factures pour ECODISTRIB.
@@ -21,18 +23,33 @@ Si l'utilisateur demande de modifier une facture déjà générée, retourne le 
 Le champ "text" doit toujours être présent, même quand type="invoice" (pour un message d'accompagnement).
 Réponds en français.`
 
+const chatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().min(1).max(10000),
+})
+
+const invoiceChatSchema = z.object({
+  message: z.string().min(1).max(5000),
+  history: z.array(chatMessageSchema).max(50).optional().default([]),
+})
+
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const { message, history } = await req.json() as { message: string; history: ChatMessage[] }
+  const session = await getSessionUser()
+  if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
 
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'Message requis.' }, { status: 400 })
+  try {
+    const body = await req.json()
+    const parsed = invoiceChatSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Données invalides.', details: parsed.error.flatten() }, { status: 400 })
     }
+
+    const { message, history } = parsed.data as { message: string; history: ChatMessage[] }
 
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (!apiKey) {
@@ -66,24 +83,24 @@ export async function POST(req: NextRequest) {
       jsonStr = codeBlockMatch[1].trim()
     }
 
-    let parsed: { type: string; data?: Record<string, unknown>; text: string }
+    let result: { type: string; data?: Record<string, unknown>; text: string }
     try {
-      parsed = JSON.parse(jsonStr)
+      result = JSON.parse(jsonStr)
     } catch {
       // Dernier essai : chercher le premier { ... } dans le texte
       const braceMatch = rawText.match(/\{[\s\S]*\}/)
       if (braceMatch) {
         try {
-          parsed = JSON.parse(braceMatch[0])
+          result = JSON.parse(braceMatch[0])
         } catch {
-          parsed = { type: 'message', text: rawText }
+          result = { type: 'message', text: rawText }
         }
       } else {
-        parsed = { type: 'message', text: rawText }
+        result = { type: 'message', text: rawText }
       }
     }
 
-    return NextResponse.json(parsed)
+    return NextResponse.json(result)
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Erreur interne'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
