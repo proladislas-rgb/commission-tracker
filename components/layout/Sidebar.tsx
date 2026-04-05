@@ -211,7 +211,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
         <div className="flex items-center gap-2 mb-1" style={{ justifyContent: collapsed ? 'center' : undefined }}>
           <span className="w-2 h-2 rounded-full bg-green animate-pulse2 flex-shrink-0" />
           {!collapsed && (
-            <span className="text-[11px] font-semibold text-txt2 uppercase tracking-widest">Commission Tracker</span>
+            <span className="text-[11px] font-semibold uppercase tracking-widest gradient-text">Commission Tracker</span>
           )}
         </div>
         {!collapsed && associe && (

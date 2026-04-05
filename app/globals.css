@@ -35,6 +35,8 @@
   --animate-rowIn: fadeIn 0.3s ease forwards;
   --animate-toastIn: toastIn 0.3s ease forwards;
   --animate-toastOut: toastOut 0.3s ease forwards;
+  --animate-slideInLeft: slideInLeft 0.3s ease forwards;
+  --animate-scaleIn: scaleIn 0.2s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -67,6 +69,16 @@
   100% { opacity: 0; transform: translateX(100%); }
 }
 
+@keyframes slideInLeft {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -79,11 +91,11 @@ html, body {
   padding: 0;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+/* Scrollbar — fine et stylisée */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #07080d; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
 /* Selection */
 ::selection { background: rgba(99,102,241,0.3); }
@@ -93,4 +105,26 @@ html, body {
   background: linear-gradient(90deg, #151a24 25%, #1f2836 50%, #151a24 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s linear infinite;
+}
+
+/* Glow effects — hover sur les cartes */
+.glow-hover {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.glow-hover:hover {
+  border-color: rgba(99,102,241,0.3);
+  box-shadow: 0 0 20px -8px rgba(99,102,241,0.5);
+}
+
+/* Gradient text — pour logo/titres */
+.gradient-text {
+  background: linear-gradient(to right, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth transitions globales */
+a, button {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
