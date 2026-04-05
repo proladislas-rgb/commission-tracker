@@ -19,6 +19,7 @@ import CommissionTable from '@/components/dashboard/CommissionTable'
 import SeedButton from '@/components/dashboard/SeedButton'
 import ExportButton from '@/components/dashboard/ExportButton'
 
+import ErrorAlert from '@/components/ui/ErrorAlert'
 import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
 export default function DashboardPage() {
@@ -86,9 +87,9 @@ export default function DashboardPage() {
   // Garde-fou de cohérence : vérification toutes les 10s
   const associeId = associe?.id
 
-  const { commissions, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId, selectedClientId ?? undefined)
-  const { paiements, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId, selectedClientId ?? undefined)
-  const { sommesDues, add: addSommeDue, updateStatus: updateSommeDueStatus, remove: removeSommeDue } = useSommesDues(selectedClientId ?? undefined)
+  const { commissions, error: commissionsError, add: addCommission, update: updateCommission, remove: removeCommission, reload: reloadCommissions } = useCommissions(associeId, selectedClientId ?? undefined)
+  const { paiements, error: paiementsError, add: addPaiement, reload: reloadPaiements, updateStatus: updatePaiementStatus, remove: removePaiement } = usePaiements(associeId, selectedClientId ?? undefined)
+  const { sommesDues, error: sommesDuesError, add: addSommeDue, updateStatus: updateSommeDueStatus, remove: removeSommeDue } = useSommesDues(selectedClientId ?? undefined)
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -290,6 +291,10 @@ export default function DashboardPage() {
           encaisse={encaisse}
         />
       </div>
+
+      {commissionsError && <ErrorAlert message="Erreur de chargement des commissions." onRetry={reloadCommissions} />}
+      {paiementsError && <ErrorAlert message="Erreur de chargement des paiements." onRetry={reloadPaiements} />}
+      {sommesDuesError && <ErrorAlert message="Erreur de chargement des montants à percevoir." />}
 
       <KpiGrid commissions={commissions} paiements={paiements} sommesDues={sommesDues} />
 

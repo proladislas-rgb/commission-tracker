@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { CommissionStatusBadge } from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
@@ -60,6 +60,8 @@ export default function CommissionTable({
   onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime, onCreatePrimeWithCommission,
 }: Props) {
   const [filter, setFilter]             = useState<string>('all')
+  const [page, setPage]                 = useState(0)
+  const PAGE_SIZE = 10
   // Formulaire ajout commission (sur prime existante)
   const [showAdd, setShowAdd]           = useState(false)
   const [editId, setEditId]             = useState<string | null>(null)
@@ -78,6 +80,15 @@ export default function CommissionTable({
     filter === 'all' ? commissions : commissions.filter(c => String(c.prime_id) === String(filter)),
     [commissions, filter]
   )
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = useMemo(() =>
+    filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
+    [filtered, page]
+  )
+
+  // Reset page on filter change
+  useEffect(() => { setPage(0) }, [filter])
 
   const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
   const canDelete = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
@@ -225,14 +236,14 @@ export default function CommissionTable({
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-sm text-txt3">
                     Aucune commission
                   </td>
                 </tr>
               ) : (
-                filtered.map((c, i) => {
+                paginated.map((c, i) => {
                   const prime = primes.find(p => String(p.id) === String(c.prime_id))
                   return (
                     <tr
@@ -303,6 +314,31 @@ export default function CommissionTable({
             )}
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[rgba(255,255,255,0.06)]">
+            <span className="text-xs text-txt3">
+              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} sur {filtered.length}
+            </span>
+            <div className="flex gap-1">
+              <button
+                disabled={page === 0}
+                onClick={() => setPage(p => p - 1)}
+                className="px-3 py-1 text-xs rounded-[8px] text-txt2 hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Précédent
+              </button>
+              <button
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage(p => p + 1)}
+                className="px-3 py-1 text-xs rounded-[8px] text-txt2 hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal ajout/modification commission (sur prime EXISTANTE) */}

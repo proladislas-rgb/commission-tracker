@@ -49,16 +49,32 @@ export function useSommesDues(clientId?: string) {
   })
 
   const add = useCallback(async (data: { label: string; montant: number; created_by: string }) => {
-    const { data: inserted, error: err } = await supabase
-      .from('sommes_dues')
-      .insert({ label: data.label, montant: data.montant, status: 'du', created_by: data.created_by })
-      .select('*')
-      .single()
-    if (err) throw err
-    const normalized = normalize(inserted) as SommeDue
-    setSommesDues(prev => prev.some(s => s.id === normalized.id) ? prev : [normalized, ...prev])
-    return normalized
-  }, [])
+    const optimisticId = crypto.randomUUID()
+    const optimistic: SommeDue = {
+      id: optimisticId,
+      label: data.label,
+      montant: data.montant,
+      status: 'du',
+      created_by: data.created_by,
+      client_id: clientId ?? null,
+      created_at: new Date().toISOString(),
+    }
+    setSommesDues(prev => [optimistic, ...prev])
+    try {
+      const { data: inserted, error: err } = await supabase
+        .from('sommes_dues')
+        .insert({ label: data.label, montant: data.montant, status: 'du', created_by: data.created_by, client_id: clientId })
+        .select('*')
+        .single()
+      if (err) throw err
+      const normalized = normalize(inserted) as SommeDue
+      setSommesDues(prev => prev.map(s => s.id === optimisticId ? normalized : s))
+      return normalized
+    } catch (e) {
+      setSommesDues(prev => prev.filter(s => s.id !== optimisticId))
+      throw e
+    }
+  }, [clientId])
 
   const updateStatus = useCallback(async (id: string, status: SommeDueStatus) => {
     let snapshot: SommeDue[] = []
