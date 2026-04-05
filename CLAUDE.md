@@ -14,7 +14,7 @@
 - LR Consulting W.L.L
 - Bldg. 40, Road 1701, Block 317, Diplomatic Area, Kingdom of Bahrain
 - C.R. Number: 190710 - 1
-- Contact : ladislas2005@gmail.com / +973 3400 8825
+- Contact : proladislas@gmail.com / +973 3400 8825
 - Banque : Al Salam Bank, IBAN BH32ALSA00387049100101, SWIFT ALSABHBM
 
 ## Base de données Supabase

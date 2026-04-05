@@ -94,7 +94,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         Diplomatic Area<br>
         Kingdom of Bahrain<br>
         C.R. Number: 190710 - 1<br>
-        ladislas2005@gmail.com<br>
+        proladislas@gmail.com<br>
         +973 3400 8825
       </div>
     </div>
@@ -193,7 +193,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <div style="font-size: 12px; font-weight: 700; color: #192a45; margin-bottom: 2px;">LR Consulting W.L.L</div>
     <div style="font-size: 9px; color: #888888; line-height: 1.6;">
       C.R. Number: 190710 - 1 &nbsp;|&nbsp; Bldg. 40, Road 1701, Block 317, Diplomatic Area, Kingdom of Bahrain<br>
-      +973 3400 8825 &nbsp;|&nbsp; ladislas2005@gmail.com
+      +973 3400 8825 &nbsp;|&nbsp; proladislas@gmail.com
     </div>
   </div>
 

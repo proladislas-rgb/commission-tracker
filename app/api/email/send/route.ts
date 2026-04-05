@@ -221,7 +221,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             <span style="font-size:12px;color:#64748b;">Bldg. 40, Road 1701, Block 317, Diplomatic Area</span><br/>
             <span style="font-size:12px;color:#64748b;">Kingdom of Bahrain · C.R. 190710-1</span><br/>
             <span style="font-size:12px;">
-              <a href="mailto:ladislas2005@gmail.com" style="color:#192a45;text-decoration:none;">ladislas2005@gmail.com</a>
+              <a href="mailto:proladislas@gmail.com" style="color:#192a45;text-decoration:none;">proladislas@gmail.com</a>
               &nbsp;·&nbsp;
               <a href="tel:+97334008825" style="color:#192a45;text-decoration:none;">+973 3400 8825</a>
             </span>

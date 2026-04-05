@@ -13,8 +13,8 @@ const notifySchema = z.object({
 
 // Email mapping — in a real app this would be in the users table
 const USER_EMAILS: Record<string, string> = {
-  'admin': 'ladislas2005@gmail.com',     // Hugues-Henri gets notified
-  'associe': 'ladislas2005@gmail.com',    // Ladislas gets notified
+  'admin': 'proladislas@gmail.com',     // Hugues-Henri gets notified
+  'associe': 'proladislas@gmail.com',    // Ladislas gets notified
 }
 
 async function sendNotificationEmail(to: string, subject: string, htmlBody: string, request: NextRequest) {

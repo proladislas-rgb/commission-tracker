@@ -111,7 +111,7 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
     <div class="total-item"><div class="total-label">Solde restant dû</div><div class="total-value" style="color:#f43f5e">${formatCurrency(restantDu)}</div></div>
   </div>
 
-  <div class="footer">LR Consulting W.L.L — ladislas2005@gmail.com — +973 3400 8825 — Al Salam Bank, IBAN BH32ALSA00387049100101</div>
+  <div class="footer">LR Consulting W.L.L — proladislas@gmail.com — +973 3400 8825 — Al Salam Bank, IBAN BH32ALSA00387049100101</div>
 </body>
 </html>`
 
