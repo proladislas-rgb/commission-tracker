@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -63,11 +63,11 @@ function ToastNotification({ item, onClose }: { item: ToastItem; onClose: () => 
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
 
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
