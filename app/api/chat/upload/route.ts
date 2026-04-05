@@ -22,26 +22,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 Mo
-  const ALLOWED_TYPES = [
-    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-    'application/pdf',
-    'text/plain', 'text/csv',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav',
-  ]
 
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json({ error: 'Fichier trop volumineux (max 10 Mo).' }, { status: 400 })
   }
 
-  if (file.type && !ALLOWED_TYPES.includes(file.type)) {
+  // Bloquer uniquement les exécutables dangereux
+  const BLOCKED_TYPES = ['application/x-msdownload', 'application/x-executable']
+  if (file.type && BLOCKED_TYPES.includes(file.type)) {
     return NextResponse.json({ error: 'Type de fichier non autorisé.' }, { status: 400 })
   }
 
   const timestamp = Date.now()
-  const path = `${channelId}/${timestamp}_${file.name}`
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255)
+  const path = `${channelId}/${timestamp}_${sanitizedName}`
 
   const buffer = Buffer.from(await file.arrayBuffer())
 

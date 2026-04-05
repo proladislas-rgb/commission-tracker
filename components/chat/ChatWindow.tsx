@@ -30,6 +30,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   const { typingUsers, setTyping } = useTyping(channel?.id ?? null, user?.id ?? null, user?.display_name ?? null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [dragOver, setDragOver] = useState(false)
+  const dragCountRef = useRef(0)
   const [uploading, setUploading] = useState(false)
   const [chatUsers, setChatUsers] = useState<User[]>([])
 
@@ -108,13 +109,6 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
     }
   }, [user, channel])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setDragOver(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFileUpload(file)
-  }, [handleFileUpload])
-
   if (!channel) {
     return (
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#07080d' }}>
@@ -128,9 +122,10 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   return (
     <div
       style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#07080d', minWidth: 0, position: 'relative' }}
-      onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={handleDrop}
+      onDragOver={e => { e.preventDefault(); e.stopPropagation() }}
+      onDragEnter={e => { e.preventDefault(); dragCountRef.current++; setDragOver(true) }}
+      onDragLeave={e => { e.preventDefault(); dragCountRef.current--; if (dragCountRef.current === 0) setDragOver(false) }}
+      onDrop={e => { e.preventDefault(); dragCountRef.current = 0; setDragOver(false); const file = e.dataTransfer.files[0]; if (file) handleFileUpload(file) }}
     >
       {/* Header */}
       <div style={{ padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: '#0f1117', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -224,7 +219,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           backgroundColor: 'rgba(7,8,13,0.85)', backdropFilter: 'blur(4px)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           border: '2px dashed rgba(99,102,241,0.5)', borderRadius: '12px',
-          pointerEvents: 'none',
+          pointerEvents: 'none' as const,
         }}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />

@@ -3,6 +3,10 @@ import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 const notifySchema = z.object({
   type: z.enum(['mention', 'digest']),
   mentionedUserId: z.string().min(1).optional(),
@@ -46,6 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { type, mentionedUserId, senderName, channelName, messagePreview } = parsed.data
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://commission-tracker-neon.vercel.app'
 
     if (type === 'mention' && mentionedUserId) {
       // Get mentioned user's email
@@ -69,12 +74,12 @@ export async function POST(req: NextRequest) {
         <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:24px;">
           <div style="background:#0f1117;border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.1);">
             <p style="color:#8898aa;font-size:12px;margin:0 0 8px;">
-              <strong style="color:#6366f1;">@${senderName}</strong> dans <strong>#${channelName}</strong>
+              <strong style="color:#6366f1;">@${escapeHtml(senderName)}</strong> dans <strong>#${escapeHtml(channelName)}</strong>
             </p>
             <p style="color:#e8edf5;font-size:14px;line-height:1.5;margin:0;background:#151a24;border-radius:8px;padding:12px;">
-              ${messagePreview}
+              ${escapeHtml(messagePreview)}
             </p>
-            <a href="https://commission-tracker-neon.vercel.app/dashboard/chat"
+            <a href="${appUrl}/dashboard/chat"
                style="display:inline-block;margin-top:16px;background:#6366f1;color:white;text-decoration:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;">
               Ouvrir le chat
             </a>
@@ -133,7 +138,7 @@ export async function POST(req: NextRequest) {
                 <ul style="list-style:none;padding:0;margin:0;background:#151a24;border-radius:8px;padding:12px;">
                   ${messageList}
                 </ul>
-                <a href="https://commission-tracker-neon.vercel.app/dashboard/chat"
+                <a href="${appUrl}/dashboard/chat"
                    style="display:inline-block;margin-top:16px;background:#6366f1;color:white;text-decoration:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;">
                   Voir les messages
                 </a>

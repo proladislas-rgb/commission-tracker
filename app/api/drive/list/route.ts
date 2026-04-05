@@ -54,7 +54,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  const folderId = request.nextUrl.searchParams.get('folderId') ?? 'root'
+  const rawFolderId = request.nextUrl.searchParams.get('folderId') ?? 'root'
+  const folderId = rawFolderId === 'root' ? 'root' : rawFolderId.replace(/[^a-zA-Z0-9_-]/g, '')
+  if (!folderId) return NextResponse.json({ error: 'folderId invalide' }, { status: 400 })
   const q = `'${folderId}' in parents and trashed = false`
 
   const params = new URLSearchParams({

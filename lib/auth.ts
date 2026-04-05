@@ -2,7 +2,11 @@ import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import type { AuthUser } from './types'
 
-const SECRET = new TextEncoder().encode(process.env.AUTH_SECRET ?? 'fallback-secret-change-me')
+const authSecret = process.env.AUTH_SECRET
+if (!authSecret && typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+  throw new Error('AUTH_SECRET doit être défini en production')
+}
+const SECRET = new TextEncoder().encode(authSecret ?? 'dev-only-fallback-secret-not-for-prod')
 const COOKIE_NAME = 'ct_session'
 
 export async function signToken(user: AuthUser): Promise<string> {

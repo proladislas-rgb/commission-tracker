@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useClientContext } from '@/hooks/useClientContext'
 import { supabase } from '@/lib/supabase'
 import type { InvoiceData } from '@/lib/invoice-template'
 import { generateInvoiceHTML } from '@/lib/invoice-template'
@@ -16,8 +17,11 @@ interface InvoicePreviewProps {
 
 export default function InvoicePreview({ data, associeId, onModify, onInjected }: InvoicePreviewProps) {
   const { user } = useAuth()
+  const { selectedClientId } = useClientContext()
   const [injecting, setInjecting] = useState(false)
   const [injected, setInjected] = useState(false)
+  const [showInjectForm, setShowInjectForm] = useState(false)
+  const [injectLabel, setInjectLabel] = useState('')
 
   function handleDownloadPDF() {
     const html = generateInvoiceHTML(data)
@@ -36,12 +40,22 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
     try {
       // created_by doit être l'associé pour que le dashboard affiche le paiement
       const createdBy = associeId ?? user.id
+      // Parser la date (format "23 December 2025" ou ISO)
+      let dateStr: string
+      const parsed = new Date(data.dueDate)
+      if (!isNaN(parsed.getTime())) {
+        dateStr = parsed.toISOString().split('T')[0]
+      } else {
+        // Fallback: date du jour
+        dateStr = new Date().toISOString().split('T')[0]
+      }
       const { error } = await supabase.from('paiements').insert({
-        date: new Date(data.dueDate).toISOString().split('T')[0],
+        date: dateStr,
         montant: Number(data.amount),
-        label: `Facture #${data.invoiceNumber}`,
+        label: injectLabel.trim() || `Facture #${data.invoiceNumber}`,
         status: 'en_attente',
         created_by: createdBy,
+        client_id: selectedClientId,
       })
       if (error) throw new Error(error.message)
       setInjected(true)
@@ -101,20 +115,46 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
         >
           Modifier
         </button>
-        {!injected ? (
+        {!injected && !showInjectForm && (
           <button
-            onClick={handleInjectPaiement}
-            disabled={injecting}
-            className="px-3 py-1.5 rounded-btn text-xs font-medium bg-amber/15 text-amber border border-amber/30 hover:bg-amber/25 transition-colors cursor-pointer disabled:opacity-50"
+            onClick={() => { setInjectLabel(`Facture #${data.invoiceNumber}`); setShowInjectForm(true) }}
+            className="px-3 py-1.5 rounded-btn text-xs font-medium bg-amber/15 text-amber border border-amber/30 hover:bg-amber/25 transition-colors cursor-pointer"
           >
-            {injecting ? 'Injection...' : 'Valider et injecter dans les paiements'}
+            Valider et injecter dans les paiements
           </button>
-        ) : (
+        )}
+        {injected && (
           <span className="px-3 py-1.5 rounded-btn text-xs font-medium text-green">
             Paiement injecté
           </span>
         )}
       </div>
+
+      {/* Formulaire injection */}
+      {showInjectForm && !injected && (
+        <div className="px-4 py-3 border-t border-border flex items-center gap-2">
+          <input
+            type="text"
+            value={injectLabel}
+            onChange={e => setInjectLabel(e.target.value)}
+            placeholder="Libellé du paiement"
+            className="flex-1 bg-raised border border-border rounded-btn px-3 py-1.5 text-xs text-txt placeholder-txt3 outline-none focus:border-indigo/50"
+          />
+          <button
+            onClick={handleInjectPaiement}
+            disabled={injecting}
+            className="px-3 py-1.5 rounded-btn text-xs font-medium bg-amber text-black hover:bg-amber/80 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
+          >
+            {injecting ? '...' : 'Injecter'}
+          </button>
+          <button
+            onClick={() => setShowInjectForm(false)}
+            className="px-2 py-1.5 rounded-btn text-xs text-txt3 hover:text-txt transition-colors cursor-pointer flex-shrink-0"
+          >
+            Annuler
+          </button>
+        </div>
+      )}
     </div>
   )
 }

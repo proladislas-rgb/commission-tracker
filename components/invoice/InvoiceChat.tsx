@@ -54,11 +54,6 @@ export default function InvoiceChat() {
     inputRef.current?.focus()
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleInjected(_message: string) {
-    // Confirmation affichée via le badge vert sur la carte InvoicePreview
-  }
-
   return (
     <div
       className="rounded-[14px] flex flex-col"
@@ -126,7 +121,7 @@ export default function InvoiceChat() {
                   data={msg.invoiceData}
                   associeId={associeId}
                   onModify={handleModify}
-                  onInjected={handleInjected}
+                  onInjected={() => {}}
                 />
               )}
             </div>

@@ -110,10 +110,27 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
   }
 
   // --- Voice recording ---
+  function getSupportedMimeType(): { mimeType: string; ext: string } {
+    const types = [
+      { mimeType: 'audio/webm;codecs=opus', ext: 'webm' },
+      { mimeType: 'audio/webm', ext: 'webm' },
+      { mimeType: 'audio/mp4', ext: 'mp4' },
+      { mimeType: 'audio/ogg;codecs=opus', ext: 'ogg' },
+      { mimeType: 'audio/ogg', ext: 'ogg' },
+    ]
+    for (const t of types) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(t.mimeType)) return t
+    }
+    return { mimeType: '', ext: 'webm' } // fallback: let browser decide
+  }
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const supported = getSupportedMimeType()
+      const options = supported.mimeType ? { mimeType: supported.mimeType } : undefined
+      const mediaRecorder = new MediaRecorder(stream, options)
+      const actualMime = mediaRecorder.mimeType || 'audio/webm'
       chunksRef.current = []
 
       mediaRecorder.ondataavailable = (e) => {
@@ -122,8 +139,9 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
 
       mediaRecorder.onstop = () => {
         stream.getTracks().forEach(t => t.stop())
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-        const file = new File([blob], `vocal_${Date.now()}.webm`, { type: 'audio/webm' })
+        const blob = new Blob(chunksRef.current, { type: actualMime })
+        const ext = supported.ext
+        const file = new File([blob], `vocal_${Date.now()}.${ext}`, { type: actualMime })
         onFileUpload(file)
       }
 
