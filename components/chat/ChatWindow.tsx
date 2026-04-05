@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useMessages } from '@/hooks/useMessages'
 import { useTyping } from '@/hooks/useTyping'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabase'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import type { Channel } from '@/lib/types'
+import type { Channel, User } from '@/lib/types'
 
 interface ChatWindowProps {
   channel: Channel | null
@@ -30,6 +31,14 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [chatUsers, setChatUsers] = useState<User[]>([])
+
+  // Load users for mentions
+  useEffect(() => {
+    supabase.from('users').select('id, display_name, role, avatar_color').then(({ data }) => {
+      if (data) setChatUsers(data as User[])
+    })
+  }, [])
 
   // Mark channel as read
   useEffect(() => {
@@ -46,10 +55,36 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
     }
   }, [messages])
 
-  const handleSend = useCallback((content: string) => {
+  const handleSend = useCallback(async (content: string) => {
     if (!user) return
     sendMessage(user.id, content)
-  }, [user, sendMessage])
+
+    // Check for @mentions and send notification emails
+    const mentionMatches = content.match(/@(\S+)/g)
+    if (mentionMatches && channel) {
+      const mentionedNames = mentionMatches.map(m => m.slice(1).toLowerCase())
+      const mentionedUsers = chatUsers.filter(u =>
+        mentionedNames.some(name => u.display_name.toLowerCase().startsWith(name)) && u.id !== user.id
+      )
+      for (const mentioned of mentionedUsers) {
+        try {
+          await fetch('/api/chat/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'mention',
+              mentionedUserId: mentioned.id,
+              senderName: user.display_name,
+              channelName: channel.name,
+              messagePreview: content.slice(0, 200),
+            }),
+          })
+        } catch {
+          // notification silencieuse
+        }
+      }
+    }
+  }, [user, sendMessage, chatUsers, channel])
 
   const handleReaction = useCallback((messageId: string, emoji: string) => {
     if (!user) return
@@ -182,11 +217,23 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
         </div>
       )}
 
-      {/* Drag & drop zone */}
+      {/* Drag & drop overlay */}
       {dragOver && (
-        <div style={{ margin: '0 12px 5px', border: '1.5px dashed rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', color: '#3d4f63', fontSize: '10px', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Glisse un fichier ici · Drive ou local
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 50,
+          backgroundColor: 'rgba(7,8,13,0.85)', backdropFilter: 'blur(4px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          border: '2px dashed rgba(99,102,241,0.5)', borderRadius: '12px',
+          pointerEvents: 'none',
+        }}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <p style={{ color: '#6366f1', fontSize: '14px', fontWeight: 500, marginTop: '12px' }}>
+            Déposer le fichier ici
+          </p>
         </div>
       )}
 
@@ -198,7 +245,13 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       )}
 
       {/* Input */}
-      <ChatInput onSend={handleSend} onTyping={setTyping} onFileUpload={handleFileUpload} disabled={uploading} />
+      <ChatInput
+        onSend={handleSend}
+        onTyping={setTyping}
+        onFileUpload={handleFileUpload}
+        disabled={uploading}
+        users={chatUsers.map(u => ({ id: u.id, display_name: u.display_name }))}
+      />
 
       <style jsx>{`
         @keyframes typingBounce {

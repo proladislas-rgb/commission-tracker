@@ -29,6 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav',
   ]
 
   if (file.size > MAX_FILE_SIZE) {

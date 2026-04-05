@@ -11,11 +11,30 @@ const FILE_ICON_STYLES: Record<string, { bg: string; color: string; label: strin
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'rgba(16,185,129,0.15)', color: '#10b981', label: 'XLSX' },
 }
 
+function isAudioType(mimeType: string | null): boolean {
+  return !!mimeType && mimeType.startsWith('audio/')
+}
+
 function getFileStyle(mimeType: string | null): { bg: string; color: string; label: string } {
   if (!mimeType) return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
   if (FILE_ICON_STYLES[mimeType]) return FILE_ICON_STYLES[mimeType]
+  if (mimeType.startsWith('audio/')) return { bg: 'rgba(16,185,129,0.15)', color: '#10b981', label: 'VOCAL' }
   if (mimeType.startsWith('image/')) return { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', label: 'IMG' }
   return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
+}
+
+function renderContent(content: string | null) {
+  if (!content) return null
+  // Parse @mentions and highlight them
+  const parts = content.split(/(@\S+)/g)
+  return parts.map((part, i) => {
+    if (part.startsWith('@')) {
+      return (
+        <span key={i} style={{ color: '#6366f1', fontWeight: 600 }}>{part}</span>
+      )
+    }
+    return part
+  })
 }
 
 function formatFileSize(bytes: string | null): string {
@@ -89,7 +108,21 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
           onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
           onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)' }}
         >
-          {isFile ? (
+          {isFile && isAudioType(message.file_type) ? (
+            /* Audio player — vocal message */
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '200px' }}>
+              <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
+                {fileStyle.label}
+              </div>
+              <audio
+                controls
+                preload="metadata"
+                style={{ height: '32px', flex: 1, minWidth: 0 }}
+              >
+                <source src={message.file_url ?? ''} type={message.file_type ?? 'audio/webm'} />
+              </audio>
+            </div>
+          ) : isFile ? (
             <a
               href={message.file_url ?? '#'}
               target="_blank"
@@ -106,7 +139,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
             </a>
           ) : (
             <p style={{ color: '#e8edf5', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
-              {message.content}
+              {renderContent(message.content)}
             </p>
           )}
         </div>
