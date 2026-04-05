@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, skipped: 'no_email' })
       }
 
-      const subject = `💬 ${senderName} vous a mentionné dans #${channelName}`
+      const subject = `💬 ${senderName} a mentionné @${mentionedUser.display_name} dans #${channelName}`
       const html = `
         <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:24px;">
           <div style="background:#0f1117;border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.1);">

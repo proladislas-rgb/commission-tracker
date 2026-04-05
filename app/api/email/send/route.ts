@@ -207,7 +207,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  const mimeMessage = buildMimeMessage(to, subject, htmlBody, processedAttachments)
+  // Signature automatique
+  const signature = `
+    <br/><br/>
+    <div style="border-top:1px solid #e2e8f0;padding-top:16px;margin-top:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      <table cellpadding="0" cellspacing="0" style="font-size:13px;color:#2c3e50;">
+        <tr>
+          <td style="padding-right:16px;border-right:2px solid #192a45;">
+            <strong style="font-family:Didot,'Bodoni MT','Book Antiqua',Palatino,serif;font-size:19px;letter-spacing:3px;color:#192a45;font-weight:400;">LR</strong>
+          </td>
+          <td style="padding-left:16px;">
+            <strong style="color:#192a45;font-size:14px;">LR Consulting W.L.L</strong><br/>
+            <span style="font-size:12px;color:#64748b;">Bldg. 40, Road 1701, Block 317, Diplomatic Area</span><br/>
+            <span style="font-size:12px;color:#64748b;">Kingdom of Bahrain · C.R. 190710-1</span><br/>
+            <span style="font-size:12px;">
+              <a href="mailto:ladislas2005@gmail.com" style="color:#192a45;text-decoration:none;">ladislas2005@gmail.com</a>
+              &nbsp;·&nbsp;
+              <a href="tel:+97334008825" style="color:#192a45;text-decoration:none;">+973 3400 8825</a>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `
+
+  const htmlWithSignature = htmlBody + signature
+  const mimeMessage = buildMimeMessage(to, subject, htmlWithSignature, processedAttachments)
   const raw = base64urlFromBytes(new TextEncoder().encode(mimeMessage))
 
   const res = await fetch(
