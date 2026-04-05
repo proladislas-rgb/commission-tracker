@@ -33,6 +33,8 @@
   --animate-shimmer: shimmer 1.5s linear infinite;
   --animate-modalIn: modalIn 0.2s ease forwards;
   --animate-rowIn: fadeIn 0.3s ease forwards;
+  --animate-toastIn: toastIn 0.3s ease forwards;
+  --animate-toastOut: toastOut 0.3s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -53,6 +55,16 @@
 @keyframes modalIn {
   0% { opacity: 0; transform: scale(0.95); }
   100% { opacity: 1; transform: none; }
+}
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(100%); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100%); }
 }
 
 * {

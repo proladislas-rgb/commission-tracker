@@ -62,6 +62,13 @@ export default function CommissionTable({
   const [filter, setFilter]             = useState<string>('all')
   const [page, setPage]                 = useState(0)
   const PAGE_SIZE = 10
+  // Filtres avancés
+  const [showFilters, setShowFilters]   = useState(false)
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())
+  const [moisFrom, setMoisFrom]         = useState('')
+  const [moisTo, setMoisTo]             = useState('')
+  const [caMin, setCaMin]               = useState('')
+  const [caMax, setCaMax]               = useState('')
   // Formulaire ajout commission (sur prime existante)
   const [showAdd, setShowAdd]           = useState(false)
   const [editId, setEditId]             = useState<string | null>(null)
@@ -76,10 +83,34 @@ export default function CommissionTable({
   const [deleteTarget, setDeleteTarget]   = useState<Commission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  const filtered = useMemo(() =>
-    filter === 'all' ? commissions : commissions.filter(c => String(c.prime_id) === String(filter)),
-    [commissions, filter]
-  )
+  const filtered = useMemo(() => {
+    let result = commissions
+    // Filtre par prime
+    if (filter !== 'all') {
+      result = result.filter(c => String(c.prime_id) === String(filter))
+    }
+    // Filtre par statut
+    if (statusFilter.size > 0) {
+      result = result.filter(c => statusFilter.has(c.status))
+    }
+    // Filtre par mois (range)
+    if (moisFrom) {
+      result = result.filter(c => c.mois >= moisFrom)
+    }
+    if (moisTo) {
+      result = result.filter(c => c.mois <= moisTo)
+    }
+    // Filtre par CA min/max
+    const minCA = Number(caMin)
+    const maxCA = Number(caMax)
+    if (caMin && !isNaN(minCA)) {
+      result = result.filter(c => (Number(c.ca) || 0) >= minCA)
+    }
+    if (caMax && !isNaN(maxCA)) {
+      result = result.filter(c => (Number(c.ca) || 0) <= maxCA)
+    }
+    return result
+  }, [commissions, filter, statusFilter, moisFrom, moisTo, caMin, caMax])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paginated = useMemo(() =>
@@ -88,7 +119,30 @@ export default function CommissionTable({
   )
 
   // Reset page on filter change
-  useEffect(() => { setPage(0) }, [filter])
+  useEffect(() => { setPage(0) }, [filter, statusFilter, moisFrom, moisTo, caMin, caMax])
+
+  const hasAdvancedFilters = statusFilter.size > 0 || moisFrom !== '' || moisTo !== '' || caMin !== '' || caMax !== ''
+
+  function resetAllFilters() {
+    setFilter('all')
+    setStatusFilter(new Set())
+    setMoisFrom('')
+    setMoisTo('')
+    setCaMin('')
+    setCaMax('')
+  }
+
+  function toggleStatusFilter(status: string) {
+    setStatusFilter(prev => {
+      const next = new Set(prev)
+      if (next.has(status)) {
+        next.delete(status)
+      } else {
+        next.add(status)
+      }
+      return next
+    })
+  }
 
   const canEdit = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
   const canDelete = (c: Commission) => isAdmin || (isAssociate && c.user_id === userId)
@@ -214,6 +268,23 @@ export default function CommissionTable({
           ))}
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={() => setShowFilters(f => !f)}
+            className="px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all duration-150 cursor-pointer flex items-center gap-1.5"
+            style={{
+              backgroundColor: showFilters || hasAdvancedFilters ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.04)',
+              color: showFilters || hasAdvancedFilters ? '#6366f1' : '#8898aa',
+              border: `1px solid ${showFilters || hasAdvancedFilters ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.07)'}`,
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            Filtres
+            {hasAdvancedFilters && (
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo" />
+            )}
+          </button>
           {isAdmin && (
             <Button size="sm" variant="secondary" onClick={openNewPrime}>+ Nouvelle prime</Button>
           )}
@@ -222,6 +293,91 @@ export default function CommissionTable({
           )}
         </div>
       </div>
+
+      {/* Barre de filtres avancés */}
+      {showFilters && (
+        <div
+          className="mb-4 rounded-[14px] p-4 animate-fadeIn"
+          style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <div className="flex flex-col gap-4">
+            {/* Ligne 1 : Statut */}
+            <div>
+              <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-2 block">Statut</label>
+              <div className="flex gap-2 flex-wrap">
+                {STATUS_OPTIONS.map(s => (
+                  <button
+                    key={s.value}
+                    onClick={() => toggleStatusFilter(s.value)}
+                    className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
+                    style={
+                      statusFilter.has(s.value)
+                        ? { backgroundColor: 'rgba(99,102,241,0.15)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)' }
+                        : { backgroundColor: 'rgba(255,255,255,0.02)', color: '#8898aa', border: '1px solid rgba(255,255,255,0.07)' }
+                    }
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Ligne 2 : Mois range + CA range */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">Mois (de)</label>
+                <input
+                  type="month"
+                  value={moisFrom}
+                  onChange={e => setMoisFrom(e.target.value)}
+                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">Mois (à)</label>
+                <input
+                  type="month"
+                  value={moisTo}
+                  onChange={e => setMoisTo(e.target.value)}
+                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">CA min (€)</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={caMin}
+                  onChange={e => setCaMin(e.target.value)}
+                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium">CA max (€)</label>
+                <input
+                  type="number"
+                  placeholder="999999"
+                  value={caMax}
+                  onChange={e => setCaMax(e.target.value)}
+                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Réinitialiser */}
+            {hasAdvancedFilters && (
+              <div className="flex justify-end">
+                <button
+                  onClick={resetAllFilters}
+                  className="px-3 py-1.5 rounded-[8px] text-xs font-medium text-rose hover:bg-rose/10 transition-colors cursor-pointer"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-card overflow-hidden shadow-card" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="overflow-x-auto">

@@ -20,10 +20,12 @@ import SeedButton from '@/components/dashboard/SeedButton'
 import ExportButton from '@/components/dashboard/ExportButton'
 
 import ErrorAlert from '@/components/ui/ErrorAlert'
+import { useToast } from '@/components/ui/Toast'
 import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const { selectedClientId, selectedClient } = useClientContext()
   const [associe, setAssociate] = useState<User | null>(null)
   const [primes, setPrimes]     = useState<Prime[]>([])
@@ -127,10 +129,16 @@ export default function DashboardPage() {
   }
 
   async function handleAddCommission(data: Omit<Commission, 'id' | 'created_at' | 'updated_at'>) {
-    const inserted = await addCommission({ ...data, client_id: selectedClientId })
-    const prime = primes.find(p => p.id === data.prime_id)
-    await logActivity('create', 'commission', inserted.id,
-      `${user!.display_name} a ajouté une commission ${prime?.name ?? data.prime_id} de ${new Intl.NumberFormat('fr-FR').format(data.ca)} €`)
+    try {
+      const inserted = await addCommission({ ...data, client_id: selectedClientId })
+      const prime = primes.find(p => p.id === data.prime_id)
+      await logActivity('create', 'commission', inserted.id,
+        `${user!.display_name} a ajouté une commission ${prime?.name ?? data.prime_id} de ${new Intl.NumberFormat('fr-FR').format(data.ca)} €`)
+      toast('Commission ajoutée', 'success')
+    } catch (err) {
+      toast('Erreur: ' + (err instanceof Error ? err.message : 'Ajout commission échoué'), 'error')
+      throw err
+    }
   }
 
   async function handleUpdateCommission(id: string, data: Partial<Commission>) {
@@ -139,11 +147,17 @@ export default function DashboardPage() {
   }
 
   async function handleDeleteCommission(id: string) {
-    const commission = commissions.find(c => c.id === id)
-    const prime = commission ? primes.find(p => p.id === commission.prime_id) : null
-    await removeCommission(id)
-    await logActivity('delete', 'commission', id,
-      `${user!.display_name} a supprimé une commission ${prime?.name ?? ''} de ${commission ? new Intl.NumberFormat('fr-FR').format(Number(commission.ca)) : '?'} €`)
+    try {
+      const commission = commissions.find(c => c.id === id)
+      const prime = commission ? primes.find(p => p.id === commission.prime_id) : null
+      await removeCommission(id)
+      await logActivity('delete', 'commission', id,
+        `${user!.display_name} a supprimé une commission ${prime?.name ?? ''} de ${commission ? new Intl.NumberFormat('fr-FR').format(Number(commission.ca)) : '?'} €`)
+      toast('Commission supprimée', 'success')
+    } catch (err) {
+      toast('Erreur: ' + (err instanceof Error ? err.message : 'Suppression commission échouée'), 'error')
+      throw err
+    }
   }
 
   async function handleCreatePrime(data: { name: string; color: string; icon: string }): Promise<Prime> {
@@ -210,19 +224,25 @@ export default function DashboardPage() {
   }
 
   const handleAddPaiement = useCallback(async (data: Omit<Paiement, 'id' | 'created_at'>) => {
-    await addPaiement({ ...data, client_id: selectedClientId })
     try {
-      await supabase.from('activity_log').insert({
-        user_id:     data.created_by,
-        action:      'create',
-        entity_type: 'paiement',
-        entity_id:   data.created_by,
-        details:     { description: `Paiement de ${new Intl.NumberFormat('fr-FR').format(data.montant)} € ajouté` },
-      })
-    } catch {
-      // log silencieux
+      await addPaiement({ ...data, client_id: selectedClientId })
+      try {
+        await supabase.from('activity_log').insert({
+          user_id:     data.created_by,
+          action:      'create',
+          entity_type: 'paiement',
+          entity_id:   data.created_by,
+          details:     { description: `Paiement de ${new Intl.NumberFormat('fr-FR').format(data.montant)} € ajouté` },
+        })
+      } catch {
+        // log silencieux
+      }
+      toast('Paiement ajouté', 'success')
+    } catch (err) {
+      toast('Erreur: ' + (err instanceof Error ? err.message : 'Ajout paiement échoué'), 'error')
+      throw err
     }
-  }, [addPaiement, selectedClientId])
+  }, [addPaiement, selectedClientId, toast])
 
   const handleDeletePaiement = useCallback(async (id: string) => {
     const paiement = paiements.find(p => p.id === id)

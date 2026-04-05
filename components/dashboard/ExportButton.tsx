@@ -121,6 +121,62 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
     w.document.close()
   }
 
+  async function handleExportXLSX() {
+    setOpen(false)
+    const XLSX = (await import('xlsx')).default
+
+    // --- Commissions sheet ---
+    const commissionData = commissions.map(c => ({
+      'Prime': c.prime?.name ?? String(c.prime_id),
+      'CA': Number(c.ca) || 0,
+      'Commission': Number(c.commission) || 0,
+      'Dossiers': Number(c.dossiers) || 0,
+      'Mois': c.mois,
+      'Statut': c.status === 'due' ? 'Dû' : c.status === 'partiel' ? 'Partiel' : 'Payé',
+    }))
+
+    const caTotal = commissions.reduce((s, c) => s + (Number(c.ca) || 0), 0)
+    const commTotal = commissions.reduce((s, c) => s + (Number(c.commission) || 0), 0)
+    const dossiersTotal = commissions.reduce((s, c) => s + (Number(c.dossiers) || 0), 0)
+
+    commissionData.push({
+      'Prime': 'TOTAL',
+      'CA': caTotal,
+      'Commission': commTotal,
+      'Dossiers': dossiersTotal,
+      'Mois': '',
+      'Statut': '',
+    })
+
+    const wsCommissions = XLSX.utils.json_to_sheet(commissionData)
+
+    // --- Paiements sheet ---
+    const paiementData = paiements.map(p => ({
+      'Date': p.date,
+      'Libellé': p.label,
+      'Montant': Number(p.montant) || 0,
+      'Statut': p.status === 'effectue' ? 'Effectué' : p.status === 'en_attente' ? 'En attente' : 'En retard',
+    }))
+
+    const montantTotal = paiements.reduce((s, p) => s + (Number(p.montant) || 0), 0)
+
+    paiementData.push({
+      'Date': 'TOTAL',
+      'Libellé': '',
+      'Montant': montantTotal,
+      'Statut': '',
+    })
+
+    const wsPaiements = XLSX.utils.json_to_sheet(paiementData)
+
+    // --- Workbook ---
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, wsCommissions, 'Commissions')
+    XLSX.utils.book_append_sheet(wb, wsPaiements, 'Paiements')
+
+    XLSX.writeFile(wb, `commission_tracker_export_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }
+
   function handleExportCSV() {
     setOpen(false)
     const BOM = '\uFEFF'
@@ -206,6 +262,27 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
         </button>
 
         <button
+          onClick={handleExportXLSX}
+          className="w-full flex items-center gap-3 rounded-[8px] cursor-pointer transition-colors duration-200 text-left"
+          style={{ padding: '10px 14px' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+        >
+          <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(16,185,129,0.1)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="16" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-sm font-medium text-txt">Excel (.xlsx)</div>
+            <div className="text-[11px] text-txt3">Classeur multi-feuilles</div>
+          </div>
+        </button>
+
+        <button
           onClick={handleExportCSV}
           className="w-full flex items-center gap-3 rounded-[8px] cursor-pointer transition-colors duration-200 text-left"
           style={{ padding: '10px 14px' }}
@@ -222,7 +299,7 @@ export default function ExportButton({ commissions, paiements, commissionsTotal,
             </svg>
           </div>
           <div>
-            <div className="text-sm font-medium text-txt">Excel / CSV</div>
+            <div className="text-sm font-medium text-txt">CSV</div>
             <div className="text-[11px] text-txt3">Données brutes</div>
           </div>
         </button>
