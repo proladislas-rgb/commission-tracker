@@ -11,11 +11,8 @@
 - Client unique : ECODISTRIB (29 Rue Pradier, 92410 Ville-d'Avray, SIREN 903 879 492)
 
 ## Entreprise émettrice
-- LR Consulting W.L.L
-- Bldg. 40, Road 1701, Block 317, Diplomatic Area, Kingdom of Bahrain
-- C.R. Number: 190710 - 1
-- Contact : proladislas@gmail.com / +973 3400 8825
-- Banque : Al Salam Bank, IBAN BH32ALSA00387049100101, SWIFT ALSABHBM
+- Coordonnées, IBAN, SWIFT et infos légales configurées dans `.env.local` sous les variables `LR_*`
+- Ne jamais hardcoder ces informations dans le code ou les fichiers versionnés
 
 ## Base de données Supabase (project ID: kscpxenxttrxlzfuktyf)
 - users : admin (Hugues-Henri) + associé (Ladislas)

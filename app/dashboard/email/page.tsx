@@ -50,6 +50,11 @@ function EmailPageContent() {
     return []
   }, [searchParams])
 
+  // Pré-remplir depuis Reem AI (to/subject/body)
+  const initialTo = searchParams.get('to') ?? ''
+  const initialSubject = searchParams.get('subject') ?? ''
+  const initialBody = searchParams.get('body') ?? ''
+
   return (
     <div className="h-[calc(100vh-0px)] flex flex-col">
       {/* Header */}
@@ -119,7 +124,12 @@ function EmailPageContent() {
           className="flex-1 flex flex-col mx-6 md:mx-10 mb-6 overflow-hidden rounded-xl"
           style={{ border: '1px solid rgba(255,255,255,0.05)' }}
         >
-          <EmailComposer initialAttachments={initialAttachments} />
+          <EmailComposer
+            initialAttachments={initialAttachments}
+            initialTo={initialTo}
+            initialSubject={initialSubject}
+            initialBody={initialBody}
+          />
         </div>
       )}
     </div>

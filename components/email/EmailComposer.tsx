@@ -14,6 +14,9 @@ interface Attachment {
 
 interface EmailComposerProps {
   initialAttachments?: Attachment[]
+  initialTo?: string
+  initialSubject?: string
+  initialBody?: string
   onSent?: () => void
 }
 
@@ -31,10 +34,10 @@ function getTypeColor(mimeType: string): string {
   return '#8898aa'
 }
 
-export default function EmailComposer({ initialAttachments = [], onSent }: EmailComposerProps) {
-  const [to, setTo] = useState('')
-  const [subject, setSubject] = useState('')
-  const [body, setBody] = useState('')
+export default function EmailComposer({ initialAttachments = [], initialTo = '', initialSubject = '', initialBody = '', onSent }: EmailComposerProps) {
+  const [to, setTo] = useState(initialTo)
+  const [subject, setSubject] = useState(initialSubject)
+  const [body, setBody] = useState(initialBody)
   const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments)
   const [showDrivePicker, setShowDrivePicker] = useState(false)
   const [sending, setSending] = useState(false)
@@ -46,6 +49,18 @@ export default function EmailComposer({ initialAttachments = [], onSent }: Email
       setAttachments(initialAttachments)
     }
   }, [initialAttachments])
+
+  useEffect(() => {
+    if (initialTo) setTo(initialTo)
+  }, [initialTo])
+
+  useEffect(() => {
+    if (initialSubject) setSubject(initialSubject)
+  }, [initialSubject])
+
+  useEffect(() => {
+    if (initialBody) setBody(initialBody)
+  }, [initialBody])
 
   const addDriveFile = (file: { fileId: string; fileName: string; mimeType: string }) => {
     setAttachments(prev => [
