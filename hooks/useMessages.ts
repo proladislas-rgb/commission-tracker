@@ -9,6 +9,8 @@ export function useMessages(channelId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
   const realtimeRef = useRef<RealtimeChannel | null>(null)
+  const messagesRef = useRef(messages)
+  useEffect(() => { messagesRef.current = messages })
 
   const load = useCallback(async () => {
     if (!channelId) return
@@ -107,7 +109,7 @@ export function useMessages(channelId: string | null) {
   }, [channelId])
 
   const addReaction = useCallback(async (messageId: string, emoji: string, userId: string) => {
-    const msg = messages.find(m => m.id === messageId)
+    const msg = messagesRef.current.find(m => m.id === messageId)
     if (!msg) return
 
     const reactions = { ...msg.reactions }
@@ -129,7 +131,7 @@ export function useMessages(channelId: string | null) {
       // revert
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, reactions: msg.reactions } : m))
     }
-  }, [messages])
+  }, [])
 
   return { messages, loading, sendMessage, addReaction }
 }

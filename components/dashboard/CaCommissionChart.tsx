@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from 'recharts'
+import type { ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import { formatCurrency } from '@/lib/utils'
 import { CHART_TOOLTIP_STYLE } from '@/lib/constants'
 import type { Commission, Prime } from '@/lib/types'
@@ -11,6 +12,18 @@ import type { Commission, Prime } from '@/lib/types'
 interface Props {
   commissions: Commission[]
   primes: Prime[]
+}
+
+function yAxisTickFormatter(v: number): string {
+  return v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
+}
+
+function tooltipFormatter(value: ValueType | undefined): string {
+  return formatCurrency(Number(value) || 0)
+}
+
+function legendFormatter(value: string): ReactNode {
+  return <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>
 }
 
 export default function CaCommissionChart({ commissions, primes }: Props) {
@@ -23,9 +36,6 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
       color:      prime.color,
     }
   }).filter(d => d.ca > 0), [commissions, primes])
-
-  const tickFormatter = (v: number) =>
-    v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M€` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}k€` : `${v}€`
 
   return (
     <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -49,14 +59,14 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
             <XAxis dataKey="name" tick={{ fill: '#8898aa', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={tickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+            <YAxis tickFormatter={yAxisTickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
-              formatter={(value) => formatCurrency(Number(value))}
+              formatter={tooltipFormatter}
               labelStyle={{ color: '#e8edf5' }}
               itemStyle={{ color: '#8898aa' }}
             />
-            <Legend formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>} />
+            <Legend formatter={legendFormatter} />
             <Bar dataKey="ca" name="CA" fill="url(#barGradientCA)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="commission" name="Commission" fill="url(#barGradientComm)" radius={[4, 4, 0, 0]} />
           </BarChart>

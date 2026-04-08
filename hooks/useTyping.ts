@@ -38,6 +38,7 @@ export function useTyping(channelId: string | null, currentUserId: string | null
     return () => {
       supabase.removeChannel(channel)
       channelRef.current = null
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [channelId, currentUserId])
 

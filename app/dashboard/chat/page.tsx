@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useChannels } from '@/hooks/useChannels'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchUnreadCounts } from '@/lib/chat-unread'
@@ -12,6 +12,11 @@ export default function ChatPage() {
   const { user } = useAuth()
   const [userSelectedId, setUserSelectedId] = useState<string | null>(null)
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => { isMountedRef.current = false }
+  }, [])
 
   useEffect(() => {
     const userId = user?.id
@@ -20,6 +25,7 @@ export default function ChatPage() {
     async function fetchUnread() {
       const channelIds = channels.map(ch => ch.id)
       const counts = await fetchUnreadCounts(userId!, channelIds)
+      if (!isMountedRef.current) return
       setUnreadCounts(counts)
     }
 

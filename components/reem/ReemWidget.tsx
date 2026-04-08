@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useReemUI } from './ReemUIProvider'
 import ReemBubble from './ReemBubble'
 import ReemPullTab from './ReemPullTab'
@@ -8,6 +8,8 @@ import ReemPanel from './ReemPanel'
 
 export default function ReemWidget() {
   const { state, setState } = useReemUI()
+  const visibilityRef = useRef(state.visibility)
+  useEffect(() => { visibilityRef.current = state.visibility })
 
   const openPanel = useCallback(() => {
     setState(prev => ({ ...prev, visibility: 'panel-open' }))
@@ -45,13 +47,13 @@ export default function ReemWidget() {
         })
       }
       // Escape referme le panneau
-      if (e.key === 'Escape' && state.visibility === 'panel-open') {
+      if (e.key === 'Escape' && visibilityRef.current === 'panel-open') {
         setState(prev => ({ ...prev, visibility: 'bubble' }))
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [setState, state.visibility])
+  }, [setState])
 
   return (
     <>

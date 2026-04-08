@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import InlineEdit from '@/components/ui/InlineEdit'
@@ -67,6 +67,10 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   const [users, setUsers] = useState<User[]>([])
   const [activityLogs, setActivityLogs] = useState<(ActivityLog & { user?: User })[]>([])
   const [chatUnreadCount, setChatUnreadCount] = useState(0)
+  const userIdRef = useRef(user?.id)
+  useEffect(() => {
+    userIdRef.current = user?.id
+  })
 
   // Chat unread badge
   const fetchUnread = useCallback(async () => {
@@ -110,8 +114,9 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
     loadUsers()
     const interval = setInterval(async () => {
       try {
-        if (user?.id) {
-          await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', user.id)
+        const currentUserId = userIdRef.current
+        if (currentUserId) {
+          await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', currentUserId)
           loadUsers()
         }
       } catch {
@@ -119,7 +124,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       }
     }, 60_000)
     return () => clearInterval(interval)
-  }, [user?.id, loadUsers])
+  }, [loadUsers])
 
   // Activité récente
   useEffect(() => {

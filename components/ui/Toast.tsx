@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -63,23 +63,38 @@ function ToastNotification({ item, onClose }: { item: ToastItem; onClose: () => 
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set())
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
   )
 
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      timers.forEach(clearTimeout)
+      timers.clear()
+    }
+  }, [])
+
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
-    setTimeout(() => {
+    const exitTimer = setTimeout(() => {
+      timersRef.current.delete(exitTimer)
       setToasts(prev => prev.filter(t => t.id !== id))
     }, 300)
+    timersRef.current.add(exitTimer)
   }, [])
 
   const toast = useCallback((message: string, type: ToastType = 'info') => {
     const id = crypto.randomUUID()
     setToasts(prev => [...prev, { id, message, type, exiting: false }])
-    setTimeout(() => removeToast(id), 4000)
+    const autoTimer = setTimeout(() => {
+      timersRef.current.delete(autoTimer)
+      removeToast(id)
+    }, 4000)
+    timersRef.current.add(autoTimer)
   }, [removeToast])
 
   return (

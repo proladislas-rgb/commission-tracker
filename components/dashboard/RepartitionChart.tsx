@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import type { ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import { formatCurrency } from '@/lib/utils'
 import { CHART_TOOLTIP_STYLE } from '@/lib/constants'
 import type { Commission, Prime } from '@/lib/types'
@@ -9,6 +10,14 @@ import type { Commission, Prime } from '@/lib/types'
 interface Props {
   commissions: Commission[]
   primes: Prime[]
+}
+
+function tooltipFormatter(value: ValueType | undefined): string {
+  return formatCurrency(Number(value) || 0)
+}
+
+function legendFormatter(value: string): ReactNode {
+  return <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>
 }
 
 export default function RepartitionChart({ commissions, primes }: Props) {
@@ -48,13 +57,11 @@ export default function RepartitionChart({ commissions, primes }: Props) {
             </Pie>
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
-              formatter={(value) => formatCurrency(Number(value))}
+              formatter={tooltipFormatter}
               labelStyle={{ color: '#e8edf5' }}
               itemStyle={{ color: '#8898aa' }}
             />
-            <Legend
-              formatter={(value) => <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>}
-            />
+            <Legend formatter={legendFormatter} />
           </PieChart>
         </ResponsiveContainer>
       )}
