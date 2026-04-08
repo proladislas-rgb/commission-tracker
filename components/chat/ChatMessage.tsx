@@ -97,65 +97,31 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
           </span>
         )}
 
-        {/* Bubble */}
-        <div
-          style={{
-            backgroundColor: isOwn ? (isFile ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)') : '#151a24',
-            border: `0.5px solid ${isOwn ? 'rgba(255,255,255,0.15)' : (isFile ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.07)')}`,
-            borderRadius: '10px',
-            padding: isFile ? '8px 10px' : '8px 12px',
-          }}
-          onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
-          onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)' }}
-        >
-          {isFile && isAudioType(message.file_type) ? (
-            /* Audio player — vocal message */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '200px' }}>
-              <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
-                {fileStyle.label}
-              </div>
-              <audio
-                controls
-                preload="metadata"
-                style={{ height: '32px', flex: 1, minWidth: 0 }}
-              >
-                <source src={message.file_url ?? ''} type={message.file_type ?? 'audio/webm'} />
-              </audio>
-            </div>
-          ) : isFile ? (
-            <a
-              href={message.file_url ?? '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}
-            >
-              <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
-                {fileStyle.label}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <p style={{ color: '#e8edf5', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
-                <p style={{ color: '#8898aa', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
-              </div>
-            </a>
-          ) : (
-            <p style={{ color: '#e8edf5', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
-              {renderContent(message.content)}
-            </p>
-          )}
-        </div>
-
-        {/* Emoji toolbar — BELOW the bubble, visible on hover */}
-        {showPicker && (
-          <div style={{
-            backgroundColor: '#151a24',
-            border: '0.5px solid rgba(255,255,255,0.08)',
-            borderRadius: '8px',
-            padding: '3px 5px',
-            display: 'inline-flex',
-            gap: '2px',
-            marginTop: '3px',
-            zIndex: 10,
-          }}>
+        {/* Bubble wrapper — relative pour ancrer le picker en absolute */}
+        <div style={{ position: 'relative' }}>
+          {/* Emoji toolbar — flotte au-dessus de la bulle, hors du flux */}
+          <div
+            aria-hidden={!showPicker}
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 4px)',
+              right: isOwn ? 0 : undefined,
+              left: isOwn ? undefined : 0,
+              backgroundColor: '#151a24',
+              border: '0.5px solid rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+              padding: '3px 5px',
+              display: 'inline-flex',
+              gap: '2px',
+              zIndex: 10,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+              opacity: showPicker ? 1 : 0,
+              transform: showPicker ? 'translateY(0)' : 'translateY(4px)',
+              pointerEvents: showPicker ? 'auto' : 'none',
+              transition: 'opacity 140ms ease, transform 140ms ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {QUICK_EMOJIS.map(emoji => (
               <button
                 key={emoji}
@@ -168,7 +134,53 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
               </button>
             ))}
           </div>
-        )}
+
+          <div
+            style={{
+              backgroundColor: isOwn ? (isFile ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)') : '#151a24',
+              border: `0.5px solid ${isOwn ? 'rgba(255,255,255,0.15)' : (isFile ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.07)')}`,
+              borderRadius: '10px',
+              padding: isFile ? '8px 10px' : '8px 12px',
+            }}
+            onMouseEnter={e => { if (isFile) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
+            onMouseLeave={e => { if (isFile) e.currentTarget.style.borderColor = isOwn ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)' }}
+          >
+            {isFile && isAudioType(message.file_type) ? (
+              /* Audio player — vocal message */
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '200px' }}>
+                <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
+                  {fileStyle.label}
+                </div>
+                <audio
+                  controls
+                  preload="metadata"
+                  style={{ height: '32px', flex: 1, minWidth: 0 }}
+                >
+                  <source src={message.file_url ?? ''} type={message.file_type ?? 'audio/webm'} />
+                </audio>
+              </div>
+            ) : isFile ? (
+              <a
+                href={message.file_url ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}
+              >
+                <div style={{ borderRadius: '6px', padding: '3px 6px', fontSize: '9px', fontWeight: 700, backgroundColor: fileStyle.bg, color: fileStyle.color }}>
+                  {fileStyle.label}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ color: '#e8edf5', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
+                  <p style={{ color: '#8898aa', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
+                </div>
+              </a>
+            ) : (
+              <p style={{ color: '#e8edf5', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
+                {renderContent(message.content)}
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Reactions */}
         {hasReactions && (
@@ -197,22 +209,6 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                 </button>
               )
             })}
-            <button
-              onClick={() => setShowPicker(true)}
-              style={{
-                background: 'transparent',
-                border: '0.5px dashed rgba(255,255,255,0.12)',
-                borderRadius: '20px',
-                padding: '3px 8px',
-                fontSize: '12px',
-                color: '#3d4f63',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#8898aa' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#3d4f63' }}
-            >
-              +
-            </button>
           </div>
         )}
 
