@@ -84,12 +84,12 @@ function WorkspaceContent() {
       fileName: file.name,
       mimeType: file.mimeType,
     }
-    setDraft({
-      ...draft,
-      attachments: [...draft.attachments, newAttachment],
-    })
-    if (!drawerOpen) setDrawerOpen(true)
-  }, [draft, drawerOpen, setDraft])
+    setDraft(prev => ({
+      ...prev,
+      attachments: [...prev.attachments, newAttachment],
+    }))
+    setDrawerOpen(true)
+  }, [setDraft])
 
   const handleSent = useCallback(() => {
     clearDraft()

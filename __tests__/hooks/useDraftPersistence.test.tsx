@@ -78,4 +78,13 @@ describe('useDraftPersistence', () => {
     expect(result.current.draft).toEqual(EMPTY_DRAFT)
     expect(result.current.restored).toBe(false)
   })
+
+  it('setDraft accepte un updater fonctionnel et lit le state le plus récent', () => {
+    const { result } = renderHook(() => useDraftPersistence())
+    act(() => {
+      result.current.setDraft(prev => ({ ...prev, to: 'first@x.fr' }))
+      result.current.setDraft(prev => ({ ...prev, to: prev.to + ',second@x.fr' }))
+    })
+    expect(result.current.draft.to).toBe('first@x.fr,second@x.fr')
+  })
 })

@@ -32,9 +32,11 @@ function loadFromStorage(): { draft: Draft; restored: boolean } {
   return { draft: EMPTY_DRAFT, restored: false }
 }
 
+type DraftUpdater = Draft | ((prev: Draft) => Draft)
+
 export function useDraftPersistence(): {
   draft: Draft
-  setDraft: (d: Draft) => void
+  setDraft: (next: DraftUpdater) => void
   clearDraft: () => void
   restored: boolean
 } {
@@ -47,22 +49,26 @@ export function useDraftPersistence(): {
     }
   }, [])
 
-  const setDraft = useCallback((next: Draft) => {
-    setState(prev => ({ ...prev, draft: next }))
+  const setDraft = useCallback((next: DraftUpdater) => {
+    setState(prev => {
+      const resolved = typeof next === 'function' ? (next as (p: Draft) => Draft)(prev.draft) : next
 
-    // Debounced write
-    if (writeTimerRef.current) clearTimeout(writeTimerRef.current)
-    writeTimerRef.current = setTimeout(() => {
-      try {
-        if (hasContent(next)) {
-          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toSerializableDraft(next)))
-        } else {
-          localStorage.removeItem(DRAFT_STORAGE_KEY)
+      // Reschedule debounced write based on the resolved value
+      if (writeTimerRef.current) clearTimeout(writeTimerRef.current)
+      writeTimerRef.current = setTimeout(() => {
+        try {
+          if (hasContent(resolved)) {
+            localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toSerializableDraft(resolved)))
+          } else {
+            localStorage.removeItem(DRAFT_STORAGE_KEY)
+          }
+        } catch (err) {
+          console.warn('[workspace] localStorage indisponible à l\'écriture:', err)
         }
-      } catch (err) {
-        console.warn('[workspace] localStorage indisponible à l\'écriture:', err)
-      }
-    }, DEBOUNCE_MS)
+      }, DEBOUNCE_MS)
+
+      return { ...prev, draft: resolved }
+    })
   }, [])
 
   const clearDraft = useCallback(() => {
