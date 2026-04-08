@@ -34,8 +34,16 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
     const fileList = e.target.files
     if (!fileList) return
     const files = Array.from(fileList)
+    const baseAttachments = draft.attachments  // snapshot at user action time
     let pending = files.length
     const collected: Attachment[] = []
+
+    const finalize = () => {
+      pending -= 1
+      if (pending === 0) {
+        onDraftChange({ ...draft, attachments: [...baseAttachments, ...collected] })
+      }
+    }
 
     files.forEach(file => {
       const reader = new FileReader()
@@ -48,10 +56,11 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
           data: base64,
           size: file.size,
         })
-        pending -= 1
-        if (pending === 0) {
-          update({ attachments: [...draft.attachments, ...collected] })
-        }
+        finalize()
+      }
+      reader.onerror = () => {
+        // Si un fichier échoue, on continue sans bloquer le batch
+        finalize()
       }
       reader.readAsDataURL(file)
     })
@@ -110,10 +119,11 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
       <div className="flex-1 flex flex-col overflow-y-auto px-6 py-4 gap-3">
         {/* Destinataire */}
         <div>
-          <label className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
+          <label htmlFor="composer-to" className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
             Destinataire
           </label>
           <input
+            id="composer-to"
             type="email"
             value={draft.to}
             onChange={e => update({ to: e.target.value })}
@@ -130,10 +140,11 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
 
         {/* Objet */}
         <div>
-          <label className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
+          <label htmlFor="composer-subject" className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
             Objet
           </label>
           <input
+            id="composer-subject"
             type="text"
             value={draft.subject}
             onChange={e => update({ subject: e.target.value })}
@@ -150,10 +161,11 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
 
         {/* Message */}
         <div className="flex-1 flex flex-col min-h-0">
-          <label className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
+          <label htmlFor="composer-body" className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-1.5 block">
             Message
           </label>
           <textarea
+            id="composer-body"
             value={draft.body}
             onChange={e => update({ body: e.target.value })}
             placeholder="Rédigez votre message..."
@@ -211,6 +223,7 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
                   </span>
 
                   <button
+                    type="button"
                     onClick={() => removeAttachment(i)}
                     className="p-0.5 rounded hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
                     aria-label="Supprimer la pièce jointe"
@@ -229,6 +242,7 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
         {/* Bouton ajout PJ locale (Drive géré depuis l'explorateur principal) */}
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-txt2 transition-all duration-200 cursor-pointer"
             style={{
@@ -279,6 +293,7 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
         style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
       >
         <button
+          type="button"
           onClick={handleSend}
           disabled={sending}
           className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 cursor-pointer disabled:opacity-50"
