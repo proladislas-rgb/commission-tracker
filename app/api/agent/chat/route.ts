@@ -4,17 +4,54 @@ import Anthropic from '@anthropic-ai/sdk'
 import { getSessionUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { AGENT_TOOLS, executeAgentTool } from '@/lib/agent-tools'
+import type { ReemContext } from '@/lib/reem-types'
 
-const SYSTEM_PROMPT =
+const BASE_SYSTEM_PROMPT =
   'Tu es Reem AI, l\'assistante intelligente de LR Consulting W.L.L, basée au Royaume de Bahreïn. ' +
-  'Tu parles toujours en français. Tu peux interroger les données, créer des commissions/paiements ' +
-  '(avec confirmation), chercher dans Drive, composer des emails, et discuter librement. ' +
+  'Tu parles toujours en français. Tu peux interroger les données (query_data), identifier les retards de paiement ' +
+  '(get_overdue_payments), synthétiser une période (summarize_period), chercher dans Google Drive, rédiger des brouillons ' +
+  'd\'email (draft_email) qui s\'ouvriront dans le tiroir Workspace de l\'utilisateur, et proposer des liens de navigation ' +
+  '(propose_navigation) que l\'utilisateur clique lui-même. ' +
+  '\n\n' +
+  'IMPORTANT : tu ne peux PAS créer, modifier ou supprimer de données directement (pas de tools d\'écriture en V1). ' +
+  'Quand tu veux aider l\'utilisateur à créer une commission ou un paiement, propose-lui un lien vers la page correspondante ' +
+  'via propose_navigation et laisse-le faire lui-même. Pour rédiger un email, utilise draft_email qui ouvrira ' +
+  'le tiroir du Workspace pré-rempli. ' +
+  '\n\n' +
   'Utilise le format français pour les chiffres (espaces, €). Sois concise et professionnelle.'
 
 const chatSchema = z.object({
   message: z.string().min(1).max(5000),
-  clientId: z.string().nullable().optional().default(null),
+  context: z.object({
+    pathname: z.string(),
+    pageLabel: z.string(),
+    activeClientId: z.string().nullable(),
+    selectedEntity: z.object({
+      type: z.enum(['client', 'commission', 'paiement', 'invoice', 'email_draft']),
+      id: z.string().optional(),
+      preview: z.string().optional(),
+    }).optional(),
+  }).optional(),
 })
+
+function buildSystemPrompt(context?: ReemContext): string {
+  if (!context) return BASE_SYSTEM_PROMPT
+  const lines = [
+    BASE_SYSTEM_PROMPT,
+    '',
+    'Contexte utilisateur courant :',
+    `- Page : ${context.pageLabel} (${context.pathname})`,
+    context.activeClientId
+      ? `- Client actif : ${context.activeClientId}`
+      : '- Client actif : aucun',
+  ]
+  if (context.selectedEntity) {
+    lines.push(`- Entité en cours : ${context.selectedEntity.type}${context.selectedEntity.preview ? ` — ${context.selectedEntity.preview}` : ''}`)
+  }
+  lines.push('')
+  lines.push('Prends ce contexte en compte. Quand l\'utilisateur dit "ce client", "cette facture", "ce mail", réfère-toi à l\'entité en cours.')
+  return lines.join('\n')
+}
 
 export async function POST(req: NextRequest) {
   const session = await getSessionUser()
@@ -29,16 +66,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Données invalides.', details: parsed.error.flatten() }, { status: 400 })
     }
 
-    const { message, clientId } = parsed.data
+    const { message, context } = parsed.data
 
-    // Save user message
     await supabaseAdmin.from('agent_messages').insert({
       user_id: session.id,
       role: 'user',
       content: message,
     })
 
-    // Load conversation history
     const { data: history } = await supabaseAdmin
       .from('agent_messages')
       .select('role, content, tool_data')
@@ -51,7 +86,6 @@ export async function POST(req: NextRequest) {
       content: m.content,
     }))
 
-    // Google access token from cookies
     let googleAccessToken: string | null = null
     try {
       const cookieHeader = req.headers.get('cookie') ?? ''
@@ -70,32 +104,34 @@ export async function POST(req: NextRequest) {
     }
 
     const client = new Anthropic({ apiKey })
-    const context = { clientId, userId: session.id, googleAccessToken }
+    const agentContext = {
+      clientId: context?.activeClientId ?? null,
+      userId: session.id,
+      googleAccessToken,
+      pageContext: context,
+    }
 
-    // Initial call
+    const systemPrompt = buildSystemPrompt(context)
+
     let response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2048,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       tools: AGENT_TOOLS,
       messages,
     })
 
-    // Collect tool data for the frontend
     const toolData: Array<{ tool: string; type: string; result: unknown }> = []
 
-    // Tool use loop
     while (response.stop_reason === 'tool_use') {
       const assistantContent = response.content
-      const toolUseBlocks = assistantContent.filter(
-        (b) => b.type === 'tool_use',
-      )
+      const toolUseBlocks = assistantContent.filter((b) => b.type === 'tool_use')
 
       const toolResults: Anthropic.ToolResultBlockParam[] = []
       for (const block of toolUseBlocks) {
         if (block.type !== 'tool_use') continue
         try {
-          const result = await executeAgentTool(block.name, block.input as Record<string, unknown>, context)
+          const result = await executeAgentTool(block.name, block.input as Record<string, unknown>, agentContext)
           toolData.push({ tool: block.name, type: result.type, result: result.result })
           toolResults.push({
             type: 'tool_result',
@@ -119,19 +155,17 @@ export async function POST(req: NextRequest) {
       response = await client.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2048,
-        system: SYSTEM_PROMPT,
+        system: systemPrompt,
         tools: AGENT_TOOLS,
         messages,
       })
     }
 
-    // Extract text content
     const textBlocks = response.content.filter(
       (b): b is Anthropic.TextBlock => b.type === 'text',
     )
     const content = textBlocks.map((b) => b.text).join('\n')
 
-    // Save assistant response
     await supabaseAdmin.from('agent_messages').insert({
       user_id: session.id,
       role: 'assistant',
