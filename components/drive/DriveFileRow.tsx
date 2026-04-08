@@ -13,6 +13,8 @@ interface DriveFile {
 interface DriveFileRowProps {
   file: DriveFile
   onDelete?: () => void
+  attachMode?: boolean
+  onAttach?: (file: DriveFile) => void
 }
 
 const TYPE_STYLES: Record<string, { color: string; label: string }> = {
@@ -51,7 +53,7 @@ function formatDate(dateStr: string): string {
   }).format(new Date(dateStr))
 }
 
-export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
+export default function DriveFileRow({ file, onDelete, attachMode = false, onAttach }: DriveFileRowProps) {
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const style = getTypeStyle(file.mimeType)
@@ -133,10 +135,31 @@ export default function DriveFileRow({ file, onDelete }: DriveFileRowProps) {
             </svg>
           </button>
 
+          {attachMode && onAttach && (
+            <button
+              type="button"
+              onClick={() => onAttach(file)}
+              className="px-2 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors flex items-center gap-1"
+              style={{
+                backgroundColor: 'rgba(99,102,241,0.15)',
+                color: '#818cf8',
+                border: '1px solid rgba(99,102,241,0.25)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.22)' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.15)' }}
+              title="Joindre au brouillon en cours"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+              </svg>
+              Joindre
+            </button>
+          )}
+
           {/* Envoyer par email */}
           <button
             onClick={() => {
-              window.location.href = `/dashboard/email?attach=${file.id}&name=${encodeURIComponent(file.name)}&mime=${encodeURIComponent(file.mimeType)}`
+              window.location.href = `/dashboard/workspace?attach=${file.id}&name=${encodeURIComponent(file.name)}&mime=${encodeURIComponent(file.mimeType)}`
             }}
             className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Envoyer par email"
