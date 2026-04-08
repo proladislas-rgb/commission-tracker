@@ -21,6 +21,7 @@ import ExportButton from '@/components/dashboard/ExportButton'
 
 import ErrorAlert from '@/components/ui/ErrorAlert'
 import { useToast } from '@/components/ui/Toast'
+import ReemInsights from '@/components/reem/ReemInsights'
 import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
 export default function DashboardPage() {
@@ -356,6 +357,8 @@ export default function DashboardPage() {
         onDeletePrime={handleDeletePrime}
         onCreatePrimeWithCommission={handleCreatePrimeWithCommission}
       />
+
+      <ReemInsights />
 
     </>
   )
