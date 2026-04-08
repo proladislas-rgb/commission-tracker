@@ -88,8 +88,8 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
         body: draft.body.replace(/\n/g, '<br>'),
         attachments: draft.attachments.map(att =>
           att.type === 'drive'
-            ? { type: 'drive' as const, fileId: att.fileId!, fileName: att.fileName, mimeType: att.mimeType }
-            : { type: 'local' as const, data: att.data!, fileName: att.fileName, mimeType: att.mimeType }
+            ? { type: 'drive' as const, fileId: att.fileId, fileName: att.fileName, mimeType: att.mimeType }
+            : { type: 'local' as const, data: att.data, fileName: att.fileName, mimeType: att.mimeType }
         ),
       }
 

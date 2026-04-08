@@ -2,14 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import DriveFileRow from './DriveFileRow'
-
-interface DriveFile {
-  id: string
-  name: string
-  mimeType: string
-  modifiedTime: string
-  size?: string
-}
+import type { DriveFile } from '@/lib/drive'
 
 interface BreadcrumbItem {
   id: string

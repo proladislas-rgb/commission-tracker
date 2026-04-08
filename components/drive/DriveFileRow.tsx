@@ -1,14 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-
-interface DriveFile {
-  id: string
-  name: string
-  mimeType: string
-  modifiedTime: string
-  size?: string
-}
+import type { DriveFile } from '@/lib/drive'
 
 interface DriveFileRowProps {
   file: DriveFile

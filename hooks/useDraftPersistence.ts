@@ -32,7 +32,12 @@ function loadFromStorage(): { draft: Draft; restored: boolean } {
   return { draft: EMPTY_DRAFT, restored: false }
 }
 
-type DraftUpdater = Draft | ((prev: Draft) => Draft)
+type DraftFunctionalUpdater = (prev: Draft) => Draft
+export type DraftUpdater = Draft | DraftFunctionalUpdater
+
+function isFunctionalUpdater(v: DraftUpdater): v is DraftFunctionalUpdater {
+  return typeof v === 'function'
+}
 
 export function useDraftPersistence(): {
   draft: Draft
@@ -51,7 +56,7 @@ export function useDraftPersistence(): {
 
   const setDraft = useCallback((next: DraftUpdater) => {
     setState(prev => {
-      const resolved = typeof next === 'function' ? (next as (p: Draft) => Draft)(prev.draft) : next
+      const resolved = isFunctionalUpdater(next) ? next(prev.draft) : next
 
       // Reschedule debounced write based on the resolved value
       if (writeTimerRef.current) clearTimeout(writeTimerRef.current)

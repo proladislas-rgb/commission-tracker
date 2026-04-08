@@ -1,13 +1,23 @@
 // lib/workspace.ts
 
-export interface Attachment {
-  type: 'drive' | 'local'
-  fileId?: string         // si type === 'drive'
+export interface DriveAttachment {
+  type: 'drive'
+  fileId: string
   fileName: string
   mimeType: string
-  data?: string           // base64 si type === 'local' — NON persisté en localStorage
   size?: number
 }
+
+export interface LocalAttachment {
+  type: 'local'
+  data: string            // base64 — NON persisté en localStorage
+  fileName: string
+  mimeType: string
+  size?: number
+}
+
+/** Union discriminée par `type` — élimine le besoin de non-null assertions. */
+export type Attachment = DriveAttachment | LocalAttachment
 
 export interface Draft {
   to: string

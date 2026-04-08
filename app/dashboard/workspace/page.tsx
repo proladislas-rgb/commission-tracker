@@ -6,13 +6,8 @@ import DriveExplorer from '@/components/drive/DriveExplorer'
 import EmailDrawer from '@/components/workspace/EmailDrawer'
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader'
 import { useDraftPersistence } from '@/hooks/useDraftPersistence'
-import { hasContent, type Attachment } from '@/lib/workspace'
-
-interface DriveFile {
-  id: string
-  name: string
-  mimeType: string
-}
+import { hasContent, type DriveAttachment } from '@/lib/workspace'
+import type { DriveFile } from '@/lib/drive'
 
 function WorkspaceContent() {
   const searchParams = useSearchParams()
@@ -42,6 +37,9 @@ function WorkspaceContent() {
   // Restauration brouillon → ouvrir le tiroir + toast
   useEffect(() => {
     if (restored) {
+      // Sync au mount depuis localStorage : pattern légitime, pas dérivable
+      // car drawerOpen et restoredToast ont d'autres sources de mutation.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDrawerOpen(true)
       setRestoredToast(true)
       const t = setTimeout(() => setRestoredToast(false), 4000)
@@ -60,7 +58,7 @@ function WorkspaceContent() {
     const subject = searchParams.get('subject') ?? ''
     const body = searchParams.get('body') ?? ''
 
-    const attachments: Attachment[] = []
+    const attachments: DriveAttachment[] = []
     if (attachFileId && attachName) {
       attachments.push({
         type: 'drive',
@@ -71,14 +69,17 @@ function WorkspaceContent() {
     }
 
     if (attachments.length > 0 || to || subject || body) {
+      // Sync depuis l'URL : pattern légitime pour absorber les query params
+      // au mount (Reem AI ou ancien lien Drive). Pas dérivable en derived state
+      // car drawerOpen a aussi des sources de mutation manuelles (✕, envoi).
       setDraft({ to, subject, body, attachments })
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDrawerOpen(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
+  }, [searchParams, restored, setDraft])
 
   const attachFileFromDrive = useCallback((file: DriveFile) => {
-    const newAttachment: Attachment = {
+    const newAttachment: DriveAttachment = {
       type: 'drive',
       fileId: file.id,
       fileName: file.name,
