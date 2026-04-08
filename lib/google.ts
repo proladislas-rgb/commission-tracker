@@ -12,6 +12,13 @@ const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
 ]
 
+/** Tokens Google persistés dans le cookie httpOnly `google_tokens`. */
+export interface StoredTokens {
+  access_token: string
+  refresh_token: string
+  expires_at: number
+}
+
 interface GoogleTokens {
   access_token: string
   refresh_token?: string

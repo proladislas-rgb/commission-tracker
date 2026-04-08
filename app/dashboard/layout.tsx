@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, createContext, useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import AppShell from '@/components/layout/AppShell'
@@ -8,7 +8,21 @@ import { ClientProvider } from '@/hooks/useClientContext'
 import ReemWidget from '@/components/reem/ReemWidget'
 import { ReemUIProvider } from '@/components/reem/ReemUIProvider'
 import { supabase } from '@/lib/supabase'
+import { useRealtime } from '@/hooks/useRealtime'
 import type { User } from '@/lib/types'
+
+interface DashboardAssociateContextValue {
+  associe: User | null
+  handleRenameAssociate: (newName: string) => Promise<void>
+}
+
+const DashboardAssociateContext = createContext<DashboardAssociateContextValue | null>(null)
+
+export function useDashboardAssociate(): DashboardAssociateContextValue {
+  const ctx = useContext(DashboardAssociateContext)
+  if (!ctx) throw new Error('useDashboardAssociate must be used within DashboardLayout')
+  return ctx
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
@@ -39,17 +53,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     loadAssociate()
   }, [loadAssociate])
 
-  // Realtime rename
-  useEffect(() => {
-    const channel = supabase
-      .channel('users-rename')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .on('postgres_changes' as any, { event: 'UPDATE', schema: 'public', table: 'users' }, (payload: { new: User }) => {
-        if (payload.new.role === 'associe') setAssociate(payload.new)
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [])
+  // Realtime rename — migré vers useRealtime (I21)
+  useRealtime({
+    table: 'users',
+    event: 'UPDATE',
+    onUpdate: (payload) => {
+      const updated = payload as unknown as User
+      if (updated.role === 'associe') setAssociate(updated)
+    },
+  })
 
   async function handleRenameAssociate(newName: string) {
     if (!associe) return
@@ -74,13 +86,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) return null
 
   return (
-    <ClientProvider>
-      <ReemUIProvider>
-        <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
-          {children}
-        </AppShell>
-        <ReemWidget />
-      </ReemUIProvider>
-    </ClientProvider>
+    <DashboardAssociateContext.Provider value={{ associe, handleRenameAssociate }}>
+      <ClientProvider>
+        <ReemUIProvider>
+          <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
+            {children}
+          </AppShell>
+          <ReemWidget />
+        </ReemUIProvider>
+      </ClientProvider>
+    </DashboardAssociateContext.Provider>
   )
 }

@@ -8,4 +8,7 @@ export interface DriveFile {
   mimeType: string
   modifiedTime: string
   size?: string
+  parents?: string[]
+  iconLink?: string
+  thumbnailLink?: string
 }

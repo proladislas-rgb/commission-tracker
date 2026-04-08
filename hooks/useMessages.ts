@@ -43,6 +43,9 @@ export function useMessages(channelId: string | null) {
   }, [])
 
   // Realtime subscription
+  // I21: exception — conservé sans useRealtime car les deux handlers (INSERT et UPDATE)
+  // font de l'enrichissement async (join users sur INSERT, mise à jour réactions sur UPDATE)
+  // qui nécessite un accès direct au channel Supabase et au ref isMountedRef.
   useEffect(() => {
     if (!channelId) return
 

@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken } from '@/lib/google'
-
-interface StoredTokens {
-  access_token: string
-  refresh_token: string
-  expires_at: number
-}
+import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()

@@ -6,6 +6,8 @@ import { useClientContext } from '@/hooks/useClientContext'
 import { useCommissions } from '@/hooks/useCommissions'
 import { usePaiements } from '@/hooks/usePaiements'
 import { useSommesDues } from '@/hooks/useSommesDues'
+import { useRealtime } from '@/hooks/useRealtime'
+import { useDashboardAssociate } from '@/app/dashboard/layout'
 import { supabase } from '@/lib/supabase'
 import { slugifyPrimeName } from '@/lib/constants'
 
@@ -22,29 +24,15 @@ import ExportButton from '@/components/dashboard/ExportButton'
 import ErrorAlert from '@/components/ui/ErrorAlert'
 import { useToast } from '@/components/ui/Toast'
 import ReemInsights from '@/components/reem/ReemInsights'
-import type { User, Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
+import type { Prime, Commission, Paiement, CommissionStatus, ActivityAction, ActivityEntityType } from '@/lib/types'
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const { selectedClientId, selectedClient } = useClientContext()
-  const [associe, setAssociate] = useState<User | null>(null)
-  const [primes, setPrimes]     = useState<Prime[]>([])
-
-  const loadAssociate = useCallback(async () => {
-    try {
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .eq('role', 'associe')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .single()
-      if (data) setAssociate(data)
-    } catch {
-      // pas d'associé trouvé
-    }
-  }, [])
+  // associe is loaded once in layout.tsx and shared via context (I19)
+  const { associe, handleRenameAssociate } = useDashboardAssociate()
+  const [primes, setPrimes] = useState<Prime[]>([])
 
   const loadPrimes = useCallback(async () => {
     try {
@@ -59,33 +47,15 @@ export default function DashboardPage() {
   }, [selectedClientId])
 
   useEffect(() => {
-    loadAssociate()
     loadPrimes()
-  }, [loadAssociate, loadPrimes])
-
-  // Realtime: users
-  useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-users')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .on('postgres_changes' as any, { event: 'UPDATE', schema: 'public', table: 'users' }, (payload: { new: User }) => {
-        if (payload.new.role === 'associe') setAssociate(payload.new)
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [])
-
-  // Realtime: primes — refetch complet pour garder la cohérence
-  useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-primes')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'primes' }, () => {
-        loadPrimes()
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
   }, [loadPrimes])
+
+  // Realtime: primes — refetch complet pour garder la cohérence (I21: migré vers useRealtime)
+  useRealtime({
+    table: 'primes',
+    event: '*',
+    onChange: () => { loadPrimes() },
+  })
 
   // Garde-fou de cohérence : vérification toutes les 10s
   const associeId = associe?.id
@@ -260,18 +230,6 @@ export default function DashboardPage() {
       // log silencieux
     }
   }, [removePaiement, paiements, user])
-
-  async function handleRenameAssociate(newName: string) {
-    if (!associe) return
-    const res = await fetch(`/api/users/${associe.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ display_name: newName }),
-    })
-    if (!res.ok) throw new Error('Erreur lors du renommage')
-    const updated = await res.json()
-    setAssociate(updated)
-  }
 
   if (!user) return null
 

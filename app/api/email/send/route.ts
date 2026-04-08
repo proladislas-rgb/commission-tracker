@@ -1,28 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken } from '@/lib/google'
-
-interface StoredTokens {
-  access_token: string
-  refresh_token: string
-  expires_at: number
-}
-
-interface DriveAttachment {
-  type: 'drive'
-  fileId: string
-  fileName: string
-  mimeType: string
-}
-
-interface LocalAttachment {
-  type: 'local'
-  data: string // base64
-  fileName: string
-  mimeType: string
-}
-
-type Attachment = DriveAttachment | LocalAttachment
+import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import type { Attachment } from '@/lib/workspace'
 
 interface SendEmailBody {
   to: string

@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import InlineEdit from '@/components/ui/InlineEdit'
 import ClientSelector from '@/components/clients/ClientSelector'
 import { supabase } from '@/lib/supabase'
+import { useRealtime } from '@/hooks/useRealtime'
 import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
 import { fetchTotalUnread } from '@/lib/chat-unread'
 import type { User, ActivityLog, Channel } from '@/lib/types'
@@ -68,31 +69,31 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
   const [chatUnreadCount, setChatUnreadCount] = useState(0)
 
   // Chat unread badge
-  useEffect(() => {
+  const fetchUnread = useCallback(async () => {
     const userId = user?.id
     if (!userId) return
-
-    async function fetchUnread() {
-      try {
-        const { data: chans } = await supabase.from('channels').select('id')
-        if (!chans) return
-        const channelIds = (chans as Channel[]).map(ch => ch.id)
-        const total = await fetchTotalUnread(userId!, channelIds)
-        setChatUnreadCount(total)
-      } catch {
-        // silencieux
-      }
+    try {
+      const { data: chans } = await supabase.from('channels').select('id')
+      if (!chans) return
+      const channelIds = (chans as Channel[]).map(ch => ch.id)
+      const total = await fetchTotalUnread(userId, channelIds)
+      setChatUnreadCount(total)
+    } catch {
+      // silencieux
     }
-
-    fetchUnread()
-    const channel = supabase.channel('sidebar-chat-unread')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
-        fetchUnread()
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
   }, [user?.id])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching external data from Supabase
+    fetchUnread()
+  }, [fetchUnread])
+
+  // I21: migré vers useRealtime — déclenchement refetch sur INSERT messages
+  useRealtime({
+    table: 'messages',
+    event: 'INSERT',
+    onInsert: () => { void fetchUnread() },
+  })
   const loadUsers = useCallback(async () => {
     try {
       const { data } = await supabase
@@ -136,6 +137,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
     }
     loadActivity()
 
+    // I21: conservé tel quel — le handler fait un fetch async avec join users
+    // que useRealtime ne peut pas exprimer proprement via onInsert (callback sync).
     const channel = supabase
       .channel('sidebar-activity')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

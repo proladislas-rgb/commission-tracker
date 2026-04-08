@@ -1,23 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken } from '@/lib/google'
-
-interface StoredTokens {
-  access_token: string
-  refresh_token: string
-  expires_at: number
-}
-
-interface DriveFile {
-  id: string
-  name: string
-  mimeType: string
-  modifiedTime: string
-  size?: string
-  parents?: string[]
-  iconLink?: string
-  thumbnailLink?: string
-}
+import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import type { DriveFile } from '@/lib/drive'
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()
