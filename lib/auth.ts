@@ -2,19 +2,16 @@ import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import type { AuthUser } from './types'
 
-// Lazy init : on ne crash pas au module load pour laisser Next.js faire sa phase
-// "Collecting page data" pendant le build Vercel. Au runtime, la toute première
-// utilisation (signToken ou verifyToken) throw si AUTH_SECRET manque.
-let _secret: Uint8Array | null = null
-function getSecret(): Uint8Array {
-  if (_secret) return _secret
-  const authSecret = process.env.AUTH_SECRET
-  if (!authSecret) {
-    throw new Error('AUTH_SECRET environment variable is required. Configure it in .env.local')
-  }
-  _secret = new TextEncoder().encode(authSecret)
-  return _secret
+// Durant la phase build Next.js, les env vars peuvent manquer. On skip le
+// throw dans ce cas et on utilise un placeholder qui ne sera jamais utilisé
+// pour signer/vérifier à ce moment-là. En runtime, on throw immédiatement
+// si AUTH_SECRET manque.
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build'
+const authSecret = process.env.AUTH_SECRET
+if (!isBuildPhase && !authSecret) {
+  throw new Error('AUTH_SECRET environment variable is required. Configure it in .env.local')
 }
+const SECRET = new TextEncoder().encode(authSecret || 'build-phase-placeholder')
 
 const COOKIE_NAME = 'ct_session'
 
@@ -24,12 +21,12 @@ export async function signToken(user: AuthUser): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('1d')
-    .sign(getSecret())
+    .sign(SECRET)
 }
 
 export async function verifyToken(token: string): Promise<AuthUser | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret())
+    const { payload } = await jwtVerify(token, SECRET)
     return (payload.user as AuthUser) ?? null
   } catch {
     return null
