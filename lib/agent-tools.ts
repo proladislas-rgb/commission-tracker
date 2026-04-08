@@ -1,5 +1,5 @@
 import type Anthropic from '@anthropic-ai/sdk'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import type { ReemContext } from '@/lib/reem-types'
 
 export interface AgentToolResult {

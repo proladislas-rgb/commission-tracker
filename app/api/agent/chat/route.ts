@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import Anthropic from '@anthropic-ai/sdk'
 import { getSessionUser } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { AGENT_TOOLS, executeAgentTool } from '@/lib/agent-tools'
 import type { ReemContext } from '@/lib/reem-types'
 

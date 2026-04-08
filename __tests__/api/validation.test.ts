@@ -19,6 +19,8 @@ vi.mock('@/lib/auth', () => ({
 const mockInsert = vi.fn(() => ({ error: null }))
 vi.mock('@/lib/supabase', () => ({
   supabase: { from: vi.fn() },
+}))
+vi.mock('@/lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: vi.fn(() => ({ insert: mockInsert })),
     storage: {
@@ -150,7 +152,7 @@ describe('Validation — /api/email/send', () => {
     const res = await POST(req)
     expect(res.status).toBe(400)
     const body = await res.json()
-    expect(body.error).toContain('email')
+    expect(body.error).toBe('Données invalides')
   })
 
   it('rejette si champs requis manquants', async () => {

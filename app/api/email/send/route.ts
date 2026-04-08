@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
 import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
-import type { Attachment } from '@/lib/workspace'
 
-interface SendEmailBody {
-  to: string
-  subject: string
-  body: string
-  attachments?: Attachment[]
-}
+const sendEmailSchema = z.object({
+  to: z.string().email('Email invalide').max(200),
+  subject: z.string().min(1).max(200),
+  body: z.string().min(1).max(100000),
+  attachments: z.array(z.object({
+    type: z.enum(['drive', 'local']),
+    fileId: z.string().optional(),
+    fileName: z.string().max(255),
+    mimeType: z.string().max(100),
+    data: z.string().optional(),
+  })).max(20).optional(),
+})
 
 const EXPORT_MIMES: Record<string, string> = {
   'application/vnd.google-apps.document': 'application/pdf',
@@ -137,22 +143,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const { tokens } = result
-  let payload: SendEmailBody
+
+  let rawBody: unknown
   try {
-    payload = (await request.json()) as SendEmailBody
+    rawBody = await request.json()
   } catch {
     return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
   }
 
-  const { to, subject, body: htmlBody, attachments = [] } = payload
-  if (!to || !subject || !htmlBody) {
-    return NextResponse.json({ error: 'to, subject et body sont requis' }, { status: 400 })
+  const parsed = sendEmailSchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Données invalides', details: parsed.error.flatten() }, { status: 400 })
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(to)) {
-    return NextResponse.json({ error: 'Adresse email destinataire invalide.' }, { status: 400 })
-  }
+  const { to, subject, body: htmlBody, attachments = [] } = parsed.data
 
   // Préparer les pièces jointes
   const processedAttachments: { fileName: string; mimeType: string; base64Data: string }[] = []
@@ -161,7 +165,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (att.type === 'drive') {
       try {
         const { data, actualMime } = await downloadDriveFile(
-          att.fileId,
+          att.fileId ?? '',
           att.mimeType,
           tokens.access_token
         )
@@ -181,7 +185,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       processedAttachments.push({
         fileName: att.fileName,
         mimeType: att.mimeType,
-        base64Data: att.data,
+        base64Data: att.data ?? '',
       })
     }
   }

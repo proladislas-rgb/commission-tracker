@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getSessionUser } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import type { Insight } from '@/lib/reem-types'
 
 const INSIGHTS_TOOL: Anthropic.Tool = {

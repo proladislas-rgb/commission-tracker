@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function DELETE() {
   const session = await getSessionUser()

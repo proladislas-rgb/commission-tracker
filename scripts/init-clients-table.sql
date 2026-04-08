@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS clients (
 );
 
 ALTER PUBLICATION supabase_realtime ADD TABLE clients;
-ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
+-- RLS activé — les policies sont gérées via le dashboard Supabase ou un fichier de migration dédié
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS idx_clients_prime ON clients(prime_id);
 CREATE INDEX IF NOT EXISTS idx_clients_created_by ON clients(created_by);
 

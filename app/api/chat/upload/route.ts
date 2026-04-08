@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()
@@ -26,9 +26,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Fichier trop volumineux (max 10 Mo).' }, { status: 400 })
   }
 
-  // Bloquer uniquement les exécutables dangereux
-  const BLOCKED_TYPES = ['application/x-msdownload', 'application/x-executable']
-  if (file.type && BLOCKED_TYPES.includes(file.type)) {
+  // Allowlist des types MIME autorisés (defense in depth)
+  // Note : pour une vérification des magic bytes, envisager le package 'file-type' en suivi.
+  const ALLOWED_MIME_TYPES = new Set([
+    // Images
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+    // Documents
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'text/csv',
+    // Audio (vocaux)
+    'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav',
+    // Archives
+    'application/zip',
+  ])
+  if (file.type && !ALLOWED_MIME_TYPES.has(file.type)) {
     return NextResponse.json({ error: 'Type de fichier non autorisé.' }, { status: 400 })
   }
 

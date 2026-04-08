@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { signToken, getCookieName } from '@/lib/auth'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import type { LoginPayload, AuthUser } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit : 5 tentatives / 15 min par IP
+    const { allowed, resetAt } = rateLimit(`login:${getClientIp(req)}`, 5, 15 * 60 * 1000)
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez dans quelques minutes.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+      )
+    }
+
     const { username, password }: LoginPayload = await req.json()
 
     if (!username || !password) {

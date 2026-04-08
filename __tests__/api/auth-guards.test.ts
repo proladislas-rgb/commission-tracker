@@ -11,6 +11,8 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/lib/supabase', () => ({
   supabase: { from: vi.fn() },
+}))
+vi.mock('@/lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: vi.fn(() => ({
       insert: vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => ({ data: null, error: null })) })) })),
