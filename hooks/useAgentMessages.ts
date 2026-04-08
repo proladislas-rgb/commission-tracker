@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { ReemContext } from '@/lib/reem-types'
 
@@ -17,9 +17,12 @@ export function useAgentMessages(userId: string | undefined) {
   const [messages, setMessages] = useState<AgentMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
+  // Version counter to discard stale loads from concurrent sends
+  const loadVersionRef = useRef(0)
 
   const load = useCallback(async () => {
     if (!userId) return
+    const version = ++loadVersionRef.current
     setLoading(true)
     try {
       const { data } = await supabase
@@ -27,11 +30,14 @@ export function useAgentMessages(userId: string | undefined) {
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: true })
-      setMessages((data ?? []) as AgentMessage[])
+      // Only apply if this is still the latest load
+      if (version === loadVersionRef.current) {
+        setMessages((data ?? []) as AgentMessage[])
+      }
     } catch {
       // silencieux
     } finally {
-      setLoading(false)
+      if (version === loadVersionRef.current) setLoading(false)
     }
   }, [userId])
 

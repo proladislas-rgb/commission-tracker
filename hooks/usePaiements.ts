@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Paiement } from '@/lib/types'
@@ -13,7 +13,15 @@ function normalizePaiement<T extends Record<string, unknown>>(row: T): T {
 }
 
 export function usePaiements(createdBy?: string, clientId?: string) {
-  const [paiements, setPaiements] = useState<Paiement[]>([])
+  const [paiements, setPaiementsRaw] = useState<Paiement[]>([])
+  const paiementsRef = useRef<Paiement[]>([])
+  const setPaiements = useCallback((next: Paiement[] | ((prev: Paiement[]) => Paiement[])) => {
+    setPaiementsRaw(prev => {
+      const resolved = typeof next === 'function' ? next(prev) : next
+      paiementsRef.current = resolved
+      return resolved
+    })
+  }, [])
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
 
@@ -38,7 +46,7 @@ export function usePaiements(createdBy?: string, clientId?: string) {
     } finally {
       setLoading(false)
     }
-  }, [createdBy, clientId])
+  }, [createdBy, clientId, setPaiements])
 
   useEffect(() => { load() }, [load])
 
@@ -73,14 +81,11 @@ export function usePaiements(createdBy?: string, clientId?: string) {
       setPaiements(prev => prev.filter(p => p.id !== optimisticId))
       throw e
     }
-  }, [])
+  }, [setPaiements])
 
   const updateStatus = useCallback(async (id: string, status: Paiement['status']) => {
-    let snapshot: Paiement[] = []
-    setPaiements(prev => {
-      snapshot = prev
-      return prev.map(x => x.id === id ? { ...x, status } : x)
-    })
+    const snapshot = paiementsRef.current
+    setPaiements(prev => prev.map(x => x.id === id ? { ...x, status } : x))
     try {
       const { error: err } = await supabase
         .from('paiements')
@@ -91,14 +96,11 @@ export function usePaiements(createdBy?: string, clientId?: string) {
       setPaiements(snapshot)
       throw e
     }
-  }, [])
+  }, [setPaiements])
 
   const remove = useCallback(async (id: string) => {
-    let snapshot: Paiement[] = []
-    setPaiements(prev => {
-      snapshot = prev
-      return prev.filter(x => x.id !== id)
-    })
+    const snapshot = paiementsRef.current
+    setPaiements(prev => prev.filter(x => x.id !== id))
     try {
       const { error: err } = await supabase
         .from('paiements')
@@ -109,7 +111,7 @@ export function usePaiements(createdBy?: string, clientId?: string) {
       setPaiements(snapshot)
       throw e
     }
-  }, [])
+  }, [setPaiements])
 
   return { paiements, loading, error, reload: load, add, updateStatus, remove }
 }

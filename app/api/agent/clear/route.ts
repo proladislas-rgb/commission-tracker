@@ -14,7 +14,8 @@ export async function DELETE() {
     .eq('user_id', session.id)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('[agent/clear] Supabase error:', error.message)
+    return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

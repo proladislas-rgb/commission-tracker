@@ -232,7 +232,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (!res.ok) {
     const err = await res.text()
-    return NextResponse.json({ error: 'gmail_send_failed', details: err }, { status: res.status })
+    console.error('[email/send] Gmail API error:', err)
+    return NextResponse.json({ error: 'Erreur lors de l\'envoi du mail.' }, { status: res.status })
   }
 
   const data = (await res.json()) as { id: string }

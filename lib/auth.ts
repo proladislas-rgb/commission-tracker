@@ -9,11 +9,12 @@ if (!authSecret) {
 const SECRET = new TextEncoder().encode(authSecret)
 const COOKIE_NAME = 'ct_session'
 
+// JWT expiry réduit à 1j (audit sécurité 2026-04-08 : était 7j)
 export async function signToken(user: AuthUser): Promise<string> {
   return new SignJWT({ user })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('1d')
     .sign(SECRET)
 }
 

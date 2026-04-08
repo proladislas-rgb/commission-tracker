@@ -55,13 +55,14 @@ const EMPTY_PRIME_FORM = {
   status:     'due' as CommissionStatus,
 }
 
+const PAGE_SIZE = 10
+
 export default function CommissionTable({
   commissions, primes, userId, isAssociate, isAdmin,
   onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime, onCreatePrimeWithCommission,
 }: Props) {
   const [filter, setFilter]             = useState<string>('all')
   const [page, setPage]                 = useState(0)
-  const PAGE_SIZE = 10
   // Filtres avancés
   const [showFilters, setShowFilters]   = useState(false)
   const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())

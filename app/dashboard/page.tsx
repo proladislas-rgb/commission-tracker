@@ -32,6 +32,8 @@ export default function DashboardPage() {
   const { selectedClientId, selectedClient } = useClientContext()
   // associe is loaded once in layout.tsx and shared via context (I19)
   const { associe, handleRenameAssociate } = useDashboardAssociate()
+  // Stable noop pour onMobileMenuOpen (prop requise par Header, gérée au niveau layout)
+  const handleMobileMenuOpen = useCallback(() => {}, [])
   const [primes, setPrimes] = useState<Prime[]>([])
 
   const loadPrimes = useCallback(async () => {
@@ -236,7 +238,7 @@ export default function DashboardPage() {
   if (!selectedClient) {
     return (
       <>
-        <Header associe={associe} primesCount={0} onRenameAssociate={handleRenameAssociate} onMobileMenuOpen={() => {}} />
+        <Header associe={associe} primesCount={0} onRenameAssociate={handleRenameAssociate} onMobileMenuOpen={handleMobileMenuOpen} />
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <p className="text-txt2 text-lg mb-2">Aucun client sélectionné</p>
           <p className="text-txt3 text-sm">Sélectionnez un client dans la sidebar ou créez-en un depuis la page Clients.</p>
@@ -251,7 +253,7 @@ export default function DashboardPage() {
         associe={associe}
         primesCount={primes.length}
         onRenameAssociate={handleRenameAssociate}
-        onMobileMenuOpen={() => {}}
+        onMobileMenuOpen={handleMobileMenuOpen}
       />
 
       <div className="flex items-center justify-between mb-4">

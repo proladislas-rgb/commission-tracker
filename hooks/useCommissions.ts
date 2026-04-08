@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Commission } from '@/lib/types'
@@ -15,7 +15,15 @@ function normalizeCommission<T extends Record<string, unknown>>(row: T): T {
 }
 
 export function useCommissions(userId?: string, clientId?: string) {
-  const [commissions, setCommissions] = useState<Commission[]>([])
+  const [commissions, setCommissionsRaw] = useState<Commission[]>([])
+  const commissionsRef = useRef<Commission[]>([])
+  const setCommissions = useCallback((next: Commission[] | ((prev: Commission[]) => Commission[])) => {
+    setCommissionsRaw(prev => {
+      const resolved = typeof next === 'function' ? next(prev) : next
+      commissionsRef.current = resolved
+      return resolved
+    })
+  }, [])
   const [loading, setLoading]         = useState(true)
   const [error, setError]             = useState<string | null>(null)
 
@@ -40,7 +48,7 @@ export function useCommissions(userId?: string, clientId?: string) {
     } finally {
       setLoading(false)
     }
-  }, [userId, clientId])
+  }, [userId, clientId, setCommissions])
 
   useEffect(() => { load() }, [load])
 
@@ -75,14 +83,11 @@ export function useCommissions(userId?: string, clientId?: string) {
       setCommissions(prev => prev.filter(c => c.id !== optimisticId))
       throw e
     }
-  }, [])
+  }, [setCommissions])
 
   const update = useCallback(async (id: string, data: Partial<Commission>) => {
-    let snapshot: Commission | undefined
-    setCommissions(cs => {
-      snapshot = cs.find(c => c.id === id)
-      return cs.map(c => c.id === id ? { ...c, ...data } : c)
-    })
+    const snapshot = commissionsRef.current.find(c => c.id === id)
+    setCommissions(cs => cs.map(c => c.id === id ? { ...c, ...data } : c))
     try {
       const { error: err } = await supabase
         .from('commissions')
@@ -90,25 +95,22 @@ export function useCommissions(userId?: string, clientId?: string) {
         .eq('id', id)
       if (err) throw err
     } catch (e) {
-      if (snapshot) setCommissions(cs => cs.map(c => c.id === id ? snapshot! : c))
+      if (snapshot) setCommissions(cs => cs.map(c => c.id === id ? snapshot : c))
       throw e
     }
-  }, [])
+  }, [setCommissions])
 
   const remove = useCallback(async (id: string) => {
-    let snapshot: Commission | undefined
-    setCommissions(cs => {
-      snapshot = cs.find(c => c.id === id)
-      return cs.filter(c => c.id !== id)
-    })
+    const snapshot = commissionsRef.current.find(c => c.id === id)
+    setCommissions(cs => cs.filter(c => c.id !== id))
     try {
       const { error: err } = await supabase.from('commissions').delete().eq('id', id)
       if (err) throw err
     } catch (e) {
-      if (snapshot) setCommissions(cs => [snapshot!, ...cs])
+      if (snapshot) setCommissions(cs => [snapshot, ...cs])
       throw e
     }
-  }, [])
+  }, [setCommissions])
 
   return { commissions, loading, error, reload: load, add, update, remove }
 }

@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
       details,
     })
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+      console.error('[activity] Supabase error:', error.message)
+      return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 })
+    }
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Requête invalide.' }, { status: 400 })

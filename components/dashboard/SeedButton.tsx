@@ -35,7 +35,10 @@ export default function SeedButton({ userId, onImported }: Props) {
       .from('commissions')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
-      .then(({ count }) => setHasData((count ?? 0) > 0))
+      .then(
+        ({ count }) => setHasData((count ?? 0) > 0),
+        () => setHasData(false),
+      )
   }, [userId])
 
   // Masquer si données présentes ou déjà importé

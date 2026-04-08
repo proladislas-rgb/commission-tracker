@@ -33,10 +33,8 @@ const invoiceChatSchema = z.object({
   history: z.array(chatMessageSchema).max(50).optional().default([]),
 })
 
-interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-}
+// Type dérivé du schéma Zod — pas de duplication avec useInvoiceChat.ts
+type ChatMessage = z.infer<typeof chatMessageSchema>
 
 export async function POST(req: NextRequest) {
   const session = await getSessionUser()
@@ -102,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result)
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Erreur interne'
-    return NextResponse.json({ error: errorMessage }, { status: 500 })
+    console.error('[invoice/chat] Erreur Anthropic:', err)
+    return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 })
   }
 }

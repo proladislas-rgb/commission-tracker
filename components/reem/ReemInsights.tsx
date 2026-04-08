@@ -32,8 +32,8 @@ function saveCache(insights: Insight[]) {
   }
 }
 
-/** Utilitaire exportable pour invalider le cache depuis d'autres hooks (après une mutation CRUD) */
-export function invalidateReemInsightsCache() {
+/** Invalide le cache local des insights (après une mutation CRUD) */
+function invalidateReemInsightsCache() {
   try {
     localStorage.removeItem(CACHE_KEY)
   } catch {

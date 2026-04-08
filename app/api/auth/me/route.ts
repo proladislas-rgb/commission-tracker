@@ -17,6 +17,7 @@ export async function DELETE() {
   try {
     const res = NextResponse.json({ ok: true })
     res.cookies.set(getCookieName(), '', { maxAge: 0, path: '/' })
+    res.cookies.set('google_tokens', '', { maxAge: 0, path: '/' })
     return res
   } catch {
     return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 })

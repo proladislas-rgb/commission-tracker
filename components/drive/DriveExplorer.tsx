@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import DriveFileRow from './DriveFileRow'
+import { useToast } from '@/components/ui/Toast'
 import type { DriveFile } from '@/lib/drive'
 
 interface BreadcrumbItem {
@@ -15,6 +16,7 @@ interface DriveExplorerProps {
 }
 
 export default function DriveExplorer({ attachMode = false, onAttachFile }: DriveExplorerProps = {}) {
+  const { toast } = useToast()
   const [folders, setFolders] = useState<DriveFile[]>([])
   const [files, setFiles] = useState<DriveFile[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,7 +70,7 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
       if (!res.ok) throw new Error('Échec de la suppression')
       await fetchFiles(currentFolderId)
     } catch {
-      // silently fail
+      toast('Échec de la suppression du dossier.', 'error')
     } finally {
       setDeletingFolderId(null)
       setConfirmDeleteFolderId(null)

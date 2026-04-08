@@ -36,9 +36,11 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
 
   // Load users for mentions
   useEffect(() => {
+    let mounted = true
     supabase.from('users').select('id, display_name, role, avatar_color').then(({ data }) => {
-      if (data) setChatUsers(data as User[])
+      if (mounted && data) setChatUsers(data as User[])
     })
+    return () => { mounted = false }
   }, [])
 
   // Mark channel as read

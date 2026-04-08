@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Commission, Paiement } from '@/lib/types'
 
@@ -14,6 +14,12 @@ interface ExportButtonProps {
 export default function ExportButton({ commissions, paiements, commissionsTotal, encaisse }: ExportButtonProps) {
   const [open, setOpen] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   function handleEnter() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)

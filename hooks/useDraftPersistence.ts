@@ -33,7 +33,7 @@ function loadFromStorage(): { draft: Draft; restored: boolean } {
 }
 
 type DraftFunctionalUpdater = (prev: Draft) => Draft
-export type DraftUpdater = Draft | DraftFunctionalUpdater
+type DraftUpdater = Draft | DraftFunctionalUpdater
 
 function isFunctionalUpdater(v: DraftUpdater): v is DraftFunctionalUpdater {
   return typeof v === 'function'

@@ -24,7 +24,10 @@ export async function PATCH(
       .select('id, username, display_name, role, avatar_color')
       .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+      console.error('[users/:id] Supabase error:', error.message)
+      return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 })
+    }
 
     await supabaseAdmin.from('activity_log').insert({
       user_id:     session.id,
