@@ -16,7 +16,12 @@ interface BreadcrumbItem {
   name: string
 }
 
-export default function DriveExplorer() {
+interface DriveExplorerProps {
+  attachMode?: boolean
+  onAttachFile?: (file: DriveFile) => void
+}
+
+export default function DriveExplorer({ attachMode = false, onAttachFile }: DriveExplorerProps = {}) {
   const [folders, setFolders] = useState<DriveFile[]>([])
   const [files, setFiles] = useState<DriveFile[]>([])
   const [loading, setLoading] = useState(true)
@@ -297,7 +302,13 @@ export default function DriveExplorer() {
                   </thead>
                   <tbody>
                     {files.map(file => (
-                      <DriveFileRow key={file.id} file={file} onDelete={() => fetchFiles(currentFolderId)} />
+                      <DriveFileRow
+                        key={file.id}
+                        file={file}
+                        onDelete={() => fetchFiles(currentFolderId)}
+                        attachMode={attachMode}
+                        onAttach={onAttachFile}
+                      />
                     ))}
                   </tbody>
                 </table>
