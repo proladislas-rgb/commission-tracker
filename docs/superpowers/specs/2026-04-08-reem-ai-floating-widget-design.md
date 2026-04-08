@@ -1,6 +1,43 @@
 # Reem AI — Agent contextuel flottant
 
-**Date :** 2026-04-08 · **Statut :** Spec en attente de validation utilisateur
+**Date :** 2026-04-08 · **Statut :** V1 validée, V2 documentée pour évolution future
+
+---
+
+## 0. Découpage V1 / V2
+
+Après revue honnête du périmètre, le scope complet est séparé en deux phases.
+
+### V1 — À construire maintenant (ce plan)
+
+Le cœur de valeur IA : Reem **observe, synthétise, rédige, propose** — sans jamais écrire en DB directement.
+
+- Widget flottant 3 états (bulle / panneau / masqué) + raccourci `⌘L` + persistance
+- Contextual awareness complet (pathname, client actif, entité courante, brouillon Workspace)
+- Suggestions contextuelles par page
+- **5 tools seulement** :
+  - `query_data` (lecture unifiée multi-entités)
+  - `get_overdue_payments`
+  - `summarize_period`
+  - `draft_email` (rédaction libre ou de relance, retour : lien vers le tiroir Workspace pré-rempli)
+  - `search_drive`
+- `propose_navigation` : Reem propose toujours des chips cliquables, jamais de navigation silencieuse
+- `<ReemInsights />` sur le dashboard, LLM-powered, cache 10min, maximum 3 cartes, placement **discret en bas de page**
+- Historique de conversation dans le panneau (bouton 📋)
+- Suppression `/dashboard/agent` + nettoyage sidebar
+
+**Pas de V1 :** aucun tool qui modifie la DB (`create_commission`, `create_paiement`, `manage_*`, `post_chat_message`). Zéro `pending_action`, zéro confirmation par étape, zéro carte d'action. Le fichier `confirm/route.ts` reste intact pour d'éventuels appels legacy mais n'est plus déclenché par Reem en V1.
+
+### V2 — Futur, si l'usage prouve le besoin
+
+À construire si après 2-3 semaines d'usage V1 tu te dis « j'ai envie que Reem écrive directement en DB ». Alors on ajoute :
+
+- 7 tools d'action : `create_commission`, `create_paiement`, `manage_client`, `manage_invoice`, `manage_drive`, `manage_prime`, `post_chat_message`
+- Modèle d'exécution Option B : cartes `pending_action` par étape avec Accepter/Refuser individuel
+- Refactor du loop `tool_use` côté backend pour distinguer tools immédiats / tools différés
+- Nouveaux `action` types dans `/api/agent/confirm`
+
+Tout ce qui concerne la V2 dans les sections suivantes est marqué **(V2)**. Les sections non marquées appartiennent à V1.
 
 ---
 
@@ -68,7 +105,7 @@ Le backend injecte ce contexte dans **le prompt système** (Reem sait sur quelle
 | `summarize_period` | Synthèse narrative chiffrée | `period: 'week'\|'month'\|'quarter'`, `client_id?` |
 | `search_drive` | Recherche fichiers Drive par nom | `query` |
 
-### 4.2 Action (exécution différée, confirmation utilisateur individuelle)
+### 4.2 Action **(V2)** — exécution différée, confirmation utilisateur individuelle
 
 | Tool | Rôle | Cible DB |
 |---|---|---|
@@ -93,7 +130,7 @@ Chaque tool d'action retourne `{ type: 'pending_action', action, data, preview }
 
 ---
 
-## 5. Exécution multi-étapes (Option B — confirmation individuelle)
+## 5. Exécution multi-étapes **(V2)** — Option B, confirmation individuelle
 
 Quand l'utilisateur demande « rédige et envoie les 3 relances », Reem :
 
