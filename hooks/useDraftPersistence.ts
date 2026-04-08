@@ -1,17 +1,28 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Draft, EMPTY_DRAFT, hasContent, toSerializableDraft } from '@/lib/workspace'
 
 export const DRAFT_STORAGE_KEY = 'workspace.draft'
 const DEBOUNCE_MS = 500
 
+function isDraftLike(value: unknown): value is Draft {
+  if (!value || typeof value !== 'object') return false
+  const v = value as Record<string, unknown>
+  return (
+    typeof v.to === 'string' &&
+    typeof v.subject === 'string' &&
+    typeof v.body === 'string' &&
+    Array.isArray(v.attachments)
+  )
+}
+
 function loadFromStorage(): { draft: Draft; restored: boolean } {
   try {
     const raw = localStorage.getItem(DRAFT_STORAGE_KEY)
     if (raw) {
-      const parsed = JSON.parse(raw) as Draft
-      if (hasContent(parsed)) {
+      const parsed: unknown = JSON.parse(raw)
+      if (isDraftLike(parsed) && hasContent(parsed)) {
         return { draft: parsed, restored: true }
       }
     }
@@ -29,6 +40,12 @@ export function useDraftPersistence(): {
 } {
   const [{ draft, restored }, setState] = useState(() => loadFromStorage())
   const writeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (writeTimerRef.current) clearTimeout(writeTimerRef.current)
+    }
+  }, [])
 
   const setDraft = useCallback((next: Draft) => {
     setState(prev => ({ ...prev, draft: next }))

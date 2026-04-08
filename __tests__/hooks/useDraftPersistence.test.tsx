@@ -71,4 +71,11 @@ describe('useDraftPersistence', () => {
     expect(result.current.draft).toEqual(EMPTY_DRAFT)
     expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull()
   })
+
+  it('ignore les données localStorage corrompues et tombe sur EMPTY_DRAFT', () => {
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ garbage: true }))
+    const { result } = renderHook(() => useDraftPersistence())
+    expect(result.current.draft).toEqual(EMPTY_DRAFT)
+    expect(result.current.restored).toBe(false)
+  })
 })
