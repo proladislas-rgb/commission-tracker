@@ -72,6 +72,39 @@ export default function ReemInsights() {
     }))
   }
 
+  // Loading state : afficher un mini indicateur discret pendant le premier fetch
+  if (loading && !insights) {
+    return (
+      <section
+        aria-label="Insights Reem AI (chargement)"
+        style={{
+          marginTop: '40px',
+          paddingTop: '24px',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          fontSize: '10px',
+          textTransform: 'uppercase',
+          letterSpacing: '1.5px',
+          color: '#3d4f63',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <span
+          style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: '#818cf8',
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }}
+        />
+        Reem analyse…
+      </section>
+    )
+  }
+
   if (!insights || insights.length === 0) return null
 
   const severityColor: Record<Insight['severity'], string> = {

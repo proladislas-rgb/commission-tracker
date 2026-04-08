@@ -37,10 +37,11 @@ export default function ReemWidget() {
         // Ne pas intercepter si l'utilisateur tape dans un input/textarea
         if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
         e.preventDefault()
+        // Cycle à 3 états : hidden → bubble → panel-open → hidden
         setState(prev => {
           if (prev.visibility === 'hidden') return { ...prev, visibility: 'bubble' }
           if (prev.visibility === 'bubble') return { ...prev, visibility: 'panel-open' }
-          return { ...prev, visibility: 'bubble' }
+          return { ...prev, visibility: 'hidden' }
         })
       }
       // Escape referme le panneau

@@ -49,7 +49,7 @@ function DataCard({ result }: { result: unknown }) {
         color: '#8898aa',
       }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
-        {rows.length} {rows.length > 1 ? 'resultats' : 'resultat'}
+        {rows.length} {rows.length > 1 ? 'résultats' : 'résultat'}
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
