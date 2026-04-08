@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import AppShell from '@/components/layout/AppShell'
 import { ClientProvider } from '@/hooks/useClientContext'
+import ReemWidget from '@/components/reem/ReemWidget'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@/lib/types'
 
@@ -76,6 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
         {children}
       </AppShell>
+      <ReemWidget />
     </ClientProvider>
   )
 }
