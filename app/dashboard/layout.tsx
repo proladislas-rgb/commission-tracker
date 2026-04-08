@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import AppShell from '@/components/layout/AppShell'
 import { ClientProvider } from '@/hooks/useClientContext'
 import ReemWidget from '@/components/reem/ReemWidget'
+import { ReemUIProvider } from '@/components/reem/ReemUIProvider'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@/lib/types'
 
@@ -74,10 +75,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ClientProvider>
-      <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
-        {children}
-      </AppShell>
-      <ReemWidget />
+      <ReemUIProvider>
+        <AppShell associe={associe} onRenameAssociate={handleRenameAssociate}>
+          {children}
+        </AppShell>
+        <ReemWidget />
+      </ReemUIProvider>
     </ClientProvider>
   )
 }

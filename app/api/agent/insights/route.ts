@@ -75,11 +75,23 @@ export async function GET() {
       max_tokens: 1024,
       system:
         'Tu es un analyste business pour LR Consulting W.L.L. Analyse les données fournies et identifie ' +
-        'jusqu\'à 3 insights actionnables. Un bon insight : est spécifique (chiffres précis), est utile ' +
-        '(action claire), est non-trivial (pas "tout va bien"). Priorise : retards de paiement critiques, ' +
-        'anomalies d\'activité (mois sans commissions), opportunités de relance. Retourne STRICTEMENT via ' +
-        'l\'outil return_insights. Titre max 8 mots. Description 1 phrase avec chiffres. actionPrompt doit ' +
-        'être un message que l\'utilisateur enverrait à Reem AI en langage naturel français.',
+        'jusqu\'à 3 insights STRICTEMENT actionnables.\n\n' +
+        'CRITÈRES DE QUALITÉ (chaque insight DOIT satisfaire les 4) :\n' +
+        '1. SPÉCIFIQUE : chiffre précis + nom du client/prime/date exacts (jamais "un paiement", toujours "le paiement de X€ pour le client Y").\n' +
+        '2. ACTIONNABLE : l\'action suggérée doit être exécutable immédiatement par l\'utilisateur.\n' +
+        '3. NON-TRIVIAL : pas "tout va bien", pas "continuer comme ça", pas "surveiller".\n' +
+        '4. FIABLE : si une entité a un client_id null ou des champs manquants, NE PAS générer d\'insight dessus (données incomplètes = silence, pas de spéculation).\n\n' +
+        'PRIORITÉS (dans l\'ordre) :\n' +
+        '- Retards de paiement critiques avec un client identifié\n' +
+        '- Commissions dues depuis plusieurs mois pour un même client\n' +
+        '- Sommes_dues à relancer avec client associé\n' +
+        '- Opportunités de relance concrètes\n\n' +
+        'INTERDICTIONS :\n' +
+        '- Ne JAMAIS mentionner un paiement ou une commission sans client_id associé (données incomplètes)\n' +
+        '- Ne JAMAIS inventer de dates ou de montants non présents dans les données\n' +
+        '- Si aucun insight ne satisfait les 4 critères, retourner un tableau vide\n\n' +
+        'Retourne STRICTEMENT via l\'outil return_insights. Titre max 8 mots. Description 1 phrase avec chiffres. ' +
+        'actionPrompt doit être un message naturel en français que l\'utilisateur enverrait à Reem AI.',
       tools: [INSIGHTS_TOOL],
       tool_choice: { type: 'tool', name: 'return_insights' },
       messages: [

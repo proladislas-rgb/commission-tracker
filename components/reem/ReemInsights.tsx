@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import type { Insight } from '@/lib/reem-types'
-import { useReemUIPersistence } from '@/hooks/useReemUIPersistence'
+import { useReemUI } from './ReemUIProvider'
 
 const CACHE_KEY = 'reem.insights.cache'
-const CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 interface CachedInsights {
   insights: Insight[]
@@ -32,37 +32,55 @@ function saveCache(insights: Insight[]) {
   }
 }
 
+/** Utilitaire exportable pour invalider le cache depuis d'autres hooks (après une mutation CRUD) */
+export function invalidateReemInsightsCache() {
+  try {
+    localStorage.removeItem(CACHE_KEY)
+  } catch {
+    // silencieux
+  }
+}
+
 export default function ReemInsights() {
   const [insights, setInsights] = useState<Insight[] | null>(null)
   const [loading, setLoading] = useState(false)
-  const { setState } = useReemUIPersistence()
+  const [fetchedAt, setFetchedAt] = useState<number | null>(null)
+  const { setState } = useReemUI()
+
+  const fetchInsights = useCallback(async (force = false) => {
+    if (!force) {
+      const cached = loadCache()
+      if (cached) {
+        setInsights(cached.insights)
+        setFetchedAt(cached.fetchedAt)
+        return
+      }
+    } else {
+      invalidateReemInsightsCache()
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/agent/insights')
+      if (!res.ok) {
+        setInsights([])
+        return
+      }
+      const data = (await res.json()) as { insights: Insight[] }
+      const next = data.insights ?? []
+      setInsights(next)
+      setFetchedAt(Date.now())
+      saveCache(next)
+    } catch {
+      setInsights([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    const cached = loadCache()
-    if (cached) {
-      setInsights(cached.insights)
-      return
-    }
-
-    async function fetchInsights() {
-      setLoading(true)
-      try {
-        const res = await fetch('/api/agent/insights')
-        if (!res.ok) {
-          setInsights([])
-          return
-        }
-        const data = (await res.json()) as { insights: Insight[] }
-        setInsights(data.insights ?? [])
-        saveCache(data.insights ?? [])
-      } catch {
-        setInsights([])
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchInsights()
-  }, [])
+  }, [fetchInsights])
 
   const handleInsightClick = (insight: Insight) => {
     setState(prev => ({
@@ -70,6 +88,10 @@ export default function ReemInsights() {
       visibility: 'panel-open',
       draftMessage: insight.actionPrompt,
     }))
+  }
+
+  const handleRefresh = () => {
+    fetchInsights(true)
   }
 
   // Loading state : afficher un mini indicateur discret pendant le premier fetch
@@ -113,6 +135,8 @@ export default function ReemInsights() {
     alert: '#f43f5e',
   }
 
+  const ageMin = fetchedAt ? Math.floor((Date.now() - fetchedAt) / 60000) : null
+
   return (
     <section
       aria-label="Insights Reem AI"
@@ -136,8 +160,55 @@ export default function ReemInsights() {
         }}
       >
         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#818cf8' }} />
-        Reem observe
+        <span>Reem observe</span>
         {loading && <span style={{ color: '#8898aa', textTransform: 'none', letterSpacing: 0 }}>— analyse en cours…</span>}
+        {!loading && ageMin !== null && (
+          <span style={{ color: '#3d4f63', textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
+            · il y a {ageMin === 0 ? 'moins d\'une minute' : `${ageMin} min`}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={loading}
+          aria-label="Actualiser les insights"
+          title="Actualiser (force une nouvelle analyse par Reem)"
+          style={{
+            marginLeft: 'auto',
+            background: 'transparent',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '6px',
+            padding: '4px 8px',
+            color: '#8898aa',
+            fontSize: '10px',
+            textTransform: 'none',
+            letterSpacing: 0,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transition: 'all 150ms',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            opacity: loading ? 0.5 : 1,
+          }}
+          onMouseEnter={e => {
+            if (!loading) {
+              e.currentTarget.style.background = 'rgba(99,102,241,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'
+              e.currentTarget.style.color = '#818cf8'
+            }
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'transparent'
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+            e.currentTarget.style.color = '#8898aa'
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+          </svg>
+          Actualiser
+        </button>
       </div>
       <div
         style={{

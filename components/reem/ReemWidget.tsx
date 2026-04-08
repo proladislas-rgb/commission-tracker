@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useCallback } from 'react'
-import { useReemUIPersistence } from '@/hooks/useReemUIPersistence'
+import { useReemUI } from './ReemUIProvider'
 import ReemBubble from './ReemBubble'
 import ReemPullTab from './ReemPullTab'
 import ReemPanel from './ReemPanel'
 
 export default function ReemWidget() {
-  const { state, setState } = useReemUIPersistence()
+  const { state, setState } = useReemUI()
 
   const openPanel = useCallback(() => {
     setState(prev => ({ ...prev, visibility: 'panel-open' }))
