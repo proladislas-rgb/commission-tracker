@@ -211,7 +211,7 @@ function EmailCard({ result }: { result: unknown }) {
   const subject = typeof data.subject === 'string' ? data.subject : ''
   const body = typeof data.body === 'string' ? data.body : ''
 
-  const href = `/dashboard/email?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  const href = `/dashboard/workspace?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 
   return (
     <div style={{

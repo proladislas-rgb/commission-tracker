@@ -20,7 +20,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     })
 
     const state = request.nextUrl.searchParams.get('state')
-    const redirectPath = state && state.startsWith('/dashboard') ? state : '/dashboard/drive'
+    const redirectPath = state && state.startsWith('/dashboard') ? state : '/dashboard/workspace'
 
     const response = NextResponse.redirect(
       new URL(redirectPath, request.url)
