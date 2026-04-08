@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import type { ReemContext } from '@/lib/reem-types'
 
 export interface AgentMessage {
   id: string
@@ -38,11 +39,10 @@ export function useAgentMessages(userId: string | undefined) {
     load()
   }, [load])
 
-  const sendMessage = useCallback(async (message: string, clientId: string | null) => {
+  const sendMessage = useCallback(async (message: string, context: ReemContext) => {
     if (!userId) return
     setSending(true)
 
-    // Optimistic user message
     const optimistic: AgentMessage = {
       id: `temp-${Date.now()}`,
       user_id: userId,
@@ -57,11 +57,10 @@ export function useAgentMessages(userId: string | undefined) {
       await fetch('/api/agent/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, userId, clientId }),
+        body: JSON.stringify({ message, context }),
       })
       await load()
     } catch {
-      // Remove optimistic on error
       setMessages(prev => prev.filter(m => m.id !== optimistic.id))
     } finally {
       setSending(false)
@@ -71,32 +70,12 @@ export function useAgentMessages(userId: string | undefined) {
   const clearHistory = useCallback(async () => {
     if (!userId) return
     try {
-      await fetch('/api/agent/clear', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      })
+      await fetch('/api/agent/clear', { method: 'DELETE' })
       setMessages([])
     } catch {
       // silencieux
     }
   }, [userId])
 
-  const confirmAction = useCallback(async (action: string, data: Record<string, unknown>): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/agent/confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, data, userId }),
-      })
-      if (!res.ok) return false
-      const json = await res.json() as { success: boolean }
-      if (json.success) await load()
-      return json.success
-    } catch {
-      return false
-    }
-  }, [userId, load])
-
-  return { messages, loading, sending, sendMessage, clearHistory, confirmAction, reload: load }
+  return { messages, loading, sending, sendMessage, clearHistory, reload: load }
 }
