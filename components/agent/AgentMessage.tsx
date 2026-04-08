@@ -51,19 +51,26 @@ function DataCard({ result }: { result: unknown }) {
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
         {rows.length} {rows.length > 1 ? 'résultats' : 'résultat'}
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table style={{
+          width: 'max-content',
+          minWidth: '100%',
+          fontSize: '11px',
+          borderCollapse: 'collapse',
+          tableLayout: 'auto',
+        }}>
           <thead>
             <tr>
               {columns.map(col => (
                 <th key={col} style={{
                   textAlign: 'left',
-                  padding: '8px 14px',
+                  padding: '8px 12px',
                   fontSize: '9px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.8px',
                   color: '#3d4f63',
                   fontWeight: 600,
+                  whiteSpace: 'nowrap',
                 }}>
                   {col}
                 </th>
@@ -75,9 +82,13 @@ function DataCard({ result }: { result: unknown }) {
               <tr key={i}>
                 {columns.map(col => (
                   <td key={col} style={{
-                    padding: '8px 14px',
+                    padding: '8px 12px',
                     borderTop: '1px solid rgba(255,255,255,0.04)',
                     color: '#e8edf5',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '260px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}>
                     {String(row[col] ?? '')}
                   </td>
