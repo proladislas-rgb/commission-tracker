@@ -7,6 +7,7 @@ import InlineEdit from '@/components/ui/InlineEdit'
 import ClientSelector from '@/components/clients/ClientSelector'
 import { supabase } from '@/lib/supabase'
 import { isOnline, avatarInitials, formatDate, formatRelativeTime } from '@/lib/utils'
+import { fetchTotalUnread } from '@/lib/chat-unread'
 import type { User, ActivityLog, Channel } from '@/lib/types'
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -75,20 +76,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       try {
         const { data: chans } = await supabase.from('channels').select('id')
         if (!chans) return
-        let total = 0
-        for (const ch of chans as Channel[]) {
-          const lastRead = localStorage.getItem(`chat_read_${ch.id}`)
-          let query = supabase
-            .from('messages')
-            .select('id', { count: 'exact', head: true })
-            .eq('channel_id', ch.id)
-            .neq('user_id', userId)
-          if (lastRead) {
-            query = query.gt('created_at', lastRead)
-          }
-          const { count } = await query
-          total += Number(count) || 0
-        }
+        const channelIds = (chans as Channel[]).map(ch => ch.id)
+        const total = await fetchTotalUnread(userId!, channelIds)
         setChatUnreadCount(total)
       } catch {
         // silencieux

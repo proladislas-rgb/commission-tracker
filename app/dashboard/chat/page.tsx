@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useChannels } from '@/hooks/useChannels'
 import { useAuth } from '@/hooks/useAuth'
-import { supabase } from '@/lib/supabase'
+import { fetchUnreadCounts } from '@/lib/chat-unread'
 import ChatSidebar from '@/components/chat/ChatSidebar'
 import ChatWindow from '@/components/chat/ChatWindow'
 
@@ -18,20 +18,8 @@ export default function ChatPage() {
     if (!userId || channels.length === 0) return
 
     async function fetchUnread() {
-      const counts: Record<string, number> = {}
-      for (const ch of channels) {
-        const lastRead = localStorage.getItem(`chat_read_${ch.id}`)
-        let query = supabase
-          .from('messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('channel_id', ch.id)
-          .neq('user_id', userId)
-        if (lastRead) {
-          query = query.gt('created_at', lastRead)
-        }
-        const { count } = await query
-        counts[ch.id] = Number(count) || 0
-      }
+      const channelIds = channels.map(ch => ch.id)
+      const counts = await fetchUnreadCounts(userId!, channelIds)
       setUnreadCounts(counts)
     }
 
