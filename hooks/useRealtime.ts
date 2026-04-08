@@ -19,10 +19,29 @@ interface RealtimeOptions {
 export function useRealtime(options: RealtimeOptions) {
   const channelRef = useRef<RealtimeChannel | null>(null)
 
-  useEffect(() => {
-    const { table, event = '*', filter, onInsert, onUpdate, onDelete, onChange } = options
+  // C4: Unique ID per hook instance to avoid channel name collisions
+  const instanceIdRef = useRef<string | null>(null)
+  if (instanceIdRef.current === null) {
+    instanceIdRef.current = crypto.randomUUID()
+  }
 
-    const channelName = `realtime:${table}:${filter ?? 'all'}`
+  // C5: Latest-ref pattern — keep callbacks fresh without re-subscribing
+  const onInsertRef = useRef(options.onInsert)
+  const onUpdateRef = useRef(options.onUpdate)
+  const onDeleteRef = useRef(options.onDelete)
+  const onChangeRef = useRef(options.onChange)
+
+  useEffect(() => {
+    onInsertRef.current = options.onInsert
+    onUpdateRef.current = options.onUpdate
+    onDeleteRef.current = options.onDelete
+    onChangeRef.current = options.onChange
+  })
+
+  useEffect(() => {
+    const { table, event = '*', filter } = options
+
+    const channelName = `realtime:${table}:${filter ?? 'all'}:${instanceIdRef.current}`
     const channel = supabase.channel(channelName)
 
     channel.on(
@@ -30,10 +49,10 @@ export function useRealtime(options: RealtimeOptions) {
       'postgres_changes' as any,
       { event, schema: 'public', table, filter },
       (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
-        onChange?.(payload as unknown as Record<string, unknown>)
-        if (payload.eventType === 'INSERT') onInsert?.(payload.new)
-        if (payload.eventType === 'UPDATE') onUpdate?.(payload.new)
-        if (payload.eventType === 'DELETE') onDelete?.(payload.old)
+        onChangeRef.current?.(payload as unknown as Record<string, unknown>)
+        if (payload.eventType === 'INSERT') onInsertRef.current?.(payload.new)
+        else if (payload.eventType === 'UPDATE') onUpdateRef.current?.(payload.new)
+        else if (payload.eventType === 'DELETE') onDeleteRef.current?.(payload.old)
       }
     )
 

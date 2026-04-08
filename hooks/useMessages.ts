@@ -35,6 +35,13 @@ export function useMessages(channelId: string | null) {
     load()
   }, [load])
 
+  // C6: Guard against setState after unmount during async fetch
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => { isMountedRef.current = false }
+  }, [])
+
   // Realtime subscription
   useEffect(() => {
     if (!channelId) return
@@ -54,11 +61,13 @@ export function useMessages(channelId: string | null) {
             .select('*, user:users(id, display_name, avatar_color, role)')
             .eq('id', newMsg.id)
             .single()
-          if (data) {
+          if (data && isMountedRef.current) {
             setMessages(prev => prev.some(m => m.id === (data as Message).id) ? prev : [...prev, data as Message])
           }
         } catch {
-          setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg])
+          if (isMountedRef.current) {
+            setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg])
+          }
         }
       }
     )

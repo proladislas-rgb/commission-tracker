@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
           const messageList = (unread ?? []).map(m => {
             const sender = (m.user as unknown as { display_name: string })?.display_name ?? '??'
             return `<li style="color:#e8edf5;font-size:13px;margin-bottom:6px;">
-              <strong style="color:#6366f1;">${sender}</strong>: ${(m.content ?? '📎 Fichier').slice(0, 100)}
+              <strong style="color:#6366f1;">${escapeHtml(sender)}</strong>: ${escapeHtml((m.content ?? '📎 Fichier').slice(0, 100))}
             </li>`
           }).join('')
 

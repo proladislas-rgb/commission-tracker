@@ -86,8 +86,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // Mettre à jour le cookie si les tokens ont été rafraîchis
   if (Date.now() < tokens.expires_at - 3500 * 1000) {
-    // tokens were just refreshed
-  } else {
     response.cookies.set('google_tokens', JSON.stringify(tokens), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

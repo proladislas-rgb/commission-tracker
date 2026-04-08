@@ -15,9 +15,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const file = formData.get('file') as File | null
   const channelId = formData.get('channelId') as string | null
-  const userId = formData.get('userId') as string | null
 
-  if (!file || !channelId || !userId) {
+  if (!file || !channelId) {
     return NextResponse.json({ error: 'missing_fields' }, { status: 400 })
   }
 
@@ -59,7 +58,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     .from('messages')
     .insert({
       channel_id: channelId,
-      user_id: userId,
+      user_id: session.id,
       file_url: fileUrl,
       file_name: file.name,
       file_size: String(file.size),
