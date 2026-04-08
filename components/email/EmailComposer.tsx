@@ -1,22 +1,11 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import DriveFilePicker from './DriveFilePicker'
-
-interface Attachment {
-  type: 'drive' | 'local'
-  fileId?: string
-  fileName: string
-  mimeType: string
-  data?: string // base64 for local
-  size?: number
-}
+import { useState, useRef } from 'react'
+import type { Draft, Attachment } from '@/lib/workspace'
 
 interface EmailComposerProps {
-  initialAttachments?: Attachment[]
-  initialTo?: string
-  initialSubject?: string
-  initialBody?: string
+  draft: Draft
+  onDraftChange: (next: Draft) => void
   onSent?: () => void
 }
 
@@ -34,74 +23,48 @@ function getTypeColor(mimeType: string): string {
   return '#8898aa'
 }
 
-export default function EmailComposer({ initialAttachments = [], initialTo = '', initialSubject = '', initialBody = '', onSent }: EmailComposerProps) {
-  const [to, setTo] = useState(initialTo)
-  const [subject, setSubject] = useState(initialSubject)
-  const [body, setBody] = useState(initialBody)
-  const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments)
-  const [showDrivePicker, setShowDrivePicker] = useState(false)
+export default function EmailComposer({ draft, onDraftChange, onSent }: EmailComposerProps) {
   const [sending, setSending] = useState(false)
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (initialAttachments.length > 0) {
-      setAttachments(initialAttachments)
-    }
-  }, [initialAttachments])
-
-  useEffect(() => {
-    if (initialTo) setTo(initialTo)
-  }, [initialTo])
-
-  useEffect(() => {
-    if (initialSubject) setSubject(initialSubject)
-  }, [initialSubject])
-
-  useEffect(() => {
-    if (initialBody) setBody(initialBody)
-  }, [initialBody])
-
-  const addDriveFile = (file: { fileId: string; fileName: string; mimeType: string }) => {
-    setAttachments(prev => [
-      ...prev,
-      { type: 'drive', fileId: file.fileId, fileName: file.fileName, mimeType: file.mimeType },
-    ])
-    setShowDrivePicker(false)
-  }
+  const update = (patch: Partial<Draft>) => onDraftChange({ ...draft, ...patch })
 
   const addLocalFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files
     if (!fileList) return
+    const files = Array.from(fileList)
+    let pending = files.length
+    const collected: Attachment[] = []
 
-    Array.from(fileList).forEach(file => {
+    files.forEach(file => {
       const reader = new FileReader()
       reader.onload = () => {
         const base64 = (reader.result as string).split(',')[1]
-        setAttachments(prev => [
-          ...prev,
-          {
-            type: 'local',
-            fileName: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            data: base64,
-            size: file.size,
-          },
-        ])
+        collected.push({
+          type: 'local',
+          fileName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          data: base64,
+          size: file.size,
+        })
+        pending -= 1
+        if (pending === 0) {
+          update({ attachments: [...draft.attachments, ...collected] })
+        }
       }
       reader.readAsDataURL(file)
     })
 
-    // Reset input
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index))
+    update({ attachments: draft.attachments.filter((_, i) => i !== index) })
   }
 
   const handleSend = async () => {
-    if (!to || !subject || !body) {
+    if (!draft.to || !draft.subject || !draft.body) {
       setStatus({ type: 'error', message: 'Remplissez tous les champs obligatoires' })
       return
     }
@@ -111,10 +74,10 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
 
     try {
       const payload = {
-        to,
-        subject,
-        body: body.replace(/\n/g, '<br>'),
-        attachments: attachments.map(att =>
+        to: draft.to,
+        subject: draft.subject,
+        body: draft.body.replace(/\n/g, '<br>'),
+        attachments: draft.attachments.map(att =>
           att.type === 'drive'
             ? { type: 'drive' as const, fileId: att.fileId!, fileName: att.fileName, mimeType: att.mimeType }
             : { type: 'local' as const, data: att.data!, fileName: att.fileName, mimeType: att.mimeType }
@@ -129,10 +92,6 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
 
       if (res.ok) {
         setStatus({ type: 'success', message: 'Email envoyé avec succès !' })
-        setTo('')
-        setSubject('')
-        setBody('')
-        setAttachments([])
         onSent?.()
       } else {
         const data = (await res.json()) as { error: string }
@@ -145,25 +104,8 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
     }
   }
 
-  const reset = () => {
-    setTo('')
-    setSubject('')
-    setBody('')
-    setAttachments([])
-    setStatus(null)
-  }
-
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <h2
-          className="text-base font-semibold text-txt"
-        >
-          Nouveau message
-        </h2>
-      </div>
-
       {/* Champs */}
       <div className="flex-1 flex flex-col overflow-y-auto px-6 py-4 gap-3">
         {/* Destinataire */}
@@ -173,8 +115,8 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
           </label>
           <input
             type="email"
-            value={to}
-            onChange={e => setTo(e.target.value)}
+            value={draft.to}
+            onChange={e => update({ to: e.target.value })}
             placeholder="email@exemple.com"
             className="w-full px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none transition-all duration-200"
             style={{
@@ -193,8 +135,8 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
           </label>
           <input
             type="text"
-            value={subject}
-            onChange={e => setSubject(e.target.value)}
+            value={draft.subject}
+            onChange={e => update({ subject: e.target.value })}
             placeholder="Objet de l'email"
             className="w-full px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none transition-all duration-200"
             style={{
@@ -212,14 +154,14 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
             Message
           </label>
           <textarea
-            value={body}
-            onChange={e => setBody(e.target.value)}
+            value={draft.body}
+            onChange={e => update({ body: e.target.value })}
             placeholder="Rédigez votre message..."
             className="w-full flex-1 px-3 py-2 rounded-lg text-sm text-txt placeholder-txt3 outline-none resize-none transition-all duration-200"
             style={{
               backgroundColor: 'rgba(255,255,255,0.02)',
               border: '1px solid rgba(255,255,255,0.07)',
-              minHeight: '300px',
+              minHeight: '180px',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
             onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)' }}
@@ -227,13 +169,13 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
         </div>
 
         {/* Pièces jointes */}
-        {attachments.length > 0 && (
+        {draft.attachments.length > 0 && (
           <div>
             <label className="text-[10px] uppercase tracking-[1.2px] text-txt3 font-semibold mb-2 block">
-              Pièces jointes ({attachments.length})
+              Pièces jointes ({draft.attachments.length})
             </label>
             <div className="flex flex-wrap gap-2">
-              {attachments.map((att, i) => (
+              {draft.attachments.map((att, i) => (
                 <div
                   key={`${att.fileName}-${i}`}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs"
@@ -242,9 +184,8 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
                     border: '1px solid rgba(255,255,255,0.07)',
                   }}
                 >
-                  {/* Icône type */}
                   <div
-                    className="w-4 h-4 rounded flex items-center justify-center text-[7px] font-bold"
+                    className="w-4 h-4 rounded flex items-center justify-center"
                     style={{ color: getTypeColor(att.mimeType) }}
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -259,7 +200,6 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
                     <span className="text-txt3">{formatSize(att.size)}</span>
                   )}
 
-                  {/* Badge source */}
                   <span
                     className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase"
                     style={{
@@ -270,10 +210,10 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
                     {att.type === 'drive' ? 'Drive' : 'Local'}
                   </span>
 
-                  {/* Supprimer */}
                   <button
                     onClick={() => removeAttachment(i)}
                     className="p-0.5 rounded hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+                    aria-label="Supprimer la pièce jointe"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18" />
@@ -286,24 +226,8 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
           </div>
         )}
 
-        {/* Boutons pièces jointes */}
+        {/* Bouton ajout PJ locale (Drive géré depuis l'explorateur principal) */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowDrivePicker(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-txt2 transition-all duration-200 cursor-pointer"
-            style={{
-              backgroundColor: 'rgba(245,158,11,0.06)',
-              border: '1px solid rgba(245,158,11,0.12)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(245,158,11,0.3)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,158,11,0.12)' }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
-              <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-            </svg>
-            Depuis Drive
-          </button>
-
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-txt2 transition-all duration-200 cursor-pointer"
@@ -321,6 +245,9 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
             </svg>
             Depuis mon PC
           </button>
+          <span className="text-[10px] text-txt3 ml-1">
+            (clic sur un fichier Drive à gauche pour l&apos;attacher)
+          </span>
 
           <input
             ref={fileInputRef}
@@ -384,22 +311,7 @@ export default function EmailComposer({ initialAttachments = [], initialTo = '',
             </>
           )}
         </button>
-
-        <button
-          onClick={reset}
-          className="px-4 py-2 rounded-lg text-sm text-txt2 hover:text-txt hover:bg-[rgba(255,255,255,0.04)] transition-all duration-200 cursor-pointer"
-        >
-          Annuler
-        </button>
       </div>
-
-      {/* Drive Picker Modal */}
-      {showDrivePicker && (
-        <DriveFilePicker
-          onSelect={addDriveFile}
-          onClose={() => setShowDrivePicker(false)}
-        />
-      )}
     </div>
   )
 }
