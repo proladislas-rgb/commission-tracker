@@ -21,6 +21,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // Rafraîchir si expiré
+  let wasRefreshed = false
   if (Date.now() > tokens.expires_at) {
     if (!tokens.refresh_token) {
       return NextResponse.json({ error: 'token_expired' }, { status: 401 })
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         refresh_token: refreshed.refresh_token ?? tokens.refresh_token,
         expires_at: Date.now() + refreshed.expires_in * 1000,
       }
+      wasRefreshed = true
     } catch {
       return NextResponse.json({ error: 'refresh_failed' }, { status: 401 })
     }
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.json({ success: true, file: { id: uploaded.id, name: uploaded.name } })
 
   // Mettre à jour le cookie si les tokens ont été rafraîchis
-  if (Date.now() < tokens.expires_at - 3500 * 1000) {
+  if (wasRefreshed) {
     response.cookies.set('google_tokens', JSON.stringify(tokens), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
