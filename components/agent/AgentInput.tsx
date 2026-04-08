@@ -5,15 +5,23 @@ import { useState, useRef, type FormEvent } from 'react'
 interface AgentInputProps {
   onSend: (message: string) => void
   disabled?: boolean
+  value?: string
+  onChange?: (next: string) => void
 }
 
-export default function AgentInput({ onSend, disabled }: AgentInputProps) {
-  const [value, setValue] = useState('')
+export default function AgentInput({ onSend, disabled, value, onChange }: AgentInputProps) {
+  const [internalValue, setInternalValue] = useState('')
+  const isControlled = value !== undefined && onChange !== undefined
+  const currentValue = isControlled ? value : internalValue
+  const setValue = (next: string) => {
+    if (isControlled) onChange(next)
+    else setInternalValue(next)
+  }
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    const trimmed = value.trim()
+    const trimmed = currentValue.trim()
     if (!trimmed || disabled) return
     onSend(trimmed)
     setValue('')
@@ -35,7 +43,7 @@ export default function AgentInput({ onSend, disabled }: AgentInputProps) {
       <input
         ref={inputRef}
         type="text"
-        value={value}
+        value={currentValue}
         onChange={e => setValue(e.target.value)}
         placeholder="Demandez a Reem... (donnees, synthese, fichiers, ou juste discuter)"
         disabled={disabled}
@@ -54,7 +62,7 @@ export default function AgentInput({ onSend, disabled }: AgentInputProps) {
       />
       <button
         type="submit"
-        disabled={disabled || !value.trim()}
+        disabled={disabled || !currentValue.trim()}
         style={{
           width: '40px',
           height: '40px',
@@ -64,8 +72,8 @@ export default function AgentInput({ onSend, disabled }: AgentInputProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          cursor: disabled || !value.trim() ? 'not-allowed' : 'pointer',
-          opacity: disabled || !value.trim() ? 0.5 : 1,
+          cursor: disabled || !currentValue.trim() ? 'not-allowed' : 'pointer',
+          opacity: disabled || !currentValue.trim() ? 0.5 : 1,
           transition: 'transform 0.15s, opacity 0.15s',
           flexShrink: 0,
         }}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 
 /* ── Types ── */
 interface ToolDataItem {
@@ -14,7 +14,6 @@ interface AgentMessageProps {
   toolData: ToolDataItem[] | null
   userName?: string
   userInitials?: string
-  onConfirm?: (action: string, data: Record<string, unknown>) => Promise<boolean>
 }
 
 /* ── Colonnes internes a masquer ── */
@@ -92,118 +91,6 @@ function DataCard({ result }: { result: unknown }) {
   )
 }
 
-/* ── ConfirmCard ── */
-function ConfirmCard({ result, onConfirm }: { result: unknown; onConfirm?: (action: string, data: Record<string, unknown>) => Promise<boolean> }) {
-  const [status, setStatus] = useState<'pending' | 'confirmed' | 'cancelled'>('pending')
-  const data = (result && typeof result === 'object' ? result : {}) as Record<string, unknown>
-  const action = typeof data.action === 'string' ? data.action : 'create'
-  const fields = Object.entries(data).filter(([k]) => !SKIP_COLS.has(k) && k !== 'action')
-
-  const handleConfirm = async () => {
-    if (!onConfirm) return
-    const ok = await onConfirm(action, data)
-    setStatus(ok ? 'confirmed' : 'pending')
-  }
-
-  if (status === 'confirmed') {
-    return (
-      <div style={{
-        background: '#0f1117',
-        border: '1px solid rgba(34,197,94,0.3)',
-        borderRadius: '10px',
-        padding: '14px',
-        marginTop: '6px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '13px',
-        color: '#22c55e',
-        fontWeight: 600,
-      }}>
-        <span style={{ fontSize: '16px' }}>&#10003;</span> Cree avec succes
-      </div>
-    )
-  }
-
-  if (status === 'cancelled') return null
-
-  return (
-    <div style={{
-      background: '#0f1117',
-      border: '1px solid rgba(245,158,11,0.25)',
-      borderRadius: '10px',
-      padding: '14px',
-      marginTop: '6px',
-    }}>
-      <h4 style={{
-        fontSize: '12px',
-        fontWeight: 600,
-        color: '#f59e0b',
-        marginBottom: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-      }}>
-        &#9888;&#65039; Confirmer la creation
-      </h4>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '8px',
-        marginBottom: '12px',
-      }}>
-        {fields.map(([key, val]) => (
-          <div key={key}>
-            <label style={{
-              fontSize: '9px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              color: '#3d4f63',
-            }}>
-              {key}
-            </label>
-            <p style={{ fontSize: '13px', color: '#e8edf5', fontWeight: 500, marginTop: '2px' }}>
-              {String(val ?? '')}
-            </p>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-        <button
-          onClick={() => setStatus('cancelled')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '8px',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#8898aa',
-          }}
-        >
-          Annuler
-        </button>
-        <button
-          onClick={handleConfirm}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '8px',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            background: '#10b981',
-            color: 'white',
-            border: 'none',
-          }}
-        >
-          &#10003; Confirmer
-        </button>
-      </div>
-    </div>
-  )
-}
-
 /* ── EmailCard ── */
 function EmailCard({ result }: { result: unknown }) {
   const data = (result && typeof result === 'object' ? result : {}) as Record<string, unknown>
@@ -256,15 +143,38 @@ function EmailCard({ result }: { result: unknown }) {
 }
 
 /* ── ToolRenderer ── */
-function ToolRenderer({ items, onConfirm }: { items: ToolDataItem[]; onConfirm?: (action: string, data: Record<string, unknown>) => Promise<boolean> }) {
+function ToolRenderer({ items }: { items: ToolDataItem[] }) {
   return (
     <>
       {items.map((item, i) => {
+        if (item.type === 'navigation') {
+          const data = item.result as { pathname: string; label: string }
+          return (
+            <a
+              href={data.pathname}
+              key={i}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                background: 'rgba(99,102,241,0.12)',
+                border: '1px solid rgba(99,102,241,0.3)',
+                borderRadius: '8px',
+                color: '#818cf8',
+                textDecoration: 'none',
+                fontSize: '12px',
+                fontWeight: 500,
+                marginTop: '6px',
+              }}
+            >
+              → {data.label}
+            </a>
+          )
+        }
         switch (item.type) {
           case 'data':
             return <DataCard key={i} result={item.result} />
-          case 'confirm':
-            return <ConfirmCard key={i} result={item.result} onConfirm={onConfirm} />
           case 'draft_email':
             return <EmailCard key={i} result={item.result} />
           default:
@@ -276,7 +186,7 @@ function ToolRenderer({ items, onConfirm }: { items: ToolDataItem[]; onConfirm?:
 }
 
 /* ── Main Component ── */
-export default function AgentMessage({ role, content, toolData, userName, userInitials, onConfirm }: AgentMessageProps) {
+export default function AgentMessage({ role, content, toolData, userName, userInitials }: AgentMessageProps) {
   const isUser = role === 'user'
 
   return (
@@ -350,7 +260,7 @@ export default function AgentMessage({ role, content, toolData, userName, userIn
         }}>
           {content}
           {toolData && toolData.length > 0 && (
-            <ToolRenderer items={toolData} onConfirm={onConfirm} />
+            <ToolRenderer items={toolData} />
           )}
         </div>
       </div>
