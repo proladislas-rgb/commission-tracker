@@ -96,6 +96,11 @@ function WorkspaceContent() {
     setDrawerOpen(false)
   }, [clearDraft])
 
+  const handleDiscard = useCallback(() => {
+    clearDraft()
+    setDrawerOpen(false)
+  }, [clearDraft])
+
   // Loading
   if (connected === null) {
     return (
@@ -171,6 +176,7 @@ function WorkspaceContent() {
         onDraftChange={setDraft}
         onClose={() => setDrawerOpen(false)}
         onSent={handleSent}
+        onDiscard={handleDiscard}
       />
 
       {/* Toast de restauration */}

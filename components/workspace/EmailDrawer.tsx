@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import EmailComposer from '@/components/email/EmailComposer'
-import type { Draft } from '@/lib/workspace'
+import { hasContent, type Draft } from '@/lib/workspace'
 
 interface EmailDrawerProps {
   open: boolean
@@ -9,9 +10,27 @@ interface EmailDrawerProps {
   onDraftChange: (next: Draft) => void
   onClose: () => void
   onSent: () => void
+  onDiscard: () => void
 }
 
-export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSent }: EmailDrawerProps) {
+export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSent, onDiscard }: EmailDrawerProps) {
+  const [confirmDiscard, setConfirmDiscard] = useState(false)
+  const draftHasContent = hasContent(draft)
+
+  const handleDiscardClick = () => {
+    if (confirmDiscard) {
+      onDiscard()
+      setConfirmDiscard(false)
+    } else {
+      setConfirmDiscard(true)
+    }
+  }
+
+  const handleClose = () => {
+    setConfirmDiscard(false)
+    onClose()
+  }
+
   return (
     <div
       aria-hidden={!open}
@@ -54,24 +73,66 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
           />
           <h2 className="text-sm font-semibold text-txt">Nouveau message</h2>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Fermer le tiroir email"
-          className="cursor-pointer rounded-md transition-colors"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#8898aa',
-            padding: '6px 10px',
-            fontSize: '16px',
-            lineHeight: 1,
-          }}
-          onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)' }}
-          onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
-        >
-          ✕
-        </button>
+
+        <div className="flex items-center gap-1">
+          {/* Bouton supprimer brouillon — visible uniquement si le brouillon a du contenu */}
+          {draftHasContent && (
+            <button
+              type="button"
+              onClick={handleDiscardClick}
+              onBlur={() => setConfirmDiscard(false)}
+              aria-label={confirmDiscard ? 'Confirmer la suppression du brouillon' : 'Supprimer le brouillon'}
+              title={confirmDiscard ? 'Confirmer la suppression' : 'Supprimer le brouillon'}
+              className="cursor-pointer rounded-md transition-colors flex items-center gap-1.5"
+              style={{
+                background: confirmDiscard ? 'rgba(244,63,94,0.15)' : 'transparent',
+                border: `1px solid ${confirmDiscard ? 'rgba(244,63,94,0.3)' : 'transparent'}`,
+                color: confirmDiscard ? '#f43f5e' : '#8898aa',
+                padding: confirmDiscard ? '5px 10px' : '6px 8px',
+                fontSize: '11px',
+                fontWeight: confirmDiscard ? 600 : 400,
+                lineHeight: 1,
+              }}
+              onMouseEnter={e => {
+                if (!confirmDiscard) {
+                  e.currentTarget.style.backgroundColor = 'rgba(244,63,94,0.08)'
+                  e.currentTarget.style.color = '#f43f5e'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!confirmDiscard) {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = '#8898aa'
+                }
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+              {confirmDiscard && <span>Confirmer</span>}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="Fermer le tiroir email"
+            className="cursor-pointer rounded-md transition-colors"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#8898aa',
+              padding: '6px 10px',
+              fontSize: '16px',
+              lineHeight: 1,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)' }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       {/* Composer */}
