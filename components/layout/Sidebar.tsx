@@ -33,6 +33,11 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
       <path d="M8 12h8M8 16h5"/>
     </svg>
   ),
+  '/dashboard/calendrier-presence': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  ),
   '/dashboard/chat': (
     <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 10a2 2 0 01-2 2H5l-3 2V4a2 2 0 012-2h8a2 2 0 012 2v6z"/>
@@ -48,6 +53,7 @@ const NAV_ITEMS = [
   { label: 'Clients',      href: '/dashboard/clients' },
   { label: 'Facturation',  href: '/dashboard/invoices' },
   { label: 'Workspace',    href: '/dashboard/workspace' },
+  { label: 'Présence',    href: '/dashboard/calendrier-presence' },
   { label: 'Chat',         href: '/dashboard/chat' },
 ]
 
