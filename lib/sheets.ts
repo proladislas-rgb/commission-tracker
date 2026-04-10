@@ -7,6 +7,8 @@ export interface SheetRow {
   france: string
   bahrein: string
   autres: string
+  /** Numéro de ligne 1-based dans le Google Sheet (pour écriture) */
+  sheetRow: number
 }
 
 /**
@@ -56,20 +58,33 @@ export async function writeSheetCell(
   }
 }
 
+/** Vérifie qu'une chaîne ressemble à une date DD/MM/YYYY */
+function isDateStr(s: string): boolean {
+  return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s.trim())
+}
+
 /**
  * Parse les lignes brutes du sheet en objets structurés.
- * Ignore la première ligne (header).
- * Convention : cellule non vide = présent, vide = absent.
+ * Ignore toutes les lignes qui ne commencent pas par une date valide
+ * (titre, sous-titre, compteurs, lignes vides).
+ * Les checkboxes Google Sheets renvoient "TRUE"/"FALSE".
  */
 export function parseSheetRows(rows: string[][]): SheetRow[] {
-  // Skip header row
-  return rows.slice(1).map(row => ({
-    date: row[0] ?? '',
-    jour: row[1] ?? '',
-    france: row[2] ?? '',
-    bahrein: row[3] ?? '',
-    autres: row[4] ?? '',
-  })).filter(r => r.date !== '')
+  const result: SheetRow[] = []
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    if (row[0] && isDateStr(row[0])) {
+      result.push({
+        date: row[0],
+        jour: row[1] ?? '',
+        france: row[2] ?? '',
+        bahrein: row[3] ?? '',
+        autres: row[4] ?? '',
+        sheetRow: i + 1, // 1-based row number in the sheet
+      })
+    }
+  }
+  return result
 }
 
 /**

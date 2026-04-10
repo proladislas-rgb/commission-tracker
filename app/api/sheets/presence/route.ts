@@ -62,9 +62,9 @@ function setCookieIfRefreshed(
 }
 
 function sheetRowToPresenceType(row: { france: string; bahrein: string; autres: string }): PresenceType {
-  if (row.france.trim()) return 'france'
-  if (row.bahrein.trim()) return 'bahrein'
-  if (row.autres.trim()) return 'autres'
+  if (row.france.trim().toUpperCase() === 'TRUE') return 'france'
+  if (row.bahrein.trim().toUpperCase() === 'TRUE') return 'bahrein'
+  if (row.autres.trim().toUpperCase() === 'TRUE') return 'autres'
   return null
 }
 
@@ -93,6 +93,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       date: row.date,
       jour: row.jour,
       presence: sheetRowToPresenceType(row),
+      sheetRow: row.sheetRow,
     }))
 
     const response = NextResponse.json({ year: Number(year), days })
@@ -105,14 +106,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 const PutPresenceSchema = z.object({
   year: z.number().int().min(2025).max(2028),
-  rowIndex: z.number().int().min(0),
+  sheetRow: z.number().int().min(1),
   presence: z.enum(['france', 'bahrein', 'autres']).nullable(),
 })
 
 /**
  * PUT /api/sheets/presence
- * Body: { year: 2026, rowIndex: 15, presence: "france" | "bahrein" | "autres" | null }
- * rowIndex = index 0-based dans le tableau (hors header), donc row Sheets = rowIndex + 2
+ * Body: { year: 2026, sheetRow: 101, presence: "france" | "bahrein" | "autres" | null }
+ * sheetRow = numéro de ligne 1-based dans le Google Sheet
  */
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()
@@ -123,27 +124,24 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Paramètres invalides' }, { status: 400 })
   }
-  const { year, rowIndex, presence } = parsed.data
+  const { year, sheetRow, presence } = parsed.data
 
   const result = await resolveTokens(request)
   if (result instanceof NextResponse) return result
   const { tokens, wasRefreshed } = result
 
-  // Row in sheet = rowIndex + 2 (1-indexed + skip header)
-  const sheetRow = rowIndex + 2
-
   try {
-    // Clear all 3 columns first
+    // Clear all 3 columns first (FALSE for checkboxes)
     await Promise.all([
-      writeSheetCell(tokens.access_token, `${year}!C${sheetRow}`, ''),
-      writeSheetCell(tokens.access_token, `${year}!D${sheetRow}`, ''),
-      writeSheetCell(tokens.access_token, `${year}!E${sheetRow}`, ''),
+      writeSheetCell(tokens.access_token, `${year}!C${sheetRow}`, 'FALSE'),
+      writeSheetCell(tokens.access_token, `${year}!D${sheetRow}`, 'FALSE'),
+      writeSheetCell(tokens.access_token, `${year}!E${sheetRow}`, 'FALSE'),
     ])
 
     // Set the selected column if not null
     if (presence) {
       const col = presenceTypeToColumn(presence)
-      await writeSheetCell(tokens.access_token, `${year}!${col}${sheetRow}`, 'X')
+      await writeSheetCell(tokens.access_token, `${year}!${col}${sheetRow}`, 'TRUE')
     }
 
     const response = NextResponse.json({ ok: true })

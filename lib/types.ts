@@ -143,9 +143,10 @@ export interface RegisterPayload {
 export type PresenceType = 'france' | 'bahrein' | 'autres' | null
 
 export interface PresenceDay {
-  date: string        // "2026-01-15"
+  date: string        // "02/04/2026"
   jour: string        // "Jeudi"
   presence: PresenceType
+  sheetRow: number    // 1-based row in the Google Sheet
 }
 
 export interface PresenceYear {

@@ -55,7 +55,7 @@ export function usePresence(initialYear?: number) {
       const res = await fetch('/api/sheets/presence', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year, rowIndex: dayIndex, presence: next }),
+        body: JSON.stringify({ year, sheetRow: day.sheetRow, presence: next }),
       })
       if (!res.ok) {
         const data = (await res.json()) as { error: string }
