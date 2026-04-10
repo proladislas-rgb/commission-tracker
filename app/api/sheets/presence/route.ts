@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
 import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
 import {
@@ -102,6 +103,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+const PutPresenceSchema = z.object({
+  year: z.number().int().min(2025).max(2028),
+  rowIndex: z.number().int().min(0),
+  presence: z.enum(['france', 'bahrein', 'autres']).nullable(),
+})
+
 /**
  * PUT /api/sheets/presence
  * Body: { year: 2026, rowIndex: 15, presence: "france" | "bahrein" | "autres" | null }
@@ -111,17 +118,12 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()
   if (!session) return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
 
-  let body: { year: number; rowIndex: number; presence: PresenceType }
-  try {
-    body = (await request.json()) as { year: number; rowIndex: number; presence: PresenceType }
-  } catch {
-    return NextResponse.json({ error: 'Body JSON invalide' }, { status: 400 })
-  }
-
-  const { year, rowIndex, presence } = body
-  if (!year || rowIndex == null || rowIndex < 0) {
+  const raw = await request.json().catch(() => null)
+  const parsed = PutPresenceSchema.safeParse(raw)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'Paramètres invalides' }, { status: 400 })
   }
+  const { year, rowIndex, presence } = parsed.data
 
   const result = await resolveTokens(request)
   if (result instanceof NextResponse) return result

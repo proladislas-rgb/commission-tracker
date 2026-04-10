@@ -4,12 +4,13 @@ interface CompteurCardsProps {
   france: number
   bahrein: number
   autres: number
+  year: number
 }
 
 const SEUIL = 183
 const SEUIL_WARNING = 170
 
-export default function CompteurCards({ france, bahrein, autres }: CompteurCardsProps) {
+export default function CompteurCards({ france, bahrein, autres, year }: CompteurCardsProps) {
   const pct = Math.min((france / SEUIL) * 100, 100)
   const remaining = Math.max(SEUIL - france, 0)
 
@@ -51,7 +52,7 @@ export default function CompteurCards({ france, bahrein, autres }: CompteurCards
         <div className="mb-1">
           <span className="text-3xl font-bold" style={{ color: '#f59e0b' }}>{bahrein}</span>
         </div>
-        <p className="text-xs text-txt3 mt-2">jours en {new Date().getFullYear()}</p>
+        <p className="text-xs text-txt3 mt-2">jours en {year}</p>
       </div>
 
       {/* Autres */}
@@ -63,7 +64,7 @@ export default function CompteurCards({ france, bahrein, autres }: CompteurCards
         <div className="mb-1">
           <span className="text-3xl font-bold" style={{ color: '#10b981' }}>{autres}</span>
         </div>
-        <p className="text-xs text-txt3 mt-2">jours en {new Date().getFullYear()}</p>
+        <p className="text-xs text-txt3 mt-2">jours en {year}</p>
       </div>
     </div>
   )

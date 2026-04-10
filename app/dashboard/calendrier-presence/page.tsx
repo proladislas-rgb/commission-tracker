@@ -11,11 +11,6 @@ export default function CalendrierPresencePage() {
   const [month, setMonth] = useState(new Date().getMonth())
   const { year, days, loading, error, counters, changeYear, toggleDay, reload } = usePresence()
 
-  const handleChangeYear = (y: number) => {
-    changeYear(y)
-    setMonth(prev => prev)
-  }
-
   return (
     <>
       {/* Header */}
@@ -44,7 +39,7 @@ export default function CalendrierPresencePage() {
             days={days}
             onToggle={toggleDay}
             onChangeMonth={setMonth}
-            onChangeYear={handleChangeYear}
+            onChangeYear={changeYear}
           />
         </div>
       )}
@@ -56,6 +51,7 @@ export default function CalendrierPresencePage() {
             france={counters.france}
             bahrein={counters.bahrein}
             autres={counters.autres}
+            year={year}
           />
         </div>
       )}

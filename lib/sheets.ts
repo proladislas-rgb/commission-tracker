@@ -1,5 +1,3 @@
-import type { StoredTokens } from '@/lib/google'
-
 const SHEETS_BASE = 'https://sheets.googleapis.com/v4/spreadsheets'
 const SPREADSHEET_ID = '13SeeG6LgR6k2725VfxkjHpBiQlKbyVXclx_pz05g2-g'
 
