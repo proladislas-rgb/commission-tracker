@@ -138,3 +138,18 @@ export interface RegisterPayload {
   role?: Role
 }
 
+// --- Calendrier de Présence ---
+
+export type PresenceType = 'france' | 'bahrein' | 'autres' | null
+
+export interface PresenceDay {
+  date: string        // "2026-01-15"
+  jour: string        // "Jeudi"
+  presence: PresenceType
+}
+
+export interface PresenceYear {
+  year: number
+  days: PresenceDay[]
+}
+
