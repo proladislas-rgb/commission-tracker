@@ -42,10 +42,10 @@ export default function InvoiceChat() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!input.trim() || loading) return
-    const clientInfo = selectedClient
+    const clientContext = selectedClient
       ? `\n[Client: ${selectedClient.name}${selectedClient.siren ? `, SIREN: ${selectedClient.siren}` : ''}${selectedClient.address ? `, Adresse: ${selectedClient.address}` : ''}]`
-      : ''
-    sendMessage(input + clientInfo)
+      : undefined
+    sendMessage(input, clientContext)
     setInput('')
   }
 

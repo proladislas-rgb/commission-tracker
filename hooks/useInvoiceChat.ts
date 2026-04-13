@@ -19,14 +19,18 @@ export function useInvoiceChat() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const sendMessage = useCallback(async (text: string) => {
+  const sendMessage = useCallback(async (text: string, clientContext?: string) => {
     const trimmed = text.trim()
     if (!trimmed) return
 
+    // Afficher seulement le texte propre dans le chat
     const userMsg: ChatMessage = { role: 'user', content: trimmed }
     setMessages(prev => [...prev, userMsg])
     setLoading(true)
     setError(null)
+
+    // Envoyer le texte + contexte client (invisible) à l'API
+    const messageForApi = clientContext ? trimmed + clientContext : trimmed
 
     try {
       // Construire l'historique sans le message de bienvenue et sans invoiceData
@@ -37,7 +41,7 @@ export function useInvoiceChat() {
       const res = await fetch('/api/invoice/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, history }),
+        body: JSON.stringify({ message: messageForApi, history }),
       })
 
       if (!res.ok) {
