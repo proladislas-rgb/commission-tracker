@@ -21,6 +21,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
   // Voice recording
   const [recording, setRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
+  const [recordingError, setRecordingError] = useState<string | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -125,6 +126,22 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
   }
 
   async function startRecording() {
+    setRecordingError(null)
+
+    // Secure context required by browsers for getUserMedia (HTTPS or localhost)
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
+      setRecordingError('Micro indisponible : contexte non sécurisé (HTTPS requis).')
+      return
+    }
+    if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+      setRecordingError('Micro non supporté par ce navigateur.')
+      return
+    }
+    if (typeof MediaRecorder === 'undefined') {
+      setRecordingError('Enregistrement audio non supporté par ce navigateur.')
+      return
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const supported = getSupportedMimeType()
@@ -150,8 +167,20 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
       setRecording(true)
       setRecordingTime(0)
       timerRef.current = setInterval(() => setRecordingTime(t => t + 1), 1000)
-    } catch {
-      // Micro non disponible
+    } catch (e) {
+      const err = e as DOMException
+      let msg = 'Impossible de démarrer l\u2019enregistrement.'
+      if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
+        msg = 'Autorisation micro refusée. Active le micro dans les paramètres du navigateur.'
+      } else if (err?.name === 'NotFoundError' || err?.name === 'OverconstrainedError') {
+        msg = 'Aucun micro détecté sur cet appareil.'
+      } else if (err?.name === 'NotReadableError') {
+        msg = 'Le micro est déjà utilisé par une autre application.'
+      } else if (err?.message) {
+        msg = `Micro : ${err.message}`
+      }
+      console.error('[chat] startRecording failed:', err)
+      setRecordingError(msg)
     }
   }
 
@@ -195,6 +224,34 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
 
   return (
     <div style={{ position: 'relative' }}>
+      {/* Recording error banner */}
+      {recordingError && (
+        <div
+          style={{
+            margin: '0 12px 6px',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(244,63,94,0.10)',
+            border: '0.5px solid rgba(244,63,94,0.35)',
+            borderRadius: '8px',
+            color: '#fda4af',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          }}
+        >
+          <span style={{ flex: 1 }}>{recordingError}</span>
+          <button
+            onClick={() => setRecordingError(null)}
+            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            title="Fermer"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Mention autocomplete dropdown */}
       {mentionQuery !== null && filteredUsers.length > 0 && (
         <div style={{

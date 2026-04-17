@@ -23,3 +23,19 @@
 - [x] Build + lint + tests (41/41) OK
 
 **À tester en local :** se reconnecter Google (nouveau scope), vérifier lecture/écriture Sheet.
+
+## Terminé (2026-04-17) — Fix vocaux chat + reconnect Google après changement mdp
+- [x] Workspace : fix détection "connecté" (401 → force reconnect, plus de faux positif sur refresh_failed/token_expired/invalid_tokens)
+- [x] Calendrier présence : bandeau dédié + bouton "Reconnecter Google" sur erreurs OAuth
+- [x] Chat `ChatInput` : check `isSecureContext` + `navigator.mediaDevices` + `MediaRecorder`, détection DOMException (NotAllowed/NotFound/NotReadable), bandeau d'erreur visible
+- [x] Chat `ChatWindow` : upload expose maintenant `error` + `details` du serveur dans un bandeau, plus de catch silencieux
+- [x] Chat upload API : normalisation MIME (`split(';')[0]`) → accepte `audio/webm;codecs=opus` renvoyé par MediaRecorder
+- [x] Chat notify : `sendNotificationEmail` retourne maintenant `{ok, error}` et le POST `/api/chat/notify` renvoie 502 avec le code d'erreur quand Gmail API échoue
+- [x] Chat `handleSend` : détecte les erreurs OAuth du notify et surface un message "Reconnecte Google" visible
+- [x] Lint OK (erreurs pré-existantes telegram-bot seulement), 41/41 tests OK
+
+**À tester en local :**
+- `/dashboard/workspace` → doit afficher "Connecter Google" (tokens révoqués par le changement de mdp)
+- `/api/auth/google/disconnect` → redirige vers OAuth consent, permet la reconnexion
+- `/dashboard/calendrier-presence` → si erreur OAuth, bouton "Reconnecter Google" visible
+- `/dashboard/chat` → cliquer sur le micro, vérifier qu'une erreur lisible s'affiche si permission refusée, ou que le vocal s'enregistre/s'envoie. Si upload échoue, lire le code d'erreur dans le bandeau pour diagnostic.

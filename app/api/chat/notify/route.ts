@@ -21,9 +21,14 @@ const USER_EMAILS: Record<string, string> = {
   'associe': 'proladislas@gmail.com',    // Ladislas gets notified
 }
 
-async function sendNotificationEmail(to: string, subject: string, htmlBody: string, request: NextRequest) {
+async function sendNotificationEmail(
+  to: string,
+  subject: string,
+  htmlBody: string,
+  request: NextRequest
+): Promise<{ ok: boolean; error?: string }> {
   const raw = request.cookies.get('google_tokens')?.value
-  if (!raw) return // No Google tokens, can't send email
+  if (!raw) return { ok: false, error: 'not_connected' }
 
   // Use the email send endpoint internally
   const res = await fetch(new URL('/api/email/send', request.url), {
@@ -35,7 +40,9 @@ async function sendNotificationEmail(to: string, subject: string, htmlBody: stri
     body: JSON.stringify({ to, subject, body: htmlBody }),
   })
 
-  return res.ok
+  if (res.ok) return { ok: true }
+  const data = (await res.json().catch(() => ({}))) as { error?: string }
+  return { ok: false, error: data.error ?? `http_${res.status}` }
 }
 
 export async function POST(req: NextRequest) {
@@ -90,7 +97,10 @@ export async function POST(req: NextRequest) {
         </div>
       `
 
-      await sendNotificationEmail(email, subject, html, req)
+      const result = await sendNotificationEmail(email, subject, html, req)
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error ?? 'send_failed' }, { status: 502 })
+      }
     }
 
     if (type === 'digest') {

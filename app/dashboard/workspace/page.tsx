@@ -23,10 +23,18 @@ function WorkspaceContent() {
         const res = await fetch('/api/drive/list?folderId=root')
         if (res.ok) {
           setConnected(true)
-        } else {
-          const data = (await res.json()) as { error: string }
-          setConnected(data.error !== 'not_connected')
+          return
         }
+        // Any 401 (not_connected, invalid_tokens, token_expired, refresh_failed)
+        // means the user must reconnect Google — including after a Google password change
+        // which revokes refresh tokens when the Gmail scope is present.
+        if (res.status === 401) {
+          setConnected(false)
+          return
+        }
+        // Other errors (500, Drive API down) — assume still connected to avoid
+        // false-positive reconnect prompts, but the feature will show its own error.
+        setConnected(true)
       } catch {
         setConnected(false)
       }

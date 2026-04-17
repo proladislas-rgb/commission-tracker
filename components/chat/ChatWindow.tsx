@@ -32,6 +32,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   const [dragOver, setDragOver] = useState(false)
   const dragCountRef = useRef(0)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [chatUsers, setChatUsers] = useState<User[]>([])
 
   // Load users for mentions
@@ -71,7 +72,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       )
       for (const mentioned of mentionedUsers) {
         try {
-          await fetch('/api/chat/notify', {
+          const res = await fetch('/api/chat/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -82,8 +83,15 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
               messagePreview: content.slice(0, 200),
             }),
           })
-        } catch {
-          // notification silencieuse
+          if (!res.ok) {
+            const data = (await res.json().catch(() => ({}))) as { error?: string }
+            console.warn(`[chat] notify mail failed for @${mentioned.display_name}:`, data.error ?? res.status)
+            if (data.error === 'refresh_failed' || data.error === 'not_connected' || data.error === 'token_expired') {
+              setUploadError('Connexion Google expirée — les notifs @mention ne partent pas. Reconnecte Google depuis le Workspace.')
+            }
+          }
+        } catch (e) {
+          console.warn('[chat] notify request failed:', e)
         }
       }
     }
@@ -97,15 +105,23 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   const handleFileUpload = useCallback(async (file: File) => {
     if (!user || !channel) return
     setUploading(true)
+    setUploadError(null)
     try {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('channelId', channel.id)
       formData.append('userId', user.id)
       const res = await fetch('/api/chat/upload', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error('Échec upload')
-    } catch {
-      // silencieux
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string; details?: string }
+        const code = data.error ?? `http_${res.status}`
+        const detail = data.details ? ` (${data.details})` : ''
+        throw new Error(`${code}${detail}`)
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Échec upload'
+      console.error('[chat] upload failed:', e)
+      setUploadError(`Envoi impossible : ${msg}`)
     } finally {
       setUploading(false)
     }
@@ -238,6 +254,34 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       {uploading && (
         <div style={{ padding: '2px 16px 4px' }}>
           <p style={{ fontSize: '10px', color: '#8898aa' }}>Upload en cours...</p>
+        </div>
+      )}
+
+      {/* Upload error banner */}
+      {uploadError && (
+        <div
+          style={{
+            margin: '0 16px 6px',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(244,63,94,0.10)',
+            border: '0.5px solid rgba(244,63,94,0.35)',
+            borderRadius: '8px',
+            color: '#fda4af',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          }}
+        >
+          <span style={{ flex: 1 }}>{uploadError}</span>
+          <button
+            onClick={() => setUploadError(null)}
+            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            title="Fermer"
+          >
+            ×
+          </button>
         </div>
       )}
 

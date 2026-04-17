@@ -39,13 +39,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/plain',
     'text/csv',
-    // Audio (vocaux)
+    // Audio (vocaux) — MediaRecorder peut renvoyer "audio/webm;codecs=opus",
+    // d'où la normalisation ci-dessous (split sur ";") avant le check.
     'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav',
     // Archives
     'application/zip',
   ])
-  if (file.type && !ALLOWED_MIME_TYPES.has(file.type)) {
-    return NextResponse.json({ error: 'Type de fichier non autorisé.' }, { status: 400 })
+  const baseMime = file.type.split(';')[0].trim().toLowerCase()
+  if (baseMime && !ALLOWED_MIME_TYPES.has(baseMime)) {
+    return NextResponse.json({ error: 'Type de fichier non autorisé.', details: file.type }, { status: 400 })
   }
 
   const timestamp = Date.now()
