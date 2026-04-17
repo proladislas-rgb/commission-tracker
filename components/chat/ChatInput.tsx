@@ -22,6 +22,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
   const [recording, setRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [recordingError, setRecordingError] = useState<string | null>(null)
+  const startingRef = useRef(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -126,19 +127,25 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
   }
 
   async function startRecording() {
+    // Guard contre double-click / ré-entrance pendant qu'un getUserMedia est en vol
+    if (startingRef.current || recording) return
+    startingRef.current = true
     setRecordingError(null)
 
     // Secure context required by browsers for getUserMedia (HTTPS or localhost)
     if (typeof window !== 'undefined' && !window.isSecureContext) {
       setRecordingError('Micro indisponible : contexte non sécurisé (HTTPS requis).')
+      startingRef.current = false
       return
     }
     if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
       setRecordingError('Micro non supporté par ce navigateur.')
+      startingRef.current = false
       return
     }
     if (typeof MediaRecorder === 'undefined') {
       setRecordingError('Enregistrement audio non supporté par ce navigateur.')
+      startingRef.current = false
       return
     }
 
@@ -166,6 +173,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
       mediaRecorderRef.current = mediaRecorder
       setRecording(true)
       setRecordingTime(0)
+      setRecordingError(null) // clear any stale error from a previous failed attempt
       timerRef.current = setInterval(() => setRecordingTime(t => t + 1), 1000)
     } catch (e) {
       const err = e as DOMException
@@ -181,6 +189,8 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
       }
       console.error('[chat] startRecording failed:', err)
       setRecordingError(msg)
+    } finally {
+      startingRef.current = false
     }
   }
 

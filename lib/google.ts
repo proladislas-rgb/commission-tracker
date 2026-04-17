@@ -1,3 +1,5 @@
+import type { NextResponse } from 'next/server'
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? ''
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? ''
 const REDIRECT_URI =
@@ -12,6 +14,30 @@ const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/spreadsheets',
 ]
+
+/** Codes d'erreur renvoyés par les routes Google en 401 = OAuth doit être reconnecté. */
+export const OAUTH_ERROR_CODES = new Set([
+  'not_connected',
+  'invalid_tokens',
+  'token_expired',
+  'refresh_failed',
+])
+
+export function isOAuthError(code: string | null | undefined): boolean {
+  return code !== null && code !== undefined && OAUTH_ERROR_CODES.has(code)
+}
+
+/** Purge le cookie google_tokens dans la réponse. Appeler quand on détecte un refresh invalide. */
+export function clearGoogleTokensCookie(response: NextResponse): NextResponse {
+  response.cookies.set('google_tokens', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  })
+  return response
+}
 
 /** Tokens Google persistés dans le cookie httpOnly `google_tokens`. */
 export interface StoredTokens {

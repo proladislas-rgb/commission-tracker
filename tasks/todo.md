@@ -34,6 +34,18 @@
 - [x] Chat `handleSend` : détecte les erreurs OAuth du notify et surface un message "Reconnecte Google" visible
 - [x] Lint OK (erreurs pré-existantes telegram-bot seulement), 41/41 tests OK
 
+## Terminé (2026-04-17) — Audit post-fix + renforcement (review code + sécurité)
+- [x] `lib/google.ts` : `OAUTH_ERROR_CODES`, `isOAuthError()`, `clearGoogleTokensCookie()` centralisés
+- [x] `components/ui/ReconnectGoogleBanner.tsx` : composant réutilisable (POST + redirect)
+- [x] Auto-clear du cookie `google_tokens` côté serveur sur `invalid_tokens`/`token_expired`/`refresh_failed` dans TOUTES les routes OAuth (drive/list, upload, delete, download ; sheets/presence ; email/send). Self-healing.
+- [x] CSRF fix sur `/api/auth/google/disconnect` : GET → POST + check `Origin` strict + retourne JSON avec l'URL OAuth consent
+- [x] Chat upload : reject MIME vide explicite, stocke le MIME normalisé (pas les params codec du client) dans Supabase + messages.file_type, retire `details: error.message` (leak backend)
+- [x] ChatWindow : états séparés `uploadError` / `googleAuthLost` / `notifyFailures`. Accumulation (plus d'overwrite), handled via `isOAuthError` + `ReconnectGoogleBanner`
+- [x] ChatInput : guard double-click via `startingRef`, auto-clear `recordingError` sur start réussi
+- [x] DriveExplorer : handle TOUS les codes OAuth via `isOAuthError` (plus seulement `not_connected`)
+- [x] Notify digest : log les failures (plus de silent catch)
+- [x] Lint OK, 41/41 tests OK, `npm run build` OK
+
 **À tester en local :**
 - `/dashboard/workspace` → doit afficher "Connecter Google" (tokens révoqués par le changement de mdp)
 - `/api/auth/google/disconnect` → redirige vers OAuth consent, permet la reconnexion

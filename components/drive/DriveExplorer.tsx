@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import DriveFileRow from './DriveFileRow'
 import { useToast } from '@/components/ui/Toast'
+import { isOAuthError } from '@/lib/google'
 import type { DriveFile } from '@/lib/drive'
 
 interface BreadcrumbItem {
@@ -109,8 +110,10 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
     }
   }
 
-  if (error === 'not_connected') {
-    return null // parent handles this
+  // Tous les codes OAuth 401 (not_connected, invalid_tokens, token_expired,
+  // refresh_failed) sont gérés par le parent qui affiche le bouton Reconnecter.
+  if (isOAuthError(error)) {
+    return null
   }
 
   return (
@@ -321,8 +324,8 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
             </div>
           )}
 
-          {/* Erreur */}
-          {error && error !== 'not_connected' && (
+          {/* Erreur (codes OAuth gérés via early-return plus haut) */}
+          {error && !isOAuthError(error) && (
             <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.15)' }}>
               <p className="text-sm text-rose">{error}</p>
             </div>

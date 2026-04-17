@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import { clearGoogleTokensCookie, refreshGoogleToken, type StoredTokens } from '@/lib/google'
 import {
   readSheetRange,
   writeSheetCell,
@@ -21,13 +21,13 @@ async function resolveTokens(
   try {
     tokens = JSON.parse(raw) as StoredTokens
   } catch {
-    return NextResponse.json({ error: 'invalid_tokens' }, { status: 401 })
+    return clearGoogleTokensCookie(NextResponse.json({ error: 'invalid_tokens' }, { status: 401 }))
   }
 
   let wasRefreshed = false
   if (Date.now() > tokens.expires_at) {
     if (!tokens.refresh_token) {
-      return NextResponse.json({ error: 'token_expired' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'token_expired' }, { status: 401 }))
     }
     try {
       const refreshed = await refreshGoogleToken(tokens.refresh_token)
@@ -38,7 +38,7 @@ async function resolveTokens(
       }
       wasRefreshed = true
     } catch {
-      return NextResponse.json({ error: 'refresh_failed' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'refresh_failed' }, { status: 401 }))
     }
   }
   return { tokens, wasRefreshed }

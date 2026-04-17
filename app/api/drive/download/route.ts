@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import { clearGoogleTokensCookie, refreshGoogleToken, type StoredTokens } from '@/lib/google'
 
 const EXPORT_MIMES: Record<string, { mime: string; ext: string }> = {
   'application/vnd.google-apps.document': { mime: 'application/pdf', ext: 'pdf' },
@@ -26,12 +26,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     tokens = JSON.parse(raw) as StoredTokens
   } catch {
-    return NextResponse.json({ error: 'invalid_tokens' }, { status: 401 })
+    return clearGoogleTokensCookie(NextResponse.json({ error: 'invalid_tokens' }, { status: 401 }))
   }
 
   if (Date.now() > tokens.expires_at) {
     if (!tokens.refresh_token) {
-      return NextResponse.json({ error: 'token_expired' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'token_expired' }, { status: 401 }))
     }
     try {
       const refreshed = await refreshGoogleToken(tokens.refresh_token)
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         expires_at: Date.now() + refreshed.expires_in * 1000,
       }
     } catch {
-      return NextResponse.json({ error: 'refresh_failed' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'refresh_failed' }, { status: 401 }))
     }
   }
 

@@ -46,8 +46,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     'application/zip',
   ])
   const baseMime = file.type.split(';')[0].trim().toLowerCase()
-  if (baseMime && !ALLOWED_MIME_TYPES.has(baseMime)) {
-    return NextResponse.json({ error: 'Type de fichier non autorisé.', details: file.type }, { status: 400 })
+  if (!baseMime || !ALLOWED_MIME_TYPES.has(baseMime)) {
+    return NextResponse.json({ error: 'Type de fichier non autorisé.' }, { status: 400 })
   }
 
   const timestamp = Date.now()
@@ -56,14 +56,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const buffer = Buffer.from(await file.arrayBuffer())
 
+  // On stocke le MIME normalisé (sans params codec) pour éviter qu'un client
+  // puisse injecter des params arbitraires dans le Content-Type de réponse CDN.
   const { error: uploadError } = await supabaseAdmin.storage
     .from('chat-files')
     .upload(path, buffer, {
-      contentType: file.type || 'application/octet-stream',
+      contentType: baseMime,
     })
 
   if (uploadError) {
-    return NextResponse.json({ error: 'upload_failed', details: uploadError.message }, { status: 500 })
+    console.error('[chat/upload] supabase storage error:', uploadError.message)
+    return NextResponse.json({ error: 'upload_failed' }, { status: 500 })
   }
 
   const { data: urlData } = supabaseAdmin.storage
@@ -80,13 +83,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       file_url: fileUrl,
       file_name: file.name,
       file_size: String(file.size),
-      file_type: file.type,
+      file_type: baseMime,
     })
     .select('*')
     .single()
 
   if (insertError) {
-    return NextResponse.json({ error: 'insert_failed', details: insertError.message }, { status: 500 })
+    console.error('[chat/upload] supabase insert error:', insertError.message)
+    return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
   }
 
   return NextResponse.json({ success: true, message })

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import { clearGoogleTokensCookie, refreshGoogleToken, type StoredTokens } from '@/lib/google'
 
 const sendEmailSchema = z.object({
   to: z.string().email('Email invalide').max(200),
@@ -23,7 +23,7 @@ const EXPORT_MIMES: Record<string, string> = {
   'application/vnd.google-apps.presentation': 'application/pdf',
 }
 
-async function getTokens(request: NextRequest): Promise<{ tokens: StoredTokens } | { error: string; status: number }> {
+async function getTokens(request: NextRequest): Promise<{ tokens: StoredTokens } | { error: string; status: number; clearCookie?: boolean }> {
   const raw = request.cookies.get('google_tokens')?.value
   if (!raw) return { error: 'not_connected', status: 401 }
 
@@ -31,11 +31,11 @@ async function getTokens(request: NextRequest): Promise<{ tokens: StoredTokens }
   try {
     tokens = JSON.parse(raw) as StoredTokens
   } catch {
-    return { error: 'invalid_tokens', status: 401 }
+    return { error: 'invalid_tokens', status: 401, clearCookie: true }
   }
 
   if (Date.now() > tokens.expires_at) {
-    if (!tokens.refresh_token) return { error: 'token_expired', status: 401 }
+    if (!tokens.refresh_token) return { error: 'token_expired', status: 401, clearCookie: true }
     try {
       const refreshed = await refreshGoogleToken(tokens.refresh_token)
       tokens = {
@@ -44,7 +44,7 @@ async function getTokens(request: NextRequest): Promise<{ tokens: StoredTokens }
         expires_at: Date.now() + refreshed.expires_in * 1000,
       }
     } catch {
-      return { error: 'refresh_failed', status: 401 }
+      return { error: 'refresh_failed', status: 401, clearCookie: true }
     }
   }
 
@@ -139,7 +139,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const result = await getTokens(request)
   if ('error' in result) {
-    return NextResponse.json({ error: result.error }, { status: result.status })
+    const errResponse = NextResponse.json({ error: result.error }, { status: result.status })
+    return result.clearCookie ? clearGoogleTokensCookie(errResponse) : errResponse
   }
 
   const { tokens } = result

@@ -5,6 +5,8 @@ import { useMessages } from '@/hooks/useMessages'
 import { useTyping } from '@/hooks/useTyping'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
+import { isOAuthError } from '@/lib/google'
+import ReconnectGoogleBanner from '@/components/ui/ReconnectGoogleBanner'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 import type { Channel, User } from '@/lib/types'
@@ -33,6 +35,8 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
   const dragCountRef = useRef(0)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [googleAuthLost, setGoogleAuthLost] = useState(false)
+  const [notifyFailures, setNotifyFailures] = useState<string[]>([])
   const [chatUsers, setChatUsers] = useState<User[]>([])
 
   // Load users for mentions
@@ -70,6 +74,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       const mentionedUsers = chatUsers.filter(u =>
         mentionedNames.some(name => u.display_name.toLowerCase().startsWith(name)) && u.id !== user.id
       )
+      const failures: string[] = []
       for (const mentioned of mentionedUsers) {
         try {
           const res = await fetch('/api/chat/notify', {
@@ -86,13 +91,19 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           if (!res.ok) {
             const data = (await res.json().catch(() => ({}))) as { error?: string }
             console.warn(`[chat] notify mail failed for @${mentioned.display_name}:`, data.error ?? res.status)
-            if (data.error === 'refresh_failed' || data.error === 'not_connected' || data.error === 'token_expired') {
-              setUploadError('Connexion Google expirée — les notifs @mention ne partent pas. Reconnecte Google depuis le Workspace.')
+            if (isOAuthError(data.error)) {
+              setGoogleAuthLost(true)
+            } else {
+              failures.push(mentioned.display_name)
             }
           }
         } catch (e) {
           console.warn('[chat] notify request failed:', e)
+          failures.push(mentioned.display_name)
         }
+      }
+      if (failures.length > 0) {
+        setNotifyFailures(failures)
       }
     }
   }, [user, sendMessage, chatUsers, channel])
@@ -257,6 +268,16 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
         </div>
       )}
 
+      {/* Google OAuth reconnect banner (notify @mention a échoué à cause des tokens) */}
+      {googleAuthLost && (
+        <div style={{ margin: '0 16px 6px' }}>
+          <ReconnectGoogleBanner
+            message="Connexion Google expirée — les notifs @mention ne partent pas."
+            redirectTo="/dashboard/chat"
+          />
+        </div>
+      )}
+
       {/* Upload error banner */}
       {uploadError && (
         <div
@@ -278,6 +299,36 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           <button
             onClick={() => setUploadError(null)}
             style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            title="Fermer"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Notify failures banner (non-OAuth errors, e.g. Gmail transient) */}
+      {notifyFailures.length > 0 && (
+        <div
+          style={{
+            margin: '0 16px 6px',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(245,158,11,0.10)',
+            border: '0.5px solid rgba(245,158,11,0.35)',
+            borderRadius: '8px',
+            color: '#fcd34d',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          }}
+        >
+          <span style={{ flex: 1 }}>
+            Mail @mention non envoyé à&nbsp;: {notifyFailures.map(n => `@${n}`).join(', ')}
+          </span>
+          <button
+            onClick={() => setNotifyFailures([])}
+            style={{ background: 'transparent', border: 'none', color: '#fcd34d', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
             title="Fermer"
           >
             ×

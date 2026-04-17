@@ -159,7 +159,10 @@ export async function POST(req: NextRequest) {
             </div>
           `
 
-          await sendNotificationEmail(email, subject, html, req)
+          const result = await sendNotificationEmail(email, subject, html, req)
+          if (!result.ok) {
+            console.warn(`[chat/notify] digest mail failed for user ${u.id}:`, result.error)
+          }
         }
       }
     }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth'
-import { refreshGoogleToken, type StoredTokens } from '@/lib/google'
+import { clearGoogleTokensCookie, refreshGoogleToken, type StoredTokens } from '@/lib/google'
 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
   const session = await getSessionUser()
@@ -17,14 +17,14 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
   try {
     tokens = JSON.parse(raw) as StoredTokens
   } catch {
-    return NextResponse.json({ error: 'invalid_tokens' }, { status: 401 })
+    return clearGoogleTokensCookie(NextResponse.json({ error: 'invalid_tokens' }, { status: 401 }))
   }
 
   // Rafraîchir si expiré
   let wasRefreshed = false
   if (Date.now() > tokens.expires_at) {
     if (!tokens.refresh_token) {
-      return NextResponse.json({ error: 'token_expired' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'token_expired' }, { status: 401 }))
     }
     try {
       const refreshed = await refreshGoogleToken(tokens.refresh_token)
@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       }
       wasRefreshed = true
     } catch {
-      return NextResponse.json({ error: 'refresh_failed' }, { status: 401 })
+      return clearGoogleTokensCookie(NextResponse.json({ error: 'refresh_failed' }, { status: 401 }))
     }
   }
 
