@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useClientContext } from '@/hooks/useClientContext'
+import { useToast } from '@/components/ui/Toast'
 import { supabase } from '@/lib/supabase'
 import type { InvoiceData } from '@/lib/invoice-template'
 import { generateInvoiceHTML } from '@/lib/invoice-template'
@@ -18,6 +19,7 @@ interface InvoicePreviewProps {
 export default function InvoicePreview({ data, associeId, onModify, onInjected }: InvoicePreviewProps) {
   const { user } = useAuth()
   const { selectedClientId } = useClientContext()
+  const { toast } = useToast()
   const [injecting, setInjecting] = useState(false)
   const [injected, setInjected] = useState(false)
   const [showInjectForm, setShowInjectForm] = useState(false)
@@ -60,8 +62,10 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
       if (error) throw new Error(error.message)
       setInjected(true)
       onInjected?.(`Paiement injecté : ${data.dueDate} — ${formatEuro(data.amount)} — En attente`)
-    } catch {
-      // silencieux
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue'
+      console.error('[invoice/inject]', err)
+      toast(`Échec de l'injection du paiement : ${msg}`, 'error')
     } finally {
       setInjecting(false)
     }
