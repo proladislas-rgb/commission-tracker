@@ -124,7 +124,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
       </thead>
       <tbody>
         <tr>
-          <td style="padding: 10px; font-size: 11px; color: #2c3e50; border-right: 1px solid #e0e0e0;">Commercial advisory services</td>
+          <td style="padding: 10px; font-size: 11px; color: #2c3e50; border-right: 1px solid #e0e0e0;">Business introduction services</td>
           <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: center; border-right: 1px solid #e0e0e0;">1</td>
           <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: right; border-right: 1px solid #e0e0e0;">${formattedAmount}</td>
           <td style="padding: 10px; font-size: 11px; color: #2c3e50; text-align: right;">${formattedAmount}</td>
