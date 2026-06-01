@@ -4,9 +4,8 @@ import { getSessionUser } from '@/lib/auth'
 import { clearGoogleTokensCookie, refreshGoogleToken, type StoredTokens } from '@/lib/google'
 import {
   readSheetRange,
-  writeSheetCell,
+  writeSheetRange,
   parseSheetRows,
-  presenceTypeToColumn,
 } from '@/lib/sheets'
 import type { PresenceDay, PresenceType } from '@/lib/types'
 
@@ -131,18 +130,14 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   const { tokens, wasRefreshed } = result
 
   try {
-    // Clear all 3 columns first (FALSE for checkboxes)
-    await Promise.all([
-      writeSheetCell(tokens.access_token, `${year}!C${sheetRow}`, 'FALSE'),
-      writeSheetCell(tokens.access_token, `${year}!D${sheetRow}`, 'FALSE'),
-      writeSheetCell(tokens.access_token, `${year}!E${sheetRow}`, 'FALSE'),
-    ])
-
-    // Set the selected column if not null
-    if (presence) {
-      const col = presenceTypeToColumn(presence)
-      await writeSheetCell(tokens.access_token, `${year}!${col}${sheetRow}`, 'TRUE')
-    }
+    // 1 seul write API pour les 3 checkboxes (au lieu de 4 successifs).
+    // Critique pour respecter le quota Google Sheets (60 writes/min/user).
+    const row: [string, string, string] = [
+      presence === 'france' ? 'TRUE' : 'FALSE',
+      presence === 'bahrein' ? 'TRUE' : 'FALSE',
+      presence === 'autres' ? 'TRUE' : 'FALSE',
+    ]
+    await writeSheetRange(tokens.access_token, `${year}!C${sheetRow}:E${sheetRow}`, [row])
 
     const response = NextResponse.json({ ok: true })
     return setCookieIfRefreshed(response, tokens, wasRefreshed)

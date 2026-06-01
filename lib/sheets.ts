@@ -34,13 +34,17 @@ export async function readSheetRange(
 }
 
 /**
- * Écrit une valeur dans une cellule.
- * range format: "2026!C15" (colonne C, ligne 15)
+ * Écrit une plage de valeurs en un seul appel API.
+ * range format: "2026!C15:E15" (cellule simple "C15" ou range "C15:E15")
+ * values: tableau 2D row-major. Pour 1 cellule: [["val"]]. Pour 1 ligne 3 colonnes: [["a","b","c"]].
+ *
+ * Batcher en un seul appel est critique pour respecter le quota Google Sheets
+ * (60 writes/min/user). Toujours préférer une range à plusieurs writes successifs.
  */
-export async function writeSheetCell(
+export async function writeSheetRange(
   accessToken: string,
   range: string,
-  value: string
+  values: string[][]
 ): Promise<void> {
   const url = `${SHEETS_BASE}/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`
   const res = await fetch(url, {
@@ -49,7 +53,7 @@ export async function writeSheetCell(
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ values: [[value]] }),
+    body: JSON.stringify({ values }),
   })
 
   if (!res.ok) {
@@ -87,13 +91,3 @@ export function parseSheetRows(rows: string[][]): SheetRow[] {
   return result
 }
 
-/**
- * Détermine la colonne Sheets (C, D, E) pour un type de présence.
- */
-export function presenceTypeToColumn(type: 'france' | 'bahrein' | 'autres'): string {
-  switch (type) {
-    case 'france': return 'C'
-    case 'bahrein': return 'D'
-    case 'autres': return 'E'
-  }
-}
