@@ -10,5 +10,4 @@ node_modules
 .next
 .superpowers/
 .claude/
-telegram-bot/.env
-telegram-bot/node_modules
+telegram-bot/
