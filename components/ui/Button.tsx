@@ -14,10 +14,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary:   'text-white active:scale-[0.98]',
-  secondary: 'bg-raised text-txt border border-border hover:bg-[rgba(255,255,255,0.04)]',
-  ghost:     'bg-transparent text-txt2 hover:text-txt hover:bg-[rgba(255,255,255,0.05)]',
-  danger:    'bg-rose/10 text-rose border border-rose/30 hover:bg-rose/20',
+  primary:   'text-white lg-shadow-accent active:scale-[0.98]',
+  secondary: 'bg-[rgba(255,255,255,0.07)] text-lg-text border border-[rgba(255,255,255,0.11)] hover:bg-[rgba(255,255,255,0.10)]',
+  ghost:     'bg-transparent text-lg-muted hover:text-lg-text hover:bg-[rgba(255,255,255,0.06)]',
+  danger:    'bg-[rgba(255,99,105,0.13)] text-lg-danger border border-[rgba(255,99,105,0.22)] hover:bg-[rgba(255,99,105,0.20)]',
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -40,13 +40,13 @@ export default function Button({
       type="button"
       disabled={disabled || loading}
       className={cn(
-        'inline-flex items-center gap-2 rounded-btn font-medium transition-all duration-300 cursor-pointer',
+        'inline-flex items-center gap-2 rounded-full font-semibold lg-ease cursor-pointer',
         'disabled:opacity-40 disabled:cursor-not-allowed',
         variantClasses[variant],
         sizeClasses[size],
         className
       )}
-      style={variant === 'primary' ? { background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', ...(props.style ?? {}) } : props.style}
+      style={variant === 'primary' ? { background: 'linear-gradient(135deg, #6a5cff, #3b82f6)', ...(props.style ?? {}) } : props.style}
       {...props}
     >
       {loading && (

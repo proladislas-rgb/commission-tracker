@@ -18,18 +18,18 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
-const typeStyles: Record<ToastType, { bg: string; border: string; icon: string }> = {
-  success: { bg: 'bg-[#10b981]/15', border: 'border-[#10b981]/40', icon: '✓' },
-  error:   { bg: 'bg-[#f43f5e]/15', border: 'border-[#f43f5e]/40', icon: '✕' },
-  info:    { bg: 'bg-[#6366f1]/15', border: 'border-[#6366f1]/40', icon: 'ℹ' },
-  warning: { bg: 'bg-[#f59e0b]/15', border: 'border-[#f59e0b]/40', icon: '⚠' },
+const typeStyles: Record<ToastType, { border: string; icon: string }> = {
+  success: { border: 'border-[rgba(61,220,139,0.30)]', icon: '✓' },
+  error:   { border: 'border-[rgba(255,99,105,0.30)]', icon: '✕' },
+  info:    { border: 'border-[rgba(106,141,255,0.30)]', icon: 'ℹ' },
+  warning: { border: 'border-[rgba(240,163,60,0.30)]', icon: '⚠' },
 }
 
 const typeTextColors: Record<ToastType, string> = {
-  success: 'text-[#10b981]',
-  error:   'text-[#f43f5e]',
-  info:    'text-[#6366f1]',
-  warning: 'text-[#f59e0b]',
+  success: 'text-[#3ddc8b]',
+  error:   'text-[#ff8589]',
+  info:    'text-[#6a8dff]',
+  warning: 'text-[#f0a33c]',
 }
 
 function ToastNotification({ item, onClose }: { item: ToastItem; onClose: () => void }) {
@@ -39,9 +39,9 @@ function ToastNotification({ item, onClose }: { item: ToastItem; onClose: () => 
   return (
     <div
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-[8px] border backdrop-blur-sm
-        ${style.bg} ${style.border}
-        shadow-lg shadow-black/20
+        flex items-center gap-3 px-4 py-3 rounded-full border
+        bg-[rgba(255,255,255,0.07)] backdrop-blur-[30px] ${style.border}
+        shadow-[0_12px_44px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.13)]
         ${item.exiting ? 'animate-toastOut' : 'animate-toastIn'}
       `}
       style={{ minWidth: 280, maxWidth: 420 }}
@@ -49,10 +49,10 @@ function ToastNotification({ item, onClose }: { item: ToastItem; onClose: () => 
       <span className={`text-base font-semibold flex-shrink-0 ${textColor}`}>
         {style.icon}
       </span>
-      <span className="text-[#e8edf5] text-sm flex-1">{item.message}</span>
+      <span className="text-lg-text text-sm flex-1">{item.message}</span>
       <button
         onClick={onClose}
-        className="text-[#8898aa] hover:text-[#e8edf5] transition-colors flex-shrink-0 ml-2 p-0.5"
+        className="text-lg-muted hover:text-lg-text transition-colors flex-shrink-0 ml-2 p-0.5"
         aria-label="Fermer"
       >
         ✕

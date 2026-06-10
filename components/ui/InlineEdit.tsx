@@ -57,7 +57,7 @@ export default function InlineEdit({
     return (
       <span
         className={cn(
-          !disabled && 'cursor-pointer hover:text-indigo2 transition-colors',
+          !disabled && 'cursor-pointer hover:text-lg-info transition-colors',
           className
         )}
         onClick={() => { if (!disabled) setEditing(true) }}
@@ -77,8 +77,8 @@ export default function InlineEdit({
       onKeyDown={handleKey}
       disabled={saving}
       className={cn(
-        'bg-raised border border-indigo rounded-btn px-2 py-0.5 text-sm text-txt outline-none',
-        'focus:ring-1 focus:ring-indigo/30 min-w-[120px]',
+        'bg-[rgba(0,0,0,0.30)] border border-lg-accent-1 rounded-[10px] px-2 py-0.5 text-sm text-lg-text outline-none',
+        'focus:ring-[3px] focus:ring-lg-accent-1/25 min-w-[120px]',
         inputClassName
       )}
     />

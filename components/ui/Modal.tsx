@@ -45,17 +45,17 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
       {/* Panel */}
       <div
         className={cn(
-          'relative w-full rounded-card',
-          'shadow-raised animate-modalIn overflow-hidden',
+          'relative w-full glass-strong',
+          'animate-modalIn overflow-hidden',
           sizeClasses[size]
         )}
-        style={{ zIndex: 9999, maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.12)' }}
+        style={{ zIndex: 9999, maxHeight: '90vh', overflowY: 'auto' }}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-base font-semibold text-txt">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.08)]">
+          <h2 className="text-base font-semibold text-lg-text tracking-[-0.01em]">{title}</h2>
           <button
             onClick={onClose}
-            className="text-txt2 hover:text-txt transition-colors p-1 rounded-btn hover:bg-raised"
+            className="text-lg-muted hover:text-lg-text transition-colors p-1.5 rounded-full hover:bg-[rgba(255,255,255,0.08)]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12" />

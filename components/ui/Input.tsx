@@ -20,12 +20,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={cn(
-            'w-full bg-raised border rounded-btn px-3 py-2 text-sm text-txt',
-            'placeholder:text-txt3 outline-none transition-all duration-150',
-            'focus:border-indigo focus:ring-1 focus:ring-indigo/30',
+            'w-full bg-[rgba(0,0,0,0.30)] border rounded-[12px] px-3 py-2 text-sm text-lg-text',
+            'placeholder:text-lg-muted/60 outline-none transition-all duration-150',
+            'focus:border-lg-accent-1 focus:ring-[3px] focus:ring-lg-accent-1/25',
             error
-              ? 'border-rose/50 focus:border-rose focus:ring-rose/20'
-              : 'border-border',
+              ? 'border-lg-danger/50 focus:border-lg-danger focus:ring-lg-danger/20'
+              : 'border-[rgba(255,255,255,0.10)]',
             className
           )}
           {...props}
