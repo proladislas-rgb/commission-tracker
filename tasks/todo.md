@@ -70,3 +70,10 @@ Design system global : `~/.claude/design-systems/liquid-glass.md` (réutilisable
 - [ ] Phases 0→6 : tokens → primitives → AppShell → Dashboard → Chat → autres pages → audit visuel
 - [ ] Contraintes : reskin pur (zéro changement hooks/lib/api), 41 tests verts à chaque phase, validation navigateur avant push
 - [ ] Ensuite : refonte fonctionnelle Reem AI (chantier séparé)
+
+### Refonte UI — état au 2026-06-10 soir (branche `ui/liquid-glass`, poussée)
+- [x] Tasks 1-6 du plan : tokens, primitives, sidebar verre, dashboard (héros+sparkline), chat, toutes les pages + login/register vitrine
+- [x] Task 7 partiel : Reem reskin minimal (palette), CLAUDE.md à jour, audit reviewer sous-agent passé (2 critiques corrigés : couleurs DB avatar/client restaurées)
+- [x] Vérifs : lint 0 erreur, 41/41 tests, build OK, smoke routes OK (login/register 200, middleware 307 OK)
+- [ ] **GATE : audit visuel Hugues en local (`npm run dev`) → merge vers main → push → promote Vercel**
+- [ ] Ensuite : refonte fonctionnelle Reem AI (chantier dédié)
