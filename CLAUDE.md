@@ -28,11 +28,17 @@
 - RLS activé sur 9/9 tables avec policies anon ciblées
 - Storage bucket : chat-files (public, pour uploads chat + vocaux)
 
-## Design system dark mode
-- bg: #07080d, surface: #0f1117, raised: #151a24
-- txt: #e8edf5, txt2: #8898aa, txt3: #3d4f63
-- indigo: #6366f1, amber: #f59e0b, emerald: #10b981, green: #22c55e, rose: #f43f5e, sky: #38bdf8
-- Rayons: 14px cartes, 8px boutons
+## Design system « Liquid Glass » (refonte 2026-06-10 — Revolut × Apple)
+- Référence canonique : `~/.claude/design-systems/liquid-glass.md` + spec `docs/superpowers/specs/2026-06-10-ui-redesign-liquid-glass-design.md`
+- bg: #0a0a0e + nappes lumineuses fixes (GlassBackdrop dans layout)
+- Cartes : classes `.glass` (rgba(255,255,255,.055) + blur 28px) et `.glass-strong` (héros/modales)
+- txt: #f5f5f8, txt2/muted: #9b9ba8, txt3: #6b6b78
+- Accent : gradient 135deg #6a5cff→#3b82f6 (`.lg-gradient`), succès #3ddc8b, warning #f0a33c, danger #ff8589, info #6a8dff
+- Rayons : 20-22px cartes, 999px boutons/pills, 12px inputs
+- Animations : transform/opacity uniquement, 150-200ms, easing cubic-bezier(0.32,0.72,0,1) (`.lg-ease`), reduced-motion respecté
+- backdrop-filter : cartes de premier niveau uniquement, jamais imbriqué
+- Pas d'emojis UI : pastilles initiales ou SVG stroke 2px
+- Exceptions héritées : templates externes (facture InvoicePreview, export print, emails) gardent leur propre style
 - Toutes les valeurs numériques Supabase doivent être converties avec Number() || 0
 - Les comparaisons d'ID utilisent String() pour éviter les type mismatch
 - Les modales utilisent createPortal(document.body) pour éviter les problèmes de stacking context

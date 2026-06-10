@@ -10,9 +10,10 @@ import Input from '@/components/ui/Input'
 import type { Client } from '@/lib/types'
 
 /* ── Couleurs par défaut pour le picker ── */
+// Couleurs PERSISTÉES en DB (clients.color) — ne pas re-thémer, compat données existantes
 const DEFAULT_COLORS = [
-  '#6a5cff', '#f0a33c', '#3ddc8b', '#ff8589',
-  '#5ea2ff', '#8b7dff', '#ec4899', '#14b8a6',
+  '#6366f1', '#f59e0b', '#10b981', '#f43f5e',
+  '#38bdf8', '#8b5cf6', '#ec4899', '#14b8a6',
 ]
 
 /* ── Client Card ── */

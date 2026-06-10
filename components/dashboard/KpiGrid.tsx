@@ -111,7 +111,7 @@ export default function KpiGrid({ commissions, paiements, sommesDues = [] }: Kpi
       </div>
 
       {/* KPIs compacts */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard label="CA total" value={formatCurrency(caTotal)} accent="#8b7dff" />
         <KpiCard label="Commissions totales" value={formatCurrency(commissionsTotal)} accent="#f0a33c" />
         <KpiCard label="Encaissé" value={formatCurrency(encaisse)} accent="#3ddc8b" />

@@ -343,7 +343,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
             backgroundColor: 'rgba(240,163,60,0.10)',
             border: '0.5px solid rgba(240,163,60,0.35)',
             borderRadius: '8px',
-            color: '#fcd34d',
+            color: '#f0a33c',
             fontSize: '11px',
             display: 'flex',
             alignItems: 'center',
@@ -356,7 +356,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           </span>
           <button
             onClick={() => setNotifyFailures([])}
-            style={{ background: 'transparent', border: 'none', color: '#fcd34d', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            style={{ background: 'transparent', border: 'none', color: '#f0a33c', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
             title="Fermer"
           >
             ×

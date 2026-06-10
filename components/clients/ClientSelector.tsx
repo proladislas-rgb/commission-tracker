@@ -46,7 +46,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           <div
             className="absolute left-full ml-2 top-0 z-50 min-w-[200px] py-1 rounded-lg border shadow-xl"
             style={{
-              background: 'rgba(255,255,255,0.055)',
+              background: 'rgba(20,20,26,0.92)',
               borderColor: 'rgba(255,255,255,0.12)',
             }}
           >
@@ -158,7 +158,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
         <div
           className="absolute left-0 right-0 top-full mt-1 z-50 py-1 rounded-lg border shadow-xl"
           style={{
-            background: 'rgba(255,255,255,0.055)',
+            background: 'rgba(20,20,26,0.92)',
             borderColor: 'rgba(255,255,255,0.12)',
           }}
         >

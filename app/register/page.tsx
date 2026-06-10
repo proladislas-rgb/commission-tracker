@@ -8,13 +8,14 @@ import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
+// Couleurs PERSISTÉES en DB (users.avatar_color) — ne pas re-thémer, compat données existantes
 const AVATAR_COLORS = [
-  { value: '#6a5cff', label: 'Indigo' },
-  { value: '#f0a33c', label: 'Amber' },
-  { value: '#3ddc8b', label: 'Emerald' },
-  { value: '#ff8589', label: 'Rose' },
-  { value: '#5ea2ff', label: 'Sky' },
-  { value: '#8b7dff', label: 'Violet' },
+  { value: '#6366f1', label: 'Indigo' },
+  { value: '#f59e0b', label: 'Amber' },
+  { value: '#10b981', label: 'Emerald' },
+  { value: '#f43f5e', label: 'Rose' },
+  { value: '#38bdf8', label: 'Sky' },
+  { value: '#8b5cf6', label: 'Violet' },
 ]
 
 export default function RegisterPage() {
@@ -24,7 +25,7 @@ export default function RegisterPage() {
   const [username, setUsername]       = useState('')
   const [password, setPassword]       = useState('')
   const [confirm, setConfirm]         = useState('')
-  const [avatarColor, setColor]       = useState('#6a5cff')
+  const [avatarColor, setColor]       = useState('#6366f1')
   const [error, setError]             = useState('')
   const [loading, setLoading]         = useState(false)
 
@@ -45,24 +46,25 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm animate-fadeIn">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-green animate-pulse2" />
-            <span className="text-sm font-semibold text-txt2 tracking-wide uppercase">Commission Tracker</span>
+          <div
+            className="lg-gradient lg-shadow-accent inline-flex items-center justify-center mb-4"
+            style={{ width: 52, height: 52, borderRadius: 16 }}
+          >
+            <span className="text-white font-extrabold text-[19px] tracking-[-0.02em]">CT</span>
           </div>
-          <h1 className="text-2xl font-bold text-txt">Créer un compte</h1>
-          <p className="text-sm text-txt2 mt-1">Le 1er compte créé sera administrateur</p>
+          <h1 className="text-[26px] font-extrabold text-lg-text tracking-[-0.03em]">Créer un compte</h1>
+          <p className="text-sm text-lg-muted mt-1.5">Le 1er compte créé sera administrateur</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-card p-6 shadow-card flex flex-col gap-4"
-          style={{ backgroundColor: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.08)' }}
+          className="glass-strong p-6 flex flex-col gap-4"
         >
           {error && (
-            <div className="bg-rose/10 border border-rose/30 rounded-btn px-3 py-2 text-sm text-rose">
+            <div className="bg-[rgba(255,99,105,0.13)] border border-[rgba(255,99,105,0.22)] rounded-[12px] px-3 py-2 text-sm text-lg-danger">
               {error}
             </div>
           )}
@@ -130,9 +132,9 @@ export default function RegisterPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-txt2 mt-4">
+        <p className="text-center text-sm text-lg-muted mt-5">
           Déjà un compte ?{' '}
-          <Link href="/login" className="text-indigo hover:text-indigo2 transition-colors">
+          <Link href="/login" className="text-lg-info font-semibold hover:underline transition-colors">
             Se connecter
           </Link>
         </p>
