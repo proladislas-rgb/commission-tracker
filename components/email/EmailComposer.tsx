@@ -16,11 +16,11 @@ function formatSize(bytes: number): string {
 }
 
 function getTypeColor(mimeType: string): string {
-  if (mimeType.includes('pdf')) return '#f43f5e'
+  if (mimeType.includes('pdf')) return '#ff8589'
   if (mimeType.includes('document') || mimeType.includes('word')) return '#38bdf8'
-  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '#10b981'
-  if (mimeType.includes('image')) return '#818cf8'
-  return '#8898aa'
+  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '#3ddc8b'
+  if (mimeType.includes('image')) return '#8b7dff'
+  return '#9b9ba8'
 }
 
 export default function EmailComposer({ draft, onDraftChange, onSent }: EmailComposerProps) {
@@ -215,8 +215,8 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
                   <span
                     className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase"
                     style={{
-                      backgroundColor: att.type === 'drive' ? 'rgba(245,158,11,0.12)' : 'rgba(34,197,94,0.12)',
-                      color: att.type === 'drive' ? '#f59e0b' : '#22c55e',
+                      backgroundColor: att.type === 'drive' ? 'rgba(240,163,60,0.12)' : 'rgba(34,197,94,0.12)',
+                      color: att.type === 'drive' ? '#f0a33c' : '#3ddc8b',
                     }}
                   >
                     {att.type === 'drive' ? 'Drive' : 'Local'}
@@ -225,10 +225,10 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
-                    className="p-0.5 rounded hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+                    className="p-0.5 rounded hover:bg-[rgba(255,99,105,0.1)] transition-colors cursor-pointer"
                     aria-label="Supprimer la pièce jointe"
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18" />
                       <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
@@ -252,7 +252,7 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(34,197,94,0.3)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(34,197,94,0.12)' }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3ddc8b" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
@@ -277,9 +277,9 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
           <div
             className="rounded-lg px-4 py-2.5 text-sm"
             style={{
-              backgroundColor: status.type === 'success' ? 'rgba(34,197,94,0.08)' : 'rgba(244,63,94,0.08)',
-              border: `1px solid ${status.type === 'success' ? 'rgba(34,197,94,0.15)' : 'rgba(244,63,94,0.15)'}`,
-              color: status.type === 'success' ? '#22c55e' : '#f43f5e',
+              backgroundColor: status.type === 'success' ? 'rgba(34,197,94,0.08)' : 'rgba(255,99,105,0.08)',
+              border: `1px solid ${status.type === 'success' ? 'rgba(34,197,94,0.15)' : 'rgba(255,99,105,0.15)'}`,
+              color: status.type === 'success' ? '#3ddc8b' : '#ff8589',
             }}
           >
             {status.message}
@@ -298,7 +298,7 @@ export default function EmailComposer({ draft, onDraftChange, onSent }: EmailCom
           disabled={sending}
           className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 cursor-pointer disabled:opacity-50"
           style={{
-            background: 'linear-gradient(135deg, #6366f1, #818cf8)',
+            background: 'linear-gradient(135deg, #6a5cff, #8b7dff)',
             boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
           }}
           onMouseEnter={e => {

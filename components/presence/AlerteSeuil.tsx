@@ -16,11 +16,11 @@ export default function AlerteSeuil({ franceDays }: AlerteSeuilProps) {
     <div
       className="flex items-center gap-3 px-4 py-3.5 rounded-card text-sm font-medium"
       style={{
-        backgroundColor: isDanger ? 'rgba(244,63,94,0.1)' : 'rgba(245,158,11,0.1)',
+        backgroundColor: isDanger ? 'rgba(255,99,105,0.1)' : 'rgba(240,163,60,0.1)',
         borderWidth: '1px',
         borderStyle: 'solid',
-        borderColor: isDanger ? 'rgba(244,63,94,0.25)' : 'rgba(245,158,11,0.25)',
-        color: isDanger ? '#f43f5e' : '#f59e0b',
+        borderColor: isDanger ? 'rgba(255,99,105,0.25)' : 'rgba(240,163,60,0.25)',
+        color: isDanger ? '#ff8589' : '#f0a33c',
       }}
     >
       <span className="text-lg">{isDanger ? '🚨' : '⚠️'}</span>

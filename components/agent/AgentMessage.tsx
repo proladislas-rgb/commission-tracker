@@ -32,7 +32,7 @@ function DataCard({ result }: { result: unknown }) {
 
   return (
     <div style={{
-      background: '#0f1117',
+      background: 'rgba(255,255,255,0.055)',
       border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: '10px',
       overflow: 'hidden',
@@ -46,9 +46,9 @@ function DataCard({ result }: { result: unknown }) {
         gap: '8px',
         fontSize: '11px',
         fontWeight: 600,
-        color: '#8898aa',
+        color: '#9b9ba8',
       }}>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3ddc8b' }} />
         {rows.length} {rows.length > 1 ? 'résultats' : 'résultat'}
       </div>
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -68,7 +68,7 @@ function DataCard({ result }: { result: unknown }) {
                   fontSize: '9px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.8px',
-                  color: '#3d4f63',
+                  color: '#6b6b78',
                   fontWeight: 600,
                   whiteSpace: 'nowrap',
                 }}>
@@ -84,7 +84,7 @@ function DataCard({ result }: { result: unknown }) {
                   <td key={col} style={{
                     padding: '8px 12px',
                     borderTop: '1px solid rgba(255,255,255,0.04)',
-                    color: '#e8edf5',
+                    color: '#f5f5f8',
                     whiteSpace: 'nowrap',
                     maxWidth: '260px',
                     overflow: 'hidden',
@@ -113,23 +113,23 @@ function EmailCard({ result }: { result: unknown }) {
 
   return (
     <div style={{
-      background: '#0f1117',
-      border: '1px solid rgba(99,102,241,0.25)',
+      background: 'rgba(255,255,255,0.055)',
+      border: '1px solid rgba(106,92,255,0.25)',
       borderRadius: '10px',
       padding: '14px',
       marginTop: '6px',
     }}>
       <div style={{ marginBottom: '8px' }}>
-        <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#3d4f63' }}>
+        <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b6b78' }}>
           Destinataire
         </span>
-        <p style={{ fontSize: '13px', color: '#e8edf5', marginTop: '2px' }}>{to}</p>
+        <p style={{ fontSize: '13px', color: '#f5f5f8', marginTop: '2px' }}>{to}</p>
       </div>
       <div style={{ marginBottom: '12px' }}>
-        <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#3d4f63' }}>
+        <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b6b78' }}>
           Objet
         </span>
-        <p style={{ fontSize: '13px', color: '#e8edf5', marginTop: '2px' }}>{subject}</p>
+        <p style={{ fontSize: '13px', color: '#f5f5f8', marginTop: '2px' }}>{subject}</p>
       </div>
       <a
         href={href}
@@ -141,10 +141,10 @@ function EmailCard({ result }: { result: unknown }) {
           borderRadius: '8px',
           fontSize: '12px',
           fontWeight: 600,
-          background: 'rgba(99,102,241,0.15)',
-          color: '#818cf8',
+          background: 'rgba(106,92,255,0.15)',
+          color: '#8b7dff',
           textDecoration: 'none',
-          border: '1px solid rgba(99,102,241,0.25)',
+          border: '1px solid rgba(106,92,255,0.25)',
         }}
       >
         Ouvrir dans Email
@@ -169,10 +169,10 @@ function ToolRenderer({ items }: { items: ToolDataItem[] }) {
                 alignItems: 'center',
                 gap: '6px',
                 padding: '6px 12px',
-                background: 'rgba(99,102,241,0.12)',
-                border: '1px solid rgba(99,102,241,0.3)',
+                background: 'rgba(106,92,255,0.12)',
+                border: '1px solid rgba(106,92,255,0.3)',
                 borderRadius: '8px',
-                color: '#818cf8',
+                color: '#8b7dff',
                 textDecoration: 'none',
                 fontSize: '12px',
                 fontWeight: 500,
@@ -213,8 +213,8 @@ export default function AgentMessage({ role, content, toolData, userName, userIn
           width: 28,
           height: 28,
           borderRadius: '50%',
-          background: 'rgba(99,102,241,0.2)',
-          color: '#818cf8',
+          background: 'rgba(106,92,255,0.2)',
+          color: '#8b7dff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -229,7 +229,7 @@ export default function AgentMessage({ role, content, toolData, userName, userIn
           width: 28,
           height: 28,
           borderRadius: '8px',
-          background: 'linear-gradient(135deg, #10b981, #059669)',
+          background: 'linear-gradient(135deg, #6a5cff, #3b82f6)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
@@ -253,7 +253,7 @@ export default function AgentMessage({ role, content, toolData, userName, userIn
         <span style={{
           fontSize: '10px',
           fontWeight: 600,
-          color: isUser ? '#818cf8' : '#10b981',
+          color: isUser ? '#8b7dff' : '#3ddc8b',
         }}>
           {isUser ? (userName ?? 'Vous') : 'Reem AI'}
         </span>
@@ -263,9 +263,9 @@ export default function AgentMessage({ role, content, toolData, userName, userIn
           borderRadius: isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
           fontSize: '13px',
           lineHeight: 1.6,
-          background: isUser ? 'rgba(255,255,255,0.07)' : '#151a24',
+          background: isUser ? 'rgba(255,255,255,0.07)' : 'rgba(30,30,38,0.92)',
           border: isUser ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.07)',
-          color: '#e8edf5',
+          color: '#f5f5f8',
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
         }}>

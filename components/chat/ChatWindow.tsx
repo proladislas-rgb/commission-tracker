@@ -169,8 +169,8 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
         </div>
         {/* Stacked avatars */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#8b7dff', border: '1.5px solid #0f1117', zIndex: 2 }}>A</div>
-          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(94,162,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#5ea2ff', border: '1.5px solid #0f1117', marginLeft: '-6px', zIndex: 1 }}>L</div>
+          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#8b7dff', border: '1.5px solid #0a0a0e', zIndex: 2 }}>A</div>
+          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(94,162,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#5ea2ff', border: '1.5px solid #0a0a0e', marginLeft: '-6px', zIndex: 1 }}>L</div>
           <span style={{ color: '#9b9ba8', fontSize: '10px', marginLeft: '4px' }}>2</span>
         </div>
       </div>
@@ -340,8 +340,8 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           style={{
             margin: '0 16px 6px',
             padding: '8px 12px',
-            backgroundColor: 'rgba(245,158,11,0.10)',
-            border: '0.5px solid rgba(245,158,11,0.35)',
+            backgroundColor: 'rgba(240,163,60,0.10)',
+            border: '0.5px solid rgba(240,163,60,0.35)',
             borderRadius: '8px',
             color: '#fcd34d',
             fontSize: '11px',

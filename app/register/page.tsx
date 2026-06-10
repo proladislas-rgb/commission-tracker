@@ -9,12 +9,12 @@ import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
 const AVATAR_COLORS = [
-  { value: '#6366f1', label: 'Indigo' },
-  { value: '#f59e0b', label: 'Amber' },
-  { value: '#10b981', label: 'Emerald' },
-  { value: '#f43f5e', label: 'Rose' },
-  { value: '#38bdf8', label: 'Sky' },
-  { value: '#8b5cf6', label: 'Violet' },
+  { value: '#6a5cff', label: 'Indigo' },
+  { value: '#f0a33c', label: 'Amber' },
+  { value: '#3ddc8b', label: 'Emerald' },
+  { value: '#ff8589', label: 'Rose' },
+  { value: '#5ea2ff', label: 'Sky' },
+  { value: '#8b7dff', label: 'Violet' },
 ]
 
 export default function RegisterPage() {
@@ -24,7 +24,7 @@ export default function RegisterPage() {
   const [username, setUsername]       = useState('')
   const [password, setPassword]       = useState('')
   const [confirm, setConfirm]         = useState('')
-  const [avatarColor, setColor]       = useState('#6366f1')
+  const [avatarColor, setColor]       = useState('#6a5cff')
   const [error, setError]             = useState('')
   const [loading, setLoading]         = useState(false)
 
@@ -59,7 +59,7 @@ export default function RegisterPage() {
         <form
           onSubmit={handleSubmit}
           className="rounded-card p-6 shadow-card flex flex-col gap-4"
-          style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ backgroundColor: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           {error && (
             <div className="bg-rose/10 border border-rose/30 rounded-btn px-3 py-2 text-sm text-rose">

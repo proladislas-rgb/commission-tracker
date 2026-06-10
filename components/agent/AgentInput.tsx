@@ -34,7 +34,7 @@ export default function AgentInput({ onSend, disabled, value, onChange }: AgentI
       style={{
         padding: '12px 24px',
         borderTop: '1px solid rgba(255,255,255,0.07)',
-        background: '#0f1117',
+        background: 'rgba(255,255,255,0.055)',
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
@@ -49,15 +49,15 @@ export default function AgentInput({ onSend, disabled, value, onChange }: AgentI
         disabled={disabled}
         style={{
           flex: 1,
-          background: '#151a24',
+          background: 'rgba(30,30,38,0.92)',
           border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '10px',
           padding: '12px 16px',
-          color: '#e8edf5',
+          color: '#f5f5f8',
           fontSize: '13px',
           outline: 'none',
         }}
-        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)' }}
+        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(61,220,139,0.4)' }}
         onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
       />
       <button
@@ -67,7 +67,7 @@ export default function AgentInput({ onSend, disabled, value, onChange }: AgentI
           width: '40px',
           height: '40px',
           borderRadius: '10px',
-          background: 'linear-gradient(135deg, #10b981, #059669)',
+          background: 'linear-gradient(135deg, #6a5cff, #3b82f6)',
           border: 'none',
           display: 'flex',
           alignItems: 'center',

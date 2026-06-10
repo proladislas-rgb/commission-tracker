@@ -20,10 +20,10 @@ export default function ReemBubble({ onClick, onHide }: ReemBubbleProps) {
         width: '54px',
         height: '54px',
         borderRadius: '50%',
-        background: 'linear-gradient(135deg, #6366f1, #818cf8)',
+        background: 'linear-gradient(135deg, #6a5cff, #8b7dff)',
         border: 'none',
         cursor: 'pointer',
-        boxShadow: '0 8px 24px rgba(99,102,241,0.45), 0 0 0 4px rgba(99,102,241,0.08)',
+        boxShadow: '0 8px 24px rgba(106,92,255,0.45), 0 0 0 4px rgba(106,92,255,0.08)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -44,8 +44,8 @@ export default function ReemBubble({ onClick, onHide }: ReemBubbleProps) {
           width: '10px',
           height: '10px',
           borderRadius: '50%',
-          backgroundColor: '#22c55e',
-          border: '2px solid #07080d',
+          backgroundColor: '#3ddc8b',
+          border: '2px solid #0a0a0e',
         }}
       />
     </button>

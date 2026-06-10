@@ -11,8 +11,8 @@ import type { Client } from '@/lib/types'
 
 /* ── Couleurs par défaut pour le picker ── */
 const DEFAULT_COLORS = [
-  '#6366f1', '#f59e0b', '#10b981', '#f43f5e',
-  '#38bdf8', '#8b5cf6', '#ec4899', '#14b8a6',
+  '#6a5cff', '#f0a33c', '#3ddc8b', '#ff8589',
+  '#5ea2ff', '#8b7dff', '#ec4899', '#14b8a6',
 ]
 
 /* ── Client Card ── */
@@ -35,7 +35,7 @@ function ClientCard({
     <div
       className="group relative rounded-card border p-4 transition-all duration-200 hover:border-indigo/40"
       style={{
-        backgroundColor: '#151a24',
+        backgroundColor: 'rgba(30,30,38,0.92)',
         borderColor: isSelected ? 'rgba(255,255,255,0.25)' : 'rgba(61,79,99,0.25)',
         boxShadow: isSelected ? '0 0 0 1px rgba(255,255,255,0.12)' : 'none',
       }}
@@ -67,7 +67,7 @@ function ClientCard({
           className="rounded-btn px-2.5 py-1 text-xs font-medium transition-colors"
           style={{
             background: isSelected ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
-            color: '#6366f1',
+            color: '#6a5cff',
           }}
         >
           {isSelected ? 'Actif' : 'Sélectionner'}
@@ -77,7 +77,7 @@ function ClientCard({
           className="rounded-btn p-1.5 text-txt3 hover:text-amber transition-colors"
           title={client.pinned ? 'Désépingler' : 'Épingler'}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill={client.pinned ? '#f59e0b' : 'none'} stroke={client.pinned ? '#f59e0b' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill={client.pinned ? '#f0a33c' : 'none'} stroke={client.pinned ? '#f0a33c' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
           </svg>
         </button>
@@ -244,7 +244,7 @@ export default function ClientsPage() {
       {/* Empty state */}
       {clients.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3d4f63" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6b78" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -290,7 +290,7 @@ export default function ClientsPage() {
               height="14"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#8898aa"
+              stroke="#9b9ba8"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"

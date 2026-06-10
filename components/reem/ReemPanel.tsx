@@ -52,10 +52,10 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
         right: '20px',
         width: 'min(380px, calc(100vw - 40px))',
         height: 'min(540px, calc(100vh - 40px))',
-        backgroundColor: '#0f1117',
-        border: '1px solid rgba(99,102,241,0.25)',
+        backgroundColor: 'rgba(255,255,255,0.055)',
+        border: '1px solid rgba(106,92,255,0.25)',
         borderRadius: '14px',
-        boxShadow: '0 16px 48px rgba(0,0,0,0.5), 0 0 0 6px rgba(99,102,241,0.05)',
+        boxShadow: '0 16px 48px rgba(0,0,0,0.5), 0 0 0 6px rgba(106,92,255,0.05)',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 50,
@@ -78,14 +78,14 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: '#22c55e',
-              boxShadow: '0 0 8px rgba(34,197,94,0.6)',
+              backgroundColor: '#3ddc8b',
+              boxShadow: '0 0 8px rgba(61,220,139,0.6)',
               flexShrink: 0,
             }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#e8edf5', lineHeight: 1.2 }}>Reem AI</div>
-            <div style={{ fontSize: '10px', color: '#8898aa', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#f5f5f8', lineHeight: 1.2 }}>Reem AI</div>
+            <div style={{ fontSize: '10px', color: '#9b9ba8', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               contexte : {context.pageLabel}
             </div>
           </div>
@@ -97,9 +97,9 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
             aria-label={showHistory ? 'Fermer l\'historique' : 'Voir l\'historique'}
             title={showHistory ? 'Chat' : 'Historique'}
             style={{
-              background: showHistory ? 'rgba(99,102,241,0.15)' : 'transparent',
+              background: showHistory ? 'rgba(106,92,255,0.15)' : 'transparent',
               border: 'none',
-              color: showHistory ? '#818cf8' : '#8898aa',
+              color: showHistory ? '#8b7dff' : '#9b9ba8',
               cursor: 'pointer',
               padding: '6px 8px',
               borderRadius: '6px',
@@ -117,7 +117,7 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#8898aa',
+              color: '#9b9ba8',
               cursor: 'pointer',
               padding: '6px 8px',
               borderRadius: '6px',
@@ -135,7 +135,7 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#8898aa',
+              color: '#9b9ba8',
               cursor: 'pointer',
               padding: '6px 10px',
               borderRadius: '6px',
@@ -152,20 +152,20 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
         {showHistory ? (
           <div>
-            <div style={{ fontSize: '11px', color: '#8898aa', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', color: '#9b9ba8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
               Historique — {messages.length} messages
             </div>
             {messages.length === 0 ? (
-              <div style={{ fontSize: '13px', color: '#3d4f63' }}>Aucun historique</div>
+              <div style={{ fontSize: '13px', color: '#6b6b78' }}>Aucun historique</div>
             ) : (
               <button
                 type="button"
                 onClick={clearHistory}
                 style={{
-                  background: 'rgba(244,63,94,0.08)',
-                  border: '1px solid rgba(244,63,94,0.2)',
+                  background: 'rgba(255,99,105,0.08)',
+                  border: '1px solid rgba(255,99,105,0.2)',
                   borderRadius: '6px',
-                  color: '#f43f5e',
+                  color: '#ff8589',
                   padding: '6px 12px',
                   fontSize: '11px',
                   cursor: 'pointer',
@@ -192,7 +192,7 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
             <div
               style={{
                 fontSize: '13px',
-                color: '#e8edf5',
+                color: '#f5f5f8',
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '10px',
@@ -201,7 +201,7 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
               }}
             >
               Bonjour {displayName.split(' ')[0] || ''} 👋<br />
-              <span style={{ color: '#8898aa', fontSize: '12px' }}>Comment puis-je t&apos;aider ?</span>
+              <span style={{ color: '#9b9ba8', fontSize: '12px' }}>Comment puis-je t&apos;aider ?</span>
             </div>
             {showSuggestions && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -216,20 +216,20 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
                       borderRadius: '8px',
                       padding: '8px 12px',
                       fontSize: '12px',
-                      color: '#8898aa',
+                      color: '#9b9ba8',
                       textAlign: 'left',
                       cursor: 'pointer',
                       transition: 'all 150ms',
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.background = 'rgba(99,102,241,0.08)'
-                      e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'
-                      e.currentTarget.style.color = '#e8edf5'
+                      e.currentTarget.style.background = 'rgba(106,92,255,0.08)'
+                      e.currentTarget.style.borderColor = 'rgba(106,92,255,0.25)'
+                      e.currentTarget.style.color = '#f5f5f8'
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
                       e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
-                      e.currentTarget.style.color = '#8898aa'
+                      e.currentTarget.style.color = '#9b9ba8'
                     }}
                   >
                     {s}
@@ -251,7 +251,7 @@ export default function ReemPanel({ onClose, onHide, draftMessage, onDraftChange
               />
             ))}
             {sending && (
-              <div style={{ fontSize: '12px', color: '#8898aa', fontStyle: 'italic' }}>Reem réfléchit…</div>
+              <div style={{ fontSize: '12px', color: '#9b9ba8', fontStyle: 'italic' }}>Reem réfléchit…</div>
             )}
             <div ref={messagesEndRef} />
           </div>

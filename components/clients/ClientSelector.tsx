@@ -38,7 +38,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
         >
           <span
             className="block w-3 h-3 rounded-full shrink-0"
-            style={{ backgroundColor: selectedClient?.color ?? '#3d4f63' }}
+            style={{ backgroundColor: selectedClient?.color ?? '#6b6b78' }}
           />
         </button>
 
@@ -46,7 +46,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           <div
             className="absolute left-full ml-2 top-0 z-50 min-w-[200px] py-1 rounded-lg border shadow-xl"
             style={{
-              background: '#0f1117',
+              background: 'rgba(255,255,255,0.055)',
               borderColor: 'rgba(255,255,255,0.12)',
             }}
           >
@@ -59,7 +59,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
                 }}
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
                 style={{
-                  color: client.id === selectedClient?.id ? '#e8edf5' : '#8898aa',
+                  color: client.id === selectedClient?.id ? '#f5f5f8' : '#9b9ba8',
                   background:
                     client.id === selectedClient?.id
                       ? 'rgba(255,255,255,0.05)'
@@ -93,7 +93,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
                 router.push('/dashboard/clients')
               }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
-              style={{ color: '#6366f1' }}
+              style={{ color: '#6a5cff' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
               }}
@@ -121,7 +121,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           borderColor: open ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.12)',
         }}
       >
-        <span className="text-xs font-medium shrink-0" style={{ color: '#8898aa' }}>
+        <span className="text-xs font-medium shrink-0" style={{ color: '#9b9ba8' }}>
           Client :
         </span>
         {selectedClient ? (
@@ -130,12 +130,12 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
               className="block w-2.5 h-2.5 rounded-full shrink-0"
               style={{ backgroundColor: selectedClient.color }}
             />
-            <span className="truncate" style={{ color: '#e8edf5' }}>
+            <span className="truncate" style={{ color: '#f5f5f8' }}>
               {selectedClient.name}
             </span>
           </span>
         ) : (
-          <span className="italic truncate flex-1 text-left" style={{ color: '#3d4f63' }}>
+          <span className="italic truncate flex-1 text-left" style={{ color: '#6b6b78' }}>
             Sélectionner...
           </span>
         )}
@@ -144,7 +144,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
           height="14"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#8898aa"
+          stroke="#9b9ba8"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -158,7 +158,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
         <div
           className="absolute left-0 right-0 top-full mt-1 z-50 py-1 rounded-lg border shadow-xl"
           style={{
-            background: '#0f1117',
+            background: 'rgba(255,255,255,0.055)',
             borderColor: 'rgba(255,255,255,0.12)',
           }}
         >
@@ -171,7 +171,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
               }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
               style={{
-                color: client.id === selectedClient?.id ? '#e8edf5' : '#8898aa',
+                color: client.id === selectedClient?.id ? '#f5f5f8' : '#9b9ba8',
                 background:
                   client.id === selectedClient?.id
                     ? 'rgba(255,255,255,0.05)'
@@ -205,7 +205,7 @@ export default function ClientSelector({ collapsed }: ClientSelectorProps) {
               router.push('/dashboard/clients')
             }}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors text-left"
-            style={{ color: '#6366f1' }}
+            style={{ color: '#6a5cff' }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
             }}

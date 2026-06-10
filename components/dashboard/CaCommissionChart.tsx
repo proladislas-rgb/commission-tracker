@@ -23,7 +23,7 @@ function tooltipFormatter(value: ValueType | undefined): string {
 }
 
 function legendFormatter(value: string): ReactNode {
-  return <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>
+  return <span style={{ color: '#9b9ba8', fontSize: 12 }}>{value}</span>
 }
 
 export default function CaCommissionChart({ commissions, primes }: Props) {
@@ -58,13 +58,13 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="name" tick={{ fill: '#8898aa', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={yAxisTickFormatter} tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+            <XAxis dataKey="name" tick={{ fill: '#9b9ba8', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={yAxisTickFormatter} tick={{ fill: '#9b9ba8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
               formatter={tooltipFormatter}
-              labelStyle={{ color: '#e8edf5' }}
-              itemStyle={{ color: '#8898aa' }}
+              labelStyle={{ color: '#f5f5f8' }}
+              itemStyle={{ color: '#9b9ba8' }}
             />
             <Legend formatter={legendFormatter} />
             <Bar dataKey="ca" name="CA" fill="url(#barGradientCA)" radius={[4, 4, 0, 0]} />

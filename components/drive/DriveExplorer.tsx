@@ -129,7 +129,7 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
                 onClick={() => navigateToBreadcrumb(i)}
                 className={`transition-colors cursor-pointer ${
                   i === breadcrumb.length - 1
-                    ? 'text-[#818cf8] font-medium'
+                    ? 'text-[#8b7dff] font-medium'
                     : 'text-txt2 hover:text-txt'
                 }`}
               >
@@ -151,18 +151,18 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
             disabled={uploading}
             className="transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: '#6366f1',
-              color: '#e8edf5',
+              backgroundColor: '#6a5cff',
+              color: '#f5f5f8',
               borderRadius: '8px',
               padding: '7px 14px',
               fontSize: '13px',
               fontWeight: 500,
             }}
             onMouseEnter={e => {
-              if (!uploading) e.currentTarget.style.backgroundColor = '#818cf8'
+              if (!uploading) e.currentTarget.style.backgroundColor = '#8b7dff'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.backgroundColor = '#6366f1'
+              e.currentTarget.style.backgroundColor = '#6a5cff'
             }}
           >
             {uploading ? 'Upload en cours...' : 'Upload vers Drive'}
@@ -172,7 +172,7 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
 
       {/* Upload error */}
       {uploadError && (
-        <p className="text-xs mb-4" style={{ color: '#8898aa' }}>{uploadError}</p>
+        <p className="text-xs mb-4" style={{ color: '#9b9ba8' }}>{uploadError}</p>
       )}
 
       {/* Loading */}
@@ -225,9 +225,9 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
                       <div className="flex items-center gap-3">
                         <div
                           className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: 'rgba(245,158,11,0.12)' }}
+                          style={{ backgroundColor: 'rgba(240,163,60,0.12)' }}
                         >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f0a33c" strokeWidth="2">
                             <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
                           </svg>
                         </div>
@@ -245,17 +245,17 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
                           onClick={() => handleDeleteFolder(folder.id)}
                           disabled={deletingFolderId === folder.id}
                           className="px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50"
-                          style={{ backgroundColor: 'rgba(244,63,94,0.15)', color: '#f43f5e' }}
+                          style={{ backgroundColor: 'rgba(255,99,105,0.15)', color: '#ff8589' }}
                         >
                           {deletingFolderId === folder.id ? '...' : 'Confirmer'}
                         </button>
                       ) : (
                         <button
                           onClick={() => setConfirmDeleteFolderId(folder.id)}
-                          className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+                          className="p-1.5 rounded-md hover:bg-[rgba(255,99,105,0.1)] transition-colors cursor-pointer"
                           title="Supprimer"
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
                             <polyline points="3 6 5 6 21 6" />
                             <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
@@ -317,7 +317,7 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
           {/* Vide */}
           {folders.length === 0 && files.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3d4f63" strokeWidth="1.5" className="mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6b78" strokeWidth="1.5" className="mb-4">
                 <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
               </svg>
               <p className="text-sm text-txt2">Ce dossier est vide</p>
@@ -326,7 +326,7 @@ export default function DriveExplorer({ attachMode = false, onAttachFile }: Driv
 
           {/* Erreur (codes OAuth gérés via early-return plus haut) */}
           {error && !isOAuthError(error) && (
-            <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.15)' }}>
+            <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: 'rgba(255,99,105,0.08)', border: '1px solid rgba(255,99,105,0.15)' }}>
               <p className="text-sm text-rose">{error}</p>
             </div>
           )}

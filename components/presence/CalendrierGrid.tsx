@@ -9,9 +9,9 @@ const MOIS_LABELS = [
 ]
 
 const PRESENCE_STYLES: Record<string, { bg: string; border: string; text: string; flag: string }> = {
-  france:  { bg: 'rgba(99,102,241,0.15)', border: 'rgba(99,102,241,0.3)', text: '#818cf8', flag: '🇫🇷' },
-  bahrein: { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)', text: '#f59e0b', flag: '🇧🇭' },
-  autres:  { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)', text: '#10b981', flag: '🌍' },
+  france:  { bg: 'rgba(106,92,255,0.15)', border: 'rgba(106,92,255,0.3)', text: '#8b7dff', flag: '🇫🇷' },
+  bahrein: { bg: 'rgba(240,163,60,0.15)', border: 'rgba(240,163,60,0.3)', text: '#f0a33c', flag: '🇧🇭' },
+  autres:  { bg: 'rgba(61,220,139,0.15)', border: 'rgba(61,220,139,0.3)', text: '#3ddc8b', flag: '🌍' },
 }
 
 interface CalendrierGridProps {
@@ -87,10 +87,10 @@ export default function CalendrierGrid({ year, month, days, onToggle, onChangeMo
         onClick={() => entry != null ? onToggle(entry.index) : undefined}
         className="aspect-square flex flex-col items-center justify-center rounded-[10px] transition-all duration-150 cursor-pointer border"
         style={{
-          backgroundColor: style?.bg ?? '#151a24',
-          borderColor: isToday ? '#6366f1' : (style?.border ?? 'transparent'),
-          color: style?.text ?? '#8898aa',
-          boxShadow: isToday ? '0 0 0 2px #6366f1' : undefined,
+          backgroundColor: style?.bg ?? 'rgba(30,30,38,0.92)',
+          borderColor: isToday ? '#6a5cff' : (style?.border ?? 'transparent'),
+          color: style?.text ?? '#9b9ba8',
+          boxShadow: isToday ? '0 0 0 2px #6a5cff' : undefined,
           gap: '2px',
         }}
         title={presence ? PRESENCE_STYLES[presence].flag : 'Non renseigné'}
@@ -129,8 +129,8 @@ export default function CalendrierGrid({ year, month, days, onToggle, onChangeMo
               onClick={() => onChangeYear(y)}
               className="px-3.5 py-1.5 rounded-[6px] text-[13px] font-medium transition-all cursor-pointer"
               style={{
-                backgroundColor: y === year ? '#6366f1' : 'transparent',
-                color: y === year ? '#ffffff' : '#8898aa',
+                backgroundColor: y === year ? '#6a5cff' : 'transparent',
+                color: y === year ? '#ffffff' : '#9b9ba8',
               }}
             >
               {y}

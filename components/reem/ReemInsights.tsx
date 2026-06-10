@@ -106,7 +106,7 @@ export default function ReemInsights() {
           fontSize: '10px',
           textTransform: 'uppercase',
           letterSpacing: '1.5px',
-          color: '#3d4f63',
+          color: '#6b6b78',
           fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
@@ -118,7 +118,7 @@ export default function ReemInsights() {
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            background: '#818cf8',
+            background: '#8b7dff',
             animation: 'pulse 1.5s ease-in-out infinite',
           }}
         />
@@ -130,9 +130,9 @@ export default function ReemInsights() {
   if (!insights || insights.length === 0) return null
 
   const severityColor: Record<Insight['severity'], string> = {
-    info: '#818cf8',
-    warning: '#f59e0b',
-    alert: '#f43f5e',
+    info: '#8b7dff',
+    warning: '#f0a33c',
+    alert: '#ff8589',
   }
 
   const ageMin = fetchedAt ? Math.floor((Date.now() - fetchedAt) / 60000) : null
@@ -151,7 +151,7 @@ export default function ReemInsights() {
           fontSize: '10px',
           textTransform: 'uppercase',
           letterSpacing: '1.5px',
-          color: '#3d4f63',
+          color: '#6b6b78',
           fontWeight: 600,
           marginBottom: '12px',
           display: 'flex',
@@ -159,11 +159,11 @@ export default function ReemInsights() {
           gap: '8px',
         }}
       >
-        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#818cf8' }} />
+        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#8b7dff' }} />
         <span>Reem observe</span>
-        {loading && <span style={{ color: '#8898aa', textTransform: 'none', letterSpacing: 0 }}>— analyse en cours…</span>}
+        {loading && <span style={{ color: '#9b9ba8', textTransform: 'none', letterSpacing: 0 }}>— analyse en cours…</span>}
         {!loading && ageMin !== null && (
-          <span style={{ color: '#3d4f63', textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
+          <span style={{ color: '#6b6b78', textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
             · il y a {ageMin === 0 ? 'moins d\'une minute' : `${ageMin} min`}
           </span>
         )}
@@ -179,7 +179,7 @@ export default function ReemInsights() {
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '6px',
             padding: '4px 8px',
-            color: '#8898aa',
+            color: '#9b9ba8',
             fontSize: '10px',
             textTransform: 'none',
             letterSpacing: 0,
@@ -192,15 +192,15 @@ export default function ReemInsights() {
           }}
           onMouseEnter={e => {
             if (!loading) {
-              e.currentTarget.style.background = 'rgba(99,102,241,0.08)'
-              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'
-              e.currentTarget.style.color = '#818cf8'
+              e.currentTarget.style.background = 'rgba(106,92,255,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(106,92,255,0.25)'
+              e.currentTarget.style.color = '#8b7dff'
             }
           }}
           onMouseLeave={e => {
             e.currentTarget.style.background = 'transparent'
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
-            e.currentTarget.style.color = '#8898aa'
+            e.currentTarget.style.color = '#9b9ba8'
           }}
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -237,9 +237,9 @@ export default function ReemInsights() {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span style={{ fontSize: '16px' }}>{insight.icon}</span>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#e8edf5' }}>{insight.title}</div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#f5f5f8' }}>{insight.title}</div>
             </div>
-            <div style={{ fontSize: '12px', color: '#8898aa', lineHeight: 1.5, marginBottom: '8px' }}>
+            <div style={{ fontSize: '12px', color: '#9b9ba8', lineHeight: 1.5, marginBottom: '8px' }}>
               {insight.description}
             </div>
             <div style={{ fontSize: '11px', color: severityColor[insight.severity], fontWeight: 500 }}>

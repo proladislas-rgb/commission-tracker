@@ -133,7 +133,7 @@ function WorkspaceContent() {
           className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
           style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b7dff" strokeWidth="1.5">
             <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
           </svg>
         </div>
@@ -147,7 +147,7 @@ function WorkspaceContent() {
           href="/api/auth/google?redirect=/dashboard/workspace"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-200"
           style={{
-            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+            background: 'linear-gradient(135deg, #8b7dff, #6a5cff)',
             boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
           }}
         >
@@ -196,9 +196,9 @@ function WorkspaceContent() {
             bottom: '24px',
             left: '50%',
             transform: 'translateX(-50%)',
-            backgroundColor: '#151a24',
-            border: '1px solid rgba(99,102,241,0.3)',
-            color: '#e8edf5',
+            backgroundColor: 'rgba(30,30,38,0.92)',
+            border: '1px solid rgba(106,92,255,0.3)',
+            color: '#f5f5f8',
             padding: '12px 20px',
             borderRadius: '10px',
             fontSize: '13px',

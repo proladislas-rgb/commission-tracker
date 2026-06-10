@@ -137,7 +137,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
 
           <div
             style={{
-              backgroundColor: isOwn ? (isFile ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)') : '#151a24',
+              backgroundColor: isOwn ? (isFile ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)') : 'rgba(30,30,38,0.92)',
               border: `0.5px solid ${isOwn ? 'rgba(255,255,255,0.15)' : (isFile ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.07)')}`,
               borderRadius: '10px',
               padding: isFile ? '8px 10px' : '8px 12px',

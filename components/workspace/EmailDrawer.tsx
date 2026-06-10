@@ -41,7 +41,7 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
         bottom: 0,
         width: 'min(460px, 100vw)',
         maxWidth: '100vw',
-        backgroundColor: '#0f1117',
+        backgroundColor: 'rgba(255,255,255,0.055)',
         borderLeft: '1px solid rgba(255,255,255,0.07)',
         boxShadow: '-12px 0 40px rgba(0,0,0,0.5)',
         transform: open ? 'translateX(0)' : 'translateX(100%)',
@@ -67,8 +67,8 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: '#6366f1',
-              boxShadow: '0 0 10px rgba(99,102,241,0.6)',
+              backgroundColor: '#6a5cff',
+              boxShadow: '0 0 10px rgba(106,92,255,0.6)',
             }}
           />
           <h2 className="text-sm font-semibold text-txt">Nouveau message</h2>
@@ -85,9 +85,9 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
               title={confirmDiscard ? 'Confirmer la suppression' : 'Supprimer le brouillon'}
               className="cursor-pointer rounded-md transition-colors flex items-center gap-1.5"
               style={{
-                background: confirmDiscard ? 'rgba(244,63,94,0.15)' : 'transparent',
-                border: `1px solid ${confirmDiscard ? 'rgba(244,63,94,0.3)' : 'transparent'}`,
-                color: confirmDiscard ? '#f43f5e' : '#8898aa',
+                background: confirmDiscard ? 'rgba(255,99,105,0.15)' : 'transparent',
+                border: `1px solid ${confirmDiscard ? 'rgba(255,99,105,0.3)' : 'transparent'}`,
+                color: confirmDiscard ? '#ff8589' : '#9b9ba8',
                 padding: confirmDiscard ? '5px 10px' : '6px 8px',
                 fontSize: '11px',
                 fontWeight: confirmDiscard ? 600 : 400,
@@ -95,14 +95,14 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
               }}
               onMouseEnter={e => {
                 if (!confirmDiscard) {
-                  e.currentTarget.style.backgroundColor = 'rgba(244,63,94,0.08)'
-                  e.currentTarget.style.color = '#f43f5e'
+                  e.currentTarget.style.backgroundColor = 'rgba(255,99,105,0.08)'
+                  e.currentTarget.style.color = '#ff8589'
                 }
               }}
               onMouseLeave={e => {
                 if (!confirmDiscard) {
                   e.currentTarget.style.backgroundColor = 'transparent'
-                  e.currentTarget.style.color = '#8898aa'
+                  e.currentTarget.style.color = '#9b9ba8'
                 }
               }}
             >
@@ -122,7 +122,7 @@ export default function EmailDrawer({ open, draft, onDraftChange, onClose, onSen
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#8898aa',
+              color: '#9b9ba8',
               padding: '6px 10px',
               fontSize: '16px',
               lineHeight: 1,

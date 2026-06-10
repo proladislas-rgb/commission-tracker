@@ -18,10 +18,10 @@ export default function ReemPullTab({ onClick }: ReemPullTabProps) {
         transform: 'translateY(-50%)',
         width: '22px',
         height: '60px',
-        background: 'rgba(99,102,241,0.18)',
-        borderTop: '1px solid rgba(99,102,241,0.4)',
-        borderLeft: '1px solid rgba(99,102,241,0.4)',
-        borderBottom: '1px solid rgba(99,102,241,0.4)',
+        background: 'rgba(106,92,255,0.18)',
+        borderTop: '1px solid rgba(106,92,255,0.4)',
+        borderLeft: '1px solid rgba(106,92,255,0.4)',
+        borderBottom: '1px solid rgba(106,92,255,0.4)',
         borderRight: 'none',
         borderTopLeftRadius: '8px',
         borderBottomLeftRadius: '8px',
@@ -32,11 +32,11 @@ export default function ReemPullTab({ onClick }: ReemPullTabProps) {
         justifyContent: 'center',
         gap: '4px',
         zIndex: 40,
-        color: '#818cf8',
+        color: '#8b7dff',
         transition: 'background-color 150ms ease',
       }}
-      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.28)' }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.18)' }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(106,92,255,0.28)' }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(106,92,255,0.18)' }}
     >
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="15 18 9 12 15 6" />

@@ -36,28 +36,28 @@ export default function WorkspaceHeader({ hasDraft, attachmentCount, drawerOpen,
         style={
           hasDraft
             ? {
-                backgroundColor: 'rgba(99,102,241,0.15)',
-                color: '#818cf8',
-                border: '1px solid rgba(99,102,241,0.3)',
+                backgroundColor: 'rgba(106,92,255,0.15)',
+                color: '#8b7dff',
+                border: '1px solid rgba(106,92,255,0.3)',
                 boxShadow: 'none',
               }
             : {
-                background: 'linear-gradient(135deg, #6366f1, #818cf8)',
-                boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+                background: 'linear-gradient(135deg, #6a5cff, #8b7dff)',
+                boxShadow: '0 4px 12px rgba(106,92,255,0.3)',
               }
         }
         onMouseEnter={e => {
           if (hasDraft) {
-            e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.22)'
+            e.currentTarget.style.backgroundColor = 'rgba(106,92,255,0.22)'
           } else {
-            e.currentTarget.style.boxShadow = '0 4px 20px rgba(99,102,241,0.45)'
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(106,92,255,0.45)'
           }
         }}
         onMouseLeave={e => {
           if (hasDraft) {
-            e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.15)'
+            e.currentTarget.style.backgroundColor = 'rgba(106,92,255,0.15)'
           } else {
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99,102,241,0.3)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(106,92,255,0.3)'
           }
         }}
       >
@@ -71,8 +71,8 @@ export default function WorkspaceHeader({ hasDraft, attachmentCount, drawerOpen,
             {attachmentCount > 0 && (
               <span
                 style={{
-                  backgroundColor: 'rgba(245,158,11,0.18)',
-                  color: '#f59e0b',
+                  backgroundColor: 'rgba(240,163,60,0.18)',
+                  color: '#f0a33c',
                   fontSize: '10px',
                   fontWeight: 700,
                   padding: '1px 6px',

@@ -11,12 +11,12 @@ interface DriveFileRowProps {
 }
 
 const TYPE_STYLES: Record<string, { color: string; label: string }> = {
-  'application/pdf': { color: '#f43f5e', label: 'PDF' },
-  'application/vnd.google-apps.document': { color: '#38bdf8', label: 'Doc' },
-  'application/vnd.google-apps.spreadsheet': { color: '#10b981', label: 'Sheet' },
-  'application/vnd.google-apps.presentation': { color: '#f59e0b', label: 'Slides' },
-  'image/': { color: '#818cf8', label: 'Image' },
-  'video/': { color: '#f43f5e', label: 'Vidéo' },
+  'application/pdf': { color: '#ff8589', label: 'PDF' },
+  'application/vnd.google-apps.document': { color: '#5ea2ff', label: 'Doc' },
+  'application/vnd.google-apps.spreadsheet': { color: '#3ddc8b', label: 'Sheet' },
+  'application/vnd.google-apps.presentation': { color: '#f0a33c', label: 'Slides' },
+  'image/': { color: '#8b7dff', label: 'Image' },
+  'video/': { color: '#ff8589', label: 'Vidéo' },
 }
 
 function getTypeStyle(mimeType: string): { color: string; label: string } {
@@ -24,7 +24,7 @@ function getTypeStyle(mimeType: string): { color: string; label: string } {
   for (const [prefix, style] of Object.entries(TYPE_STYLES)) {
     if (mimeType.startsWith(prefix)) return style
   }
-  return { color: '#8898aa', label: 'Fichier' }
+  return { color: '#9b9ba8', label: 'Fichier' }
 }
 
 function formatSize(bytes: string | undefined): string {
@@ -108,7 +108,7 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
             className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Ouvrir dans Drive"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
@@ -121,7 +121,7 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
             className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Télécharger"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -134,12 +134,12 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
               onClick={() => onAttach(file)}
               className="px-2 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors flex items-center gap-1"
               style={{
-                backgroundColor: 'rgba(99,102,241,0.15)',
-                color: '#818cf8',
-                border: '1px solid rgba(99,102,241,0.25)',
+                backgroundColor: 'rgba(106,92,255,0.15)',
+                color: '#8b7dff',
+                border: '1px solid rgba(106,92,255,0.25)',
               }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.22)' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.15)' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(106,92,255,0.22)' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(106,92,255,0.15)' }}
               title="Joindre au brouillon en cours"
             >
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -157,7 +157,7 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
             className="p-1.5 rounded-md hover:bg-[rgba(255,255,255,0.07)] transition-colors cursor-pointer"
             title="Envoyer par email"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -167,10 +167,10 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
           {!confirmDelete ? (
             <button
               onClick={() => setConfirmDelete(true)}
-              className="p-1.5 rounded-md hover:bg-[rgba(244,63,94,0.1)] transition-colors cursor-pointer"
+              className="p-1.5 rounded-md hover:bg-[rgba(255,99,105,0.1)] transition-colors cursor-pointer"
               title="Supprimer"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8898aa" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b9ba8" strokeWidth="2">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
               </svg>
@@ -180,7 +180,7 @@ export default function DriveFileRow({ file, onDelete, attachMode = false, onAtt
               onClick={handleDelete}
               disabled={deleting}
               className="px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50"
-              style={{ backgroundColor: 'rgba(244,63,94,0.15)', color: '#f43f5e' }}
+              style={{ backgroundColor: 'rgba(255,99,105,0.15)', color: '#ff8589' }}
             >
               {deleting ? '...' : 'Confirmer'}
             </button>

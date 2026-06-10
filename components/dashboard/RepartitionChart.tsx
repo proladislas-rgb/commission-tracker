@@ -17,7 +17,7 @@ function tooltipFormatter(value: ValueType | undefined): string {
 }
 
 function legendFormatter(value: string): ReactNode {
-  return <span style={{ color: '#8898aa', fontSize: 12 }}>{value}</span>
+  return <span style={{ color: '#9b9ba8', fontSize: 12 }}>{value}</span>
 }
 
 export default function RepartitionChart({ commissions, primes }: Props) {
@@ -58,8 +58,8 @@ export default function RepartitionChart({ commissions, primes }: Props) {
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
               formatter={tooltipFormatter}
-              labelStyle={{ color: '#e8edf5' }}
-              itemStyle={{ color: '#8898aa' }}
+              labelStyle={{ color: '#f5f5f8' }}
+              itemStyle={{ color: '#9b9ba8' }}
             />
             <Legend formatter={legendFormatter} />
           </PieChart>
