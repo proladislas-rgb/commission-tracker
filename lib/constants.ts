@@ -8,10 +8,12 @@ export const PRIME_COLORS = [
 ]
 
 export const CHART_TOOLTIP_STYLE = {
-  backgroundColor: '#151a24',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 8,
-  padding: 10,
+  backgroundColor: 'rgba(20,20,26,0.92)',
+  backdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.13)',
+  borderRadius: '14px',
+  boxShadow: '0 12px 44px rgba(0,0,0,0.4)',
+  fontSize: '12px',
 }
 
 export function slugifyPrimeName(name: string): string {

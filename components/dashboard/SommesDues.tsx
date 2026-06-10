@@ -18,8 +18,8 @@ interface Props {
 }
 
 const STATUS_STYLES: Record<SommeDueStatus, { bg: string; color: string; border: string }> = {
-  du:       { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
-  effectue: { bg: 'rgba(34,197,94,0.1)',  color: '#22c55e', border: 'rgba(34,197,94,0.3)' },
+  du:       { bg: 'rgba(240,163,60,0.13)', color: '#f0a33c', border: 'rgba(240,163,60,0.26)' },
+  effectue: { bg: 'rgba(61,220,139,0.12)', color: '#3ddc8b', border: 'rgba(61,220,139,0.24)' },
 }
 
 export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, onAdd, onUpdateStatus, onDelete }: Props) {
@@ -42,14 +42,14 @@ export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, o
   return (
     <section id="sommes-dues" className="mb-8 animate-fadeIn">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold">Montants à percevoir</h2>
+        <h2 className="text-[13.5px] font-bold text-lg-text tracking-[-0.01em]">Montants à percevoir</h2>
         {(isAssociate || isAdmin) && (
           <Button size="sm" onClick={() => setShowModal(true)}>+ Nouveau montant</Button>
         )}
       </div>
 
       {sommesDues.length > 0 && (
-        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="glass overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
@@ -110,7 +110,7 @@ export default function SommesDues({ sommesDues, userId, isAssociate, isAdmin, o
       )}
 
       {sommesDues.length === 0 && (
-        <div className="rounded-card p-6 text-center text-txt3 text-sm" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="glass p-6 text-center text-lg-muted text-sm">
           Aucun montant à percevoir
         </div>
       )}

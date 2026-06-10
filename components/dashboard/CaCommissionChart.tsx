@@ -38,7 +38,7 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
   }).filter(d => d.ca > 0), [commissions, primes])
 
   return (
-    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="glass p-5 min-h-[300px]">
       <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         CA vs Commissions par prime
       </h3>
@@ -49,11 +49,11 @@ export default function CaCommissionChart({ commissions, primes }: Props) {
           <BarChart data={data} margin={{ left: 0, right: 0 }}>
             <defs>
               <linearGradient id="barGradientCA" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8} />
+                <stop offset="0%" stopColor="#6a5cff" stopOpacity={1} />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.85} />
               </linearGradient>
               <linearGradient id="barGradientComm" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                <stop offset="0%" stopColor="#3ddc8b" stopOpacity={1} />
                 <stop offset="100%" stopColor="#059669" stopOpacity={0.8} />
               </linearGradient>
             </defs>

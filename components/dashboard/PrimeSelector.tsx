@@ -70,9 +70,9 @@ export default function PrimeSelector({
         onChange={e => onChange(e.target.value)}
         className="w-full bg-raised border border-border rounded-btn px-3 py-2 text-sm text-txt outline-none transition-all duration-150 cursor-pointer focus:border-indigo focus:ring-1 focus:ring-indigo/30"
       >
-        <option value="" className="bg-surface">Sélectionner une prime</option>
+        <option value="" className="bg-[#15151c]">Sélectionner une prime</option>
         {primes.map(p => (
-          <option key={p.id} value={p.id} className="bg-surface">
+          <option key={p.id} value={p.id} className="bg-[#15151c]">
             {p.icon} {p.name}
           </option>
         ))}
@@ -112,14 +112,14 @@ export default function PrimeSelector({
               placeholder="Nom de la prime"
               value={newPrime.name}
               onChange={e => setNewPrime(p => ({ ...p, name: e.target.value }))}
-              className="flex-1 bg-surface border border-border rounded-btn px-2.5 py-1.5 text-sm text-txt outline-none focus:border-indigo"
+              className="flex-1 bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-2.5 py-1.5 text-sm text-lg-text outline-none focus:border-lg-accent-1"
             />
             <input
               type="text"
               placeholder="🔥"
               value={newPrime.icon}
               onChange={e => setNewPrime(p => ({ ...p, icon: e.target.value }))}
-              className="w-12 bg-surface border border-border rounded-btn px-2 py-1.5 text-sm text-txt text-center outline-none focus:border-indigo"
+              className="w-12 bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-2 py-1.5 text-sm text-lg-text text-center outline-none focus:border-lg-accent-1"
               maxLength={4}
             />
           </div>

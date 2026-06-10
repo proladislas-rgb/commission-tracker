@@ -90,7 +90,7 @@ export default function SeedButton({ userId, onImported }: Props) {
       <div className="mb-6">
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo/10 border border-indigo/30 rounded-card text-sm text-indigo hover:bg-indigo/20 transition-all duration-150 cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[rgba(106,92,255,0.12)] border border-[rgba(106,92,255,0.30)] rounded-full text-sm text-[#8b7dff] hover:bg-[rgba(106,92,255,0.20)] transition-all duration-150 cursor-pointer"
         >
           <span>⚡</span>
           <span className="font-medium">Importer les données initiales</span>
@@ -106,7 +106,7 @@ export default function SeedButton({ userId, onImported }: Props) {
           {/* Commissions */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold mb-2">Commissions — déc. 2025</p>
-            <div className="bg-raised rounded-card p-3 space-y-1.5">
+            <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-3 space-y-1.5">
               {COMMISSIONS_DATA.map(c => (
                 <div key={c.prime_id} className="flex justify-between text-sm">
                   <span className="text-txt">
@@ -132,7 +132,7 @@ export default function SeedButton({ userId, onImported }: Props) {
           {/* Paiements */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold mb-2">Paiements reçus</p>
-            <div className="bg-raised rounded-card p-3 space-y-1.5">
+            <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-3 space-y-1.5">
               {PAIEMENTS_DATA.map(p => (
                 <div key={p.date} className="flex justify-between text-sm">
                   <span className="text-txt">{p.label}</span>
@@ -149,7 +149,7 @@ export default function SeedButton({ userId, onImported }: Props) {
           </div>
 
           {/* Récap */}
-          <div className="bg-indigo/5 border border-indigo/20 rounded-card p-4 grid grid-cols-2 gap-2 text-sm">
+          <div className="bg-[rgba(106,92,255,0.08)] border border-[rgba(106,92,255,0.20)] rounded-2xl p-4 grid grid-cols-2 gap-2 text-sm">
             <div><span className="text-txt2">CA total :</span> <span className="font-bold text-txt">{formatCurrency(totalCA)}</span></div>
             <div><span className="text-txt2">Commissions :</span> <span className="font-bold text-amber">{formatCurrency(totalCommissions)}</span></div>
             <div><span className="text-txt2">Encaissé :</span> <span className="font-bold text-green">{formatCurrency(totalPaye)}</span></div>

@@ -57,6 +57,17 @@ const EMPTY_PRIME_FORM = {
 
 const PAGE_SIZE = 10
 
+/** Initiales d'une prime pour la pastille (façon Revolut) : "Vélo cargo" → "VC". */
+function primeInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 3)
+}
+
 export default function CommissionTable({
   commissions, primes, userId, isAssociate, isAdmin,
   onAdd, onUpdate, onDelete, onCreatePrime, onDeletePrime, onCreatePrimeWithCommission,
@@ -251,17 +262,17 @@ export default function CommissionTable({
     <section id="commissions" className="mb-8 animate-fadeIn">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <h2 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold mr-2">Commissions</h2>
+          <h2 className="text-[13.5px] font-bold text-lg-text tracking-[-0.01em] mr-2">Commissions</h2>
           {/* Filtres pills */}
-          {[{ id: 'all', label: 'Tout', color: '#6366f1' }, ...primes.map(p => ({ id: p.id, label: `${p.icon} ${p.name}`, color: p.color }))].map(f => (
+          {[{ id: 'all', label: 'Tout', color: '#8b7dff' }, ...primes.map(p => ({ id: p.id, label: `${p.icon} ${p.name}`, color: p.color }))].map(f => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
+              className="px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer"
               style={
                 filter === f.id
                   ? { backgroundColor: `${f.color}22`, color: f.color, border: `1px solid ${f.color}44` }
-                  : { backgroundColor: 'rgba(255,255,255,0.02)', color: '#8898aa', border: '1px solid rgba(255,255,255,0.07)' }
+                  : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#9b9ba8', border: '1px solid rgba(255,255,255,0.10)' }
               }
             >
               {f.label}
@@ -271,11 +282,11 @@ export default function CommissionTable({
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(f => !f)}
-            className="px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all duration-150 cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer flex items-center gap-1.5"
             style={{
-              backgroundColor: showFilters || hasAdvancedFilters ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.04)',
-              color: showFilters || hasAdvancedFilters ? '#6366f1' : '#8898aa',
-              border: `1px solid ${showFilters || hasAdvancedFilters ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.07)'}`,
+              backgroundColor: showFilters || hasAdvancedFilters ? 'rgba(106,92,255,0.14)' : 'rgba(255,255,255,0.06)',
+              color: showFilters || hasAdvancedFilters ? '#8b7dff' : '#9b9ba8',
+              border: `1px solid ${showFilters || hasAdvancedFilters ? 'rgba(106,92,255,0.30)' : 'rgba(255,255,255,0.10)'}`,
             }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -283,7 +294,7 @@ export default function CommissionTable({
             </svg>
             Filtres
             {hasAdvancedFilters && (
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo" />
+              <span className="w-1.5 h-1.5 rounded-full bg-lg-accent-1" />
             )}
           </button>
           {isAdmin && (
@@ -297,10 +308,7 @@ export default function CommissionTable({
 
       {/* Barre de filtres avancés */}
       {showFilters && (
-        <div
-          className="mb-4 rounded-[14px] p-4 animate-fadeIn"
-          style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}
-        >
+        <div className="mb-4 glass p-4 animate-fadeIn">
           <div className="flex flex-col gap-4">
             {/* Ligne 1 : Statut */}
             <div>
@@ -313,8 +321,8 @@ export default function CommissionTable({
                     className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
                     style={
                       statusFilter.has(s.value)
-                        ? { backgroundColor: 'rgba(99,102,241,0.15)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)' }
-                        : { backgroundColor: 'rgba(255,255,255,0.02)', color: '#8898aa', border: '1px solid rgba(255,255,255,0.07)' }
+                        ? { backgroundColor: 'rgba(106,92,255,0.15)', color: '#8b7dff', border: '1px solid rgba(106,92,255,0.30)' }
+                        : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#9b9ba8', border: '1px solid rgba(255,255,255,0.10)' }
                     }
                   >
                     {s.label}
@@ -331,7 +339,7 @@ export default function CommissionTable({
                   type="month"
                   value={moisFrom}
                   onChange={e => setMoisFrom(e.target.value)}
-                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                  className="w-full bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-3 py-2 text-sm text-lg-text outline-none focus:border-lg-accent-1 transition-colors"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -340,7 +348,7 @@ export default function CommissionTable({
                   type="month"
                   value={moisTo}
                   onChange={e => setMoisTo(e.target.value)}
-                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                  className="w-full bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-3 py-2 text-sm text-lg-text outline-none focus:border-lg-accent-1 transition-colors"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -350,7 +358,7 @@ export default function CommissionTable({
                   placeholder="0"
                   value={caMin}
                   onChange={e => setCaMin(e.target.value)}
-                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                  className="w-full bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-3 py-2 text-sm text-lg-text outline-none focus:border-lg-accent-1 transition-colors"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -360,7 +368,7 @@ export default function CommissionTable({
                   placeholder="999999"
                   value={caMax}
                   onChange={e => setCaMax(e.target.value)}
-                  className="w-full bg-raised border border-border rounded-[8px] px-3 py-2 text-sm text-txt outline-none focus:border-indigo transition-colors"
+                  className="w-full bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-3 py-2 text-sm text-lg-text outline-none focus:border-lg-accent-1 transition-colors"
                 />
               </div>
             </div>
@@ -370,7 +378,7 @@ export default function CommissionTable({
               <div className="flex justify-end">
                 <button
                   onClick={resetAllFilters}
-                  className="px-3 py-1.5 rounded-[8px] text-xs font-medium text-rose hover:bg-rose/10 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-[8px] text-xs font-semibold text-lg-danger hover:bg-[rgba(255,99,105,0.10)] transition-colors cursor-pointer"
                 >
                   Réinitialiser
                 </button>
@@ -380,7 +388,7 @@ export default function CommissionTable({
         </div>
       )}
 
-      <div className="rounded-card overflow-hidden shadow-card" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="glass overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -411,16 +419,22 @@ export default function CommissionTable({
                       }}
                     >
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                           <span
-                            className="w-2 h-2 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: prime?.color }}
-                          />
-                          <span className="text-txt">{prime?.icon} {prime?.name ?? c.prime_id}</span>
+                            className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-extrabold tracking-[0.02em]"
+                            style={{
+                              backgroundColor: `${prime?.color ?? '#6a5cff'}24`,
+                              border: `1px solid ${prime?.color ?? '#6a5cff'}45`,
+                              color: prime?.color ?? '#8b7dff',
+                            }}
+                          >
+                            {prime ? primeInitials(prime.name) : '?'}
+                          </span>
+                          <span className="text-lg-text font-semibold">{prime?.name ?? c.prime_id}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-txt">{formatCurrency(Number(c.ca))}</td>
-                      <td className="px-4 py-3 text-amber">{formatCurrency(Number(c.commission))}</td>
+                      <td className="px-4 py-3 text-lg-text-2">{formatCurrency(Number(c.ca))}</td>
+                      <td className="px-4 py-3 font-bold text-lg-text">{formatCurrency(Number(c.commission))}</td>
                       <td className="px-4 py-3 text-txt2">{Number(c.dossiers).toLocaleString('fr-FR')}</td>
                       <td className="px-4 py-3 text-txt2">{formatMois(c.mois)}</td>
                       <td className="px-4 py-3"><CommissionStatusBadge status={c.status} /></td>
@@ -429,7 +443,7 @@ export default function CommissionTable({
                           {canEdit(c) && (
                             <button
                               onClick={() => openEdit(c)}
-                              className="p-1.5 rounded-btn text-txt2 hover:text-indigo hover:bg-indigo/10 transition-colors"
+                              className="p-1.5 rounded-full text-lg-muted hover:text-lg-info hover:bg-[rgba(106,141,255,0.10)] transition-colors"
                               title="Modifier"
                             >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -441,7 +455,7 @@ export default function CommissionTable({
                           {canDelete(c) && (
                             <button
                               onClick={() => setDeleteTarget(c)}
-                              className="p-1.5 rounded-btn text-txt2 hover:text-rose hover:bg-rose/10 transition-colors"
+                              className="p-1.5 rounded-full text-lg-muted hover:text-lg-danger hover:bg-[rgba(255,99,105,0.10)] transition-colors"
                               title="Supprimer"
                             >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -463,7 +477,7 @@ export default function CommissionTable({
                 <tr style={{ borderTop: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
                   <td className="px-4 py-3 text-[10px] uppercase tracking-[0.9px] text-txt2 font-bold">Total</td>
                   <td className="px-4 py-3 font-bold text-txt">{formatCurrency(totals.ca)}</td>
-                  <td className="px-4 py-3 font-bold text-amber">{formatCurrency(totals.commission)}</td>
+                  <td className="px-4 py-3 font-extrabold text-lg-text">{formatCurrency(totals.commission)}</td>
                   <td className="px-4 py-3 font-bold text-txt2">{totals.dossiers.toLocaleString('fr-FR')}</td>
                   <td colSpan={3} />
                 </tr>
@@ -482,14 +496,14 @@ export default function CommissionTable({
               <button
                 disabled={page === 0}
                 onClick={() => setPage(p => p - 1)}
-                className="px-3 py-1 text-xs rounded-[8px] text-txt2 hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-3.5 py-1 text-xs font-semibold rounded-full text-lg-muted bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.09)] hover:text-lg-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Précédent
               </button>
               <button
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage(p => p + 1)}
-                className="px-3 py-1 text-xs rounded-[8px] text-txt2 hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-3.5 py-1 text-xs font-semibold rounded-full text-lg-muted bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.09)] hover:text-lg-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Suivant
               </button>
@@ -574,7 +588,7 @@ export default function CommissionTable({
       >
         <div className="flex flex-col gap-4">
           {primeError && (
-            <div className="bg-rose/10 border border-rose/30 rounded-btn px-3 py-2 text-sm text-rose">
+            <div className="bg-[rgba(255,99,105,0.13)] border border-[rgba(255,99,105,0.22)] rounded-[12px] px-3 py-2 text-sm text-lg-danger">
               {primeError}
             </div>
           )}
@@ -594,7 +608,7 @@ export default function CommissionTable({
                 placeholder="🔥"
                 value={primeForm.icon}
                 onChange={e => setPrimeForm(f => ({ ...f, icon: e.target.value }))}
-                className="w-full bg-raised border border-border rounded-btn px-2 py-2 text-sm text-txt text-center outline-none focus:border-indigo"
+                className="w-full bg-[rgba(0,0,0,0.30)] border border-[rgba(255,255,255,0.10)] rounded-[12px] px-2 py-2 text-sm text-lg-text text-center outline-none focus:border-lg-accent-1"
                 maxLength={4}
               />
             </div>

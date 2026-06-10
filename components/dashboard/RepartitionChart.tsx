@@ -33,7 +33,7 @@ export default function RepartitionChart({ commissions, primes }: Props) {
   }).filter(d => d.value > 0), [commissions, primes])
 
   return (
-    <div className="rounded-card p-5 shadow-card min-h-[300px] transition-shadow duration-300" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="glass p-5 min-h-[300px]">
       <h3 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-medium mb-4">
         Répartition CA par prime
       </h3>

@@ -23,9 +23,9 @@ interface Props {
 }
 
 const STATUS_STYLES: Record<PaiementStatus, { bg: string; color: string; border: string }> = {
-  effectue:   { bg: 'rgba(34,197,94,0.1)',  color: '#22c55e', border: 'rgba(34,197,94,0.3)' },
-  en_attente: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
-  en_retard:  { bg: 'rgba(244,63,94,0.1)',  color: '#f43f5e', border: 'rgba(244,63,94,0.3)' },
+  effectue:   { bg: 'rgba(61,220,139,0.12)', color: '#3ddc8b', border: 'rgba(61,220,139,0.24)' },
+  en_attente: { bg: 'rgba(240,163,60,0.13)', color: '#f0a33c', border: 'rgba(240,163,60,0.26)' },
+  en_retard:  { bg: 'rgba(255,99,105,0.13)', color: '#ff8589', border: 'rgba(255,99,105,0.22)' },
 }
 
 const STATUS_OPTIONS = [
@@ -86,7 +86,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
   return (
     <section id="paiements" className="mb-8 animate-fadeIn">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[10px] uppercase tracking-[0.9px] text-txt2 font-semibold">Suivi paiements</h2>
+        <h2 className="text-[13.5px] font-bold text-lg-text tracking-[-0.01em]">Suivi paiements</h2>
         {isAssociate && (
           <Button size="sm" onClick={() => setShowModal(true)}>+ Nouveau paiement</Button>
         )}
@@ -95,16 +95,14 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
       {/* 3 mini-cards */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {[
-          { label: 'Encaissé',   value: encaisse,  color: '#22c55e' },
-          { label: 'En attente', value: enAttente, color: '#f59e0b' },
-          { label: 'En retard',  value: enRetard,  color: '#f43f5e' },
+          { label: 'Encaissé',   value: encaisse,  color: '#3ddc8b' },
+          { label: 'En attente', value: enAttente, color: '#f0a33c' },
+          { label: 'En retard',  value: enRetard,  color: '#ff8589' },
         ].map(item => (
           <div
             key={item.label}
-            className="rounded-[20px] p-4 min-h-[80px] relative overflow-hidden transition-shadow duration-300"
-            style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}
+            className="glass p-4 min-h-[80px] relative overflow-hidden"
           >
-            <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}88)` }} />
             <p className="text-[10px] uppercase tracking-[0.9px] font-medium mb-1" style={{ color: item.color }}>
               {item.label}
             </p>
@@ -114,17 +112,17 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
       </div>
 
       {/* Barre de progression */}
-      <div className="rounded-card p-4 mb-4 min-h-[80px]" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="glass p-4 mb-4 min-h-[80px]">
         <div className="flex justify-between text-xs text-txt2 mb-2">
           <span>Progression encaissement</span>
           <span className="font-semibold text-txt">{progress.toFixed(1)}%</span>
         </div>
-        <div className="h-2 bg-raised rounded-full overflow-hidden">
+        <div className="h-2 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
           <div
             className="h-full rounded-full will-change-transform"
             style={{
               width: mounted ? `${progress}%` : '0%',
-              background: 'linear-gradient(90deg, #6366f1, #10b981)',
+              background: 'linear-gradient(90deg, #6a5cff, #3b82f6)',
               transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
@@ -137,22 +135,22 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
       {/* Graphique */}
       {chartData.length > 0 && (
-        <div className="rounded-card p-4 mb-4 min-h-[220px]" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="glass p-4 mb-4 min-h-[220px]">
           <ResponsiveContainer width="100%" height={180}>
             <ComposedChart data={chartData} margin={{ left: 0, right: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="date" tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#8898aa', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
+              <XAxis dataKey="date" tick={{ fill: '#9b9ba8', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#9b9ba8', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={CHART_TOOLTIP_STYLE}
                 formatter={(value) => formatCurrency(Number(value))}
-                labelStyle={{ color: '#e8edf5' }}
-                itemStyle={{ color: '#8898aa' }}
+                labelStyle={{ color: '#f5f5f8' }}
+                itemStyle={{ color: '#9b9ba8' }}
               />
-              <Bar dataKey="montant" name="Montant" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-              <Line dataKey="cumul" name="Cumul" stroke="#10b981" strokeWidth={2} dot={false} />
+              <Bar dataKey="montant" name="Montant" fill="#6a5cff" radius={[4, 4, 0, 0]} />
+              <Line dataKey="cumul" name="Cumul" stroke="#3ddc8b" strokeWidth={2} dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -160,7 +158,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
 
       {/* Liste paiements */}
       {paiements.length > 0 && (
-        <div className="rounded-card overflow-hidden" style={{ backgroundColor: '#0f1117', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="glass overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
@@ -176,7 +174,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                 <tr key={p.id} className="border-t border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.04)] transition-colors duration-300 even:bg-[rgba(255,255,255,0.01)]">
                   <td className="px-4 py-2.5 text-txt2">{formatDate(p.date)}</td>
                   <td className="px-4 py-2.5 text-txt">{p.label}</td>
-                  <td className="px-4 py-2.5 font-semibold text-txt">{formatCurrency(Number(p.montant))}</td>
+                  <td className="px-4 py-2.5 font-bold text-lg-text">{formatCurrency(Number(p.montant))}</td>
                   <td className="px-4 py-2.5">
                     <select
                       value={p.status}
@@ -185,7 +183,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                         backgroundColor: STATUS_STYLES[p.status].bg,
                         color: STATUS_STYLES[p.status].color,
                         border: `1px solid ${STATUS_STYLES[p.status].border}`,
-                        borderRadius: '6px',
+                        borderRadius: '999px',
                         padding: '4px 8px',
                         fontSize: '11px',
                         fontWeight: 600,
@@ -205,7 +203,7 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
                       onClick={() => {
                         if (window.confirm('Supprimer ce paiement ?')) onDelete(p.id)
                       }}
-                      className="p-1 rounded-[6px] text-txt3 hover:text-rose hover:bg-rose/10 transition-all duration-200 cursor-pointer"
+                      className="p-1.5 rounded-full text-lg-muted hover:text-lg-danger hover:bg-[rgba(255,99,105,0.10)] transition-all duration-200 cursor-pointer"
                       title="Supprimer"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
