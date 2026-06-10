@@ -52,7 +52,7 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center" style={{ height: '100vh', backgroundColor: '#07080d' }}>
+      <div className="flex items-center justify-center" style={{ height: '100vh', backgroundColor: 'transparent' }}>
         <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }} />
       </div>
     )
@@ -60,11 +60,11 @@ export default function ChatPage() {
 
   if (channelsError) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3" style={{ height: '100vh', backgroundColor: '#07080d' }}>
-        <p style={{ color: '#fda4af', fontSize: '13px' }}>{channelsError}</p>
+      <div className="flex flex-col items-center justify-center gap-3" style={{ height: '100vh', backgroundColor: 'transparent' }}>
+        <p style={{ color: '#ff8589', fontSize: '13px' }}>{channelsError}</p>
         <button
           onClick={reloadChannels}
-          style={{ padding: '6px 14px', borderRadius: '8px', border: '0.5px solid rgba(255,255,255,0.15)', backgroundColor: '#151a24', color: '#e8edf5', fontSize: '12px', cursor: 'pointer' }}
+          style={{ padding: '6px 14px', borderRadius: '8px', border: '0.5px solid rgba(255,255,255,0.15)', backgroundColor: 'rgba(30,30,38,0.92)', color: '#f5f5f8', fontSize: '12px', cursor: 'pointer' }}
         >
           Réessayer
         </button>
@@ -73,7 +73,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex overflow-hidden" style={{ height: '100vh', backgroundColor: '#07080d' }}>
+    <div className="flex overflow-hidden" style={{ height: '100vh', backgroundColor: 'transparent' }}>
       <ChatSidebar
         channels={channels}
         activeChannelId={activeChannelId}

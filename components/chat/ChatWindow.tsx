@@ -140,8 +140,8 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
 
   if (!channel) {
     return (
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#07080d' }}>
-        <p style={{ color: '#3d4f63', fontSize: '13px' }}>Sélectionne un canal</p>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
+        <p style={{ color: '#6b6b78', fontSize: '13px' }}>Sélectionne un canal</p>
       </div>
     )
   }
@@ -150,35 +150,35 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
 
   return (
     <div
-      style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#07080d', minWidth: 0, position: 'relative' }}
+      style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', minWidth: 0, position: 'relative' }}
       onDragOver={e => { e.preventDefault(); e.stopPropagation() }}
       onDragEnter={e => { e.preventDefault(); dragCountRef.current++; setDragOver(true) }}
       onDragLeave={e => { e.preventDefault(); dragCountRef.current--; if (dragCountRef.current === 0) setDragOver(false) }}
       onDrop={e => { e.preventDefault(); dragCountRef.current = 0; setDragOver(false); const file = e.dataTransfer.files[0]; if (file) handleFileUpload(file) }}
     >
       {/* Header */}
-      <div style={{ padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: '#0f1117', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: 'rgba(255,255,255,0.055)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ color: '#818cf8', fontSize: '18px', fontWeight: 300 }}>#</span>
+          <span style={{ color: '#8b7dff', fontSize: '18px', fontWeight: 300 }}>#</span>
           <div>
-            <p style={{ color: '#e8edf5', fontSize: '13px', fontWeight: 500, margin: 0 }}>{channel.name}</p>
-            <p style={{ color: '#8898aa', fontSize: '10px', margin: 0 }}>
+            <p style={{ color: '#f5f5f8', fontSize: '13px', fontWeight: 500, margin: 0 }}>{channel.name}</p>
+            <p style={{ color: '#9b9ba8', fontSize: '10px', margin: 0 }}>
               {channel.type === 'general' ? 'Canal général' : 'Canal client'}
             </p>
           </div>
         </div>
         {/* Stacked avatars */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#818cf8', border: '1.5px solid #0f1117', zIndex: 2 }}>A</div>
-          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(56,189,248,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#38bdf8', border: '1.5px solid #0f1117', marginLeft: '-6px', zIndex: 1 }}>L</div>
-          <span style={{ color: '#8898aa', fontSize: '10px', marginLeft: '4px' }}>2</span>
+          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#8b7dff', border: '1.5px solid #0f1117', zIndex: 2 }}>A</div>
+          <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(94,162,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 500, color: '#5ea2ff', border: '1.5px solid #0f1117', marginLeft: '-6px', zIndex: 1 }}>L</div>
+          <span style={{ color: '#9b9ba8', fontSize: '10px', marginLeft: '4px' }}>2</span>
         </div>
       </div>
 
       {/* Messages */}
       <div
         ref={scrollRef}
-        style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#07080d', scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.18) transparent' }}
+        style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: 'transparent', scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.18) transparent' }}
       >
         {loading && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
@@ -188,7 +188,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
 
         {!loading && messages.length === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
-            <p style={{ color: '#3d4f63', fontSize: '12px' }}>Aucun message · Envoyez le premier !</p>
+            <p style={{ color: '#6b6b78', fontSize: '12px' }}>Aucun message · Envoyez le premier !</p>
           </div>
         )}
 
@@ -205,7 +205,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
               {showSeparator && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '8px 0' }}>
                   <div style={{ flex: 1, height: '0.5px', backgroundColor: 'rgba(255,255,255,0.07)' }} />
-                  <span style={{ color: '#3d4f63', fontSize: '9px', padding: '0 8px', flexShrink: 0 }}>
+                  <span style={{ color: '#6b6b78', fontSize: '9px', padding: '0 8px', flexShrink: 0 }}>
                     {formatDateSeparator(msg.created_at)}
                   </span>
                   <div style={{ flex: 1, height: '0.5px', backgroundColor: 'rgba(255,255,255,0.07)' }} />
@@ -230,12 +230,12 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
             <span
               key={i}
               style={{
-                width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#8898aa', display: 'inline-block',
+                width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#9b9ba8', display: 'inline-block',
                 animation: `typingBounce 1.2s infinite ${i * 0.2}s`,
               }}
             />
           ))}
-          <span style={{ color: '#3d4f63', fontSize: '10px', fontStyle: 'italic' }}>
+          <span style={{ color: '#6b6b78', fontSize: '10px', fontStyle: 'italic' }}>
             {typingUsers.map(u => u.displayName).join(', ')} écrit...
           </span>
         </div>
@@ -245,17 +245,17 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       {dragOver && (
         <div style={{
           position: 'absolute', inset: 0, zIndex: 50,
-          backgroundColor: 'rgba(7,8,13,0.85)', backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(10,10,14,0.85)', backdropFilter: 'blur(4px)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          border: '2px dashed rgba(99,102,241,0.5)', borderRadius: '12px',
+          border: '2px dashed rgba(106,92,255,0.5)', borderRadius: '12px',
           pointerEvents: 'none' as const,
         }}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6a5cff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          <p style={{ color: '#6366f1', fontSize: '14px', fontWeight: 500, marginTop: '12px' }}>
+          <p style={{ color: '#6a5cff', fontSize: '14px', fontWeight: 500, marginTop: '12px' }}>
             Déposer le fichier ici
           </p>
         </div>
@@ -264,7 +264,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
       {/* Upload indicator */}
       {uploading && (
         <div style={{ padding: '2px 16px 4px' }}>
-          <p style={{ fontSize: '10px', color: '#8898aa' }}>Upload en cours...</p>
+          <p style={{ fontSize: '10px', color: '#9b9ba8' }}>Upload en cours...</p>
         </div>
       )}
 
@@ -284,10 +284,10 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           style={{
             margin: '0 16px 6px',
             padding: '8px 12px',
-            backgroundColor: 'rgba(244,63,94,0.10)',
-            border: '0.5px solid rgba(244,63,94,0.35)',
+            backgroundColor: 'rgba(255,99,105,0.10)',
+            border: '0.5px solid rgba(255,99,105,0.35)',
             borderRadius: '8px',
-            color: '#fda4af',
+            color: '#ff8589',
             fontSize: '11px',
             display: 'flex',
             alignItems: 'center',
@@ -298,7 +298,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           <span style={{ flex: 1 }}>{chatError}</span>
           <button
             onClick={clearChatError}
-            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            style={{ background: 'transparent', border: 'none', color: '#ff8589', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
             title="Fermer"
           >
             ×
@@ -312,10 +312,10 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           style={{
             margin: '0 16px 6px',
             padding: '8px 12px',
-            backgroundColor: 'rgba(244,63,94,0.10)',
-            border: '0.5px solid rgba(244,63,94,0.35)',
+            backgroundColor: 'rgba(255,99,105,0.10)',
+            border: '0.5px solid rgba(255,99,105,0.35)',
             borderRadius: '8px',
-            color: '#fda4af',
+            color: '#ff8589',
             fontSize: '11px',
             display: 'flex',
             alignItems: 'center',
@@ -326,7 +326,7 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
           <span style={{ flex: 1 }}>{uploadError}</span>
           <button
             onClick={() => setUploadError(null)}
-            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            style={{ background: 'transparent', border: 'none', color: '#ff8589', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
             title="Fermer"
           >
             ×

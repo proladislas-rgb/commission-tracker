@@ -8,7 +8,7 @@ const QUICK_EMOJIS = ['👍', '🎉', '👀', '✅', '🔥']
 const FILE_ICON_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   'application/pdf': { bg: 'rgba(239,68,68,0.15)', color: '#ef4444', label: 'PDF' },
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'rgba(59,130,246,0.15)', color: '#3b82f6', label: 'DOCX' },
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'rgba(16,185,129,0.15)', color: '#10b981', label: 'XLSX' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'rgba(61,220,139,0.15)', color: '#3ddc8b', label: 'XLSX' },
 }
 
 function isAudioType(mimeType: string | null): boolean {
@@ -16,11 +16,11 @@ function isAudioType(mimeType: string | null): boolean {
 }
 
 function getFileStyle(mimeType: string | null): { bg: string; color: string; label: string } {
-  if (!mimeType) return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
+  if (!mimeType) return { bg: 'rgba(255,255,255,0.08)', color: '#9b9ba8', label: 'FILE' }
   if (FILE_ICON_STYLES[mimeType]) return FILE_ICON_STYLES[mimeType]
-  if (mimeType.startsWith('audio/')) return { bg: 'rgba(16,185,129,0.15)', color: '#10b981', label: 'VOCAL' }
+  if (mimeType.startsWith('audio/')) return { bg: 'rgba(61,220,139,0.15)', color: '#3ddc8b', label: 'VOCAL' }
   if (mimeType.startsWith('image/')) return { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', label: 'IMG' }
-  return { bg: 'rgba(255,255,255,0.08)', color: '#8898aa', label: 'FILE' }
+  return { bg: 'rgba(255,255,255,0.08)', color: '#9b9ba8', label: 'FILE' }
 }
 
 function renderContent(content: string | null) {
@@ -30,7 +30,7 @@ function renderContent(content: string | null) {
   return parts.map((part, i) => {
     if (part.startsWith('@')) {
       return (
-        <span key={i} style={{ color: '#6366f1', fontWeight: 600 }}>{part}</span>
+        <span key={i} style={{ color: '#6a5cff', fontWeight: 600 }}>{part}</span>
       )
     }
     return part
@@ -64,9 +64,9 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
   const initial = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
   const isAdmin = user?.role === 'admin'
-  const avatarBg = isAdmin ? 'rgba(255,255,255,0.15)' : 'rgba(56,189,248,0.25)'
-  const avatarColor = isAdmin ? '#818cf8' : '#38bdf8'
-  const nameColor = isAdmin ? '#818cf8' : '#38bdf8'
+  const avatarBg = isAdmin ? 'rgba(255,255,255,0.15)' : 'rgba(94,162,255,0.25)'
+  const avatarColor = isAdmin ? '#8b7dff' : '#5ea2ff'
+  const nameColor = isAdmin ? '#8b7dff' : '#5ea2ff'
 
   const isFile = !!message.file_url
   const fileStyle = getFileStyle(message.file_type)
@@ -107,7 +107,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
               bottom: 'calc(100% + 4px)',
               right: isOwn ? 0 : undefined,
               left: isOwn ? undefined : 0,
-              backgroundColor: '#151a24',
+              backgroundColor: 'rgba(30,30,38,0.92)',
               border: '0.5px solid rgba(255,255,255,0.1)',
               borderRadius: '8px',
               padding: '3px 5px',
@@ -170,12 +170,12 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                   {fileStyle.label}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ color: '#e8edf5', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
-                  <p style={{ color: '#8898aa', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
+                  <p style={{ color: '#f5f5f8', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{message.file_name}</p>
+                  <p style={{ color: '#9b9ba8', fontSize: '9px', margin: 0 }}>{formatFileSize(message.file_size)}</p>
                 </div>
               </a>
             ) : (
-              <p style={{ color: '#e8edf5', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
+              <p style={{ color: '#f5f5f8', fontSize: '13px', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
                 {renderContent(message.content)}
               </p>
             )}
@@ -205,7 +205,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)' }}
                 >
                   <span style={{ fontSize: '15px', lineHeight: 1 }}>{emoji}</span>
-                  <span style={{ fontSize: '11px', color: isActive ? '#818cf8' : '#8898aa', marginLeft: '2px' }}>{userIds.length}</span>
+                  <span style={{ fontSize: '11px', color: isActive ? '#8b7dff' : '#9b9ba8', marginLeft: '2px' }}>{userIds.length}</span>
                 </button>
               )
             })}
@@ -213,7 +213,7 @@ export default function ChatMessage({ message, isOwn, currentUserId, onReaction,
         )}
 
         {/* Timestamp */}
-        <span style={{ color: '#3d4f63', fontSize: '9px', marginTop: '3px' }}>
+        <span style={{ color: '#6b6b78', fontSize: '9px', marginTop: '3px' }}>
           {formatTime(message.created_at)}
         </span>
       </div>

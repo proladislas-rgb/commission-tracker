@@ -240,10 +240,10 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
           style={{
             margin: '0 12px 6px',
             padding: '8px 12px',
-            backgroundColor: 'rgba(244,63,94,0.10)',
-            border: '0.5px solid rgba(244,63,94,0.35)',
+            backgroundColor: 'rgba(255,99,105,0.10)',
+            border: '0.5px solid rgba(255,99,105,0.35)',
             borderRadius: '8px',
-            color: '#fda4af',
+            color: '#ff8589',
             fontSize: '11px',
             display: 'flex',
             alignItems: 'center',
@@ -254,7 +254,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
           <span style={{ flex: 1 }}>{recordingError}</span>
           <button
             onClick={() => setRecordingError(null)}
-            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            style={{ background: 'transparent', border: 'none', color: '#ff8589', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
             title="Fermer"
           >
             ×
@@ -266,7 +266,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
       {mentionQuery !== null && filteredUsers.length > 0 && (
         <div style={{
           position: 'absolute', bottom: '100%', left: '12px', right: '12px',
-          backgroundColor: '#151a24', border: '0.5px solid rgba(255,255,255,0.1)',
+          backgroundColor: 'rgba(30,30,38,0.92)', border: '0.5px solid rgba(255,255,255,0.1)',
           borderRadius: '8px', padding: '4px', marginBottom: '4px',
           boxShadow: '0 -4px 16px rgba(0,0,0,0.4)', zIndex: 20,
         }}>
@@ -277,19 +277,19 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px', width: '100%',
                 padding: '6px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
-                backgroundColor: i === mentionIndex ? 'rgba(99,102,241,0.15)' : 'transparent',
-                color: '#e8edf5', fontSize: '12px', textAlign: 'left',
+                backgroundColor: i === mentionIndex ? 'rgba(106,92,255,0.15)' : 'transparent',
+                color: '#f5f5f8', fontSize: '12px', textAlign: 'left',
               }}
               onMouseEnter={() => setMentionIndex(i)}
             >
-              <span style={{ color: '#6366f1', fontWeight: 600 }}>@</span>
+              <span style={{ color: '#6a5cff', fontWeight: 600 }}>@</span>
               {u.display_name}
             </button>
           ))}
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderTop: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: '#0f1117' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderTop: '0.5px solid rgba(255,255,255,0.07)', backgroundColor: 'rgba(255,255,255,0.055)' }}>
         <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
 
         {recording ? (
@@ -297,7 +297,7 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
           <>
             <button
               onClick={cancelRecording}
-              style={{ background: 'transparent', border: 'none', color: '#f43f5e', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+              style={{ background: 'transparent', border: 'none', color: '#ff8589', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
               title="Annuler"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -307,21 +307,21 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
 
             <div style={{
               flex: 1, display: 'flex', alignItems: 'center', gap: '8px',
-              backgroundColor: '#151a24', border: '0.5px solid rgba(243,63,94,0.3)',
+              backgroundColor: 'rgba(30,30,38,0.92)', border: '0.5px solid rgba(255,99,105,0.3)',
               borderRadius: '8px', padding: '8px 12px',
             }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f43f5e', animation: 'pulse 1.5s infinite' }} />
-              <span style={{ color: '#f43f5e', fontSize: '12px', fontWeight: 500 }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff8589', animation: 'pulse 1.5s infinite' }} />
+              <span style={{ color: '#ff8589', fontSize: '12px', fontWeight: 500 }}>
                 {formatRecordingTime(recordingTime)}
               </span>
-              <span style={{ color: '#8898aa', fontSize: '11px' }}>Enregistrement en cours...</span>
+              <span style={{ color: '#9b9ba8', fontSize: '11px' }}>Enregistrement en cours...</span>
             </div>
 
             <button
               onClick={stopRecording}
               style={{
-                backgroundColor: '#10b981', border: 'none', borderRadius: '8px',
-                padding: '7px 14px', color: '#fff', fontSize: '12px', fontWeight: 500,
+                backgroundColor: '#3ddc8b', border: 'none', borderRadius: '8px',
+                padding: '7px 14px', color: '#0a0a0e', fontSize: '12px', fontWeight: 700,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px',
               }}
             >
@@ -338,9 +338,9 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
             {/* Trombone */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              style={{ background: 'transparent', border: 'none', color: '#8898aa', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#818cf8' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8898aa' }}
+              style={{ background: 'transparent', border: 'none', color: '#9b9ba8', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#8b7dff' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#9b9ba8' }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
@@ -350,9 +350,9 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
             {/* Micro */}
             <button
               onClick={startRecording}
-              style={{ background: 'transparent', border: 'none', color: '#8898aa', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#10b981' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8898aa' }}
+              style={{ background: 'transparent', border: 'none', color: '#9b9ba8', cursor: 'pointer', padding: '5px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#3ddc8b' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#9b9ba8' }}
               title="Message vocal"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -375,11 +375,11 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
               className="outline-none"
               style={{
                 flex: 1,
-                backgroundColor: '#151a24',
+                backgroundColor: 'rgba(30,30,38,0.92)',
                 border: '0.5px solid rgba(255,255,255,0.08)',
                 borderRadius: '8px',
                 padding: '8px 12px',
-                color: '#e8edf5',
+                color: '#f5f5f8',
                 fontSize: '12px',
               }}
               onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)' }}
@@ -392,17 +392,17 @@ export default function ChatInput({ onSend, onTyping, onFileUpload, disabled, us
               disabled={!text.trim() || disabled}
               className="disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: '#6366f1',
+                background: 'linear-gradient(135deg, #6a5cff, #3b82f6)',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '7px 14px',
-                color: '#e8edf5',
+                color: '#f5f5f8',
                 fontSize: '12px',
                 fontWeight: 500,
                 cursor: 'pointer',
               }}
-              onMouseEnter={e => { if (text.trim()) e.currentTarget.style.backgroundColor = '#818cf8' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#6366f1' }}
+              onMouseEnter={e => { if (text.trim()) e.currentTarget.style.filter = 'brightness(1.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.filter = '' }}
             >
               Envoyer
             </button>
