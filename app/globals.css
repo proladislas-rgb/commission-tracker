@@ -1,7 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #07080d;
+  --color-bg: #0a0a0e;
+
+  /* Liquid Glass */
+  --color-lg-text: #f5f5f8;
+  --color-lg-text-2: #c9c9d4;
+  --color-lg-muted: #9b9ba8;
+  --color-lg-success: #3ddc8b;
+  --color-lg-warning: #f0a33c;
+  --color-lg-danger: #ff8589;
+  --color-lg-info: #6a8dff;
+  --color-lg-accent-1: #6a5cff;
+  --color-lg-accent-2: #3b82f6;
   --color-surface: #0f1117;
   --color-raised: #151a24;
   --color-border: rgba(255,255,255,0.07);
@@ -70,9 +81,9 @@
 }
 
 html, body {
-  background-color: #07080d;
-  color: #e8edf5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #0a0a0e;
+  color: #f5f5f8;
+  font-family: -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -113,4 +124,49 @@ html, body {
 /* Smooth transitions globales */
 a, button {
   transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ===== Liquid Glass utilities ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  border-radius: 20px;
+}
+.glass-strong {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  border-radius: 22px;
+}
+.glass-divider {
+  background: rgba(255, 255, 255, 0.06);
+  height: 1px;
+}
+.lg-gradient {
+  background: linear-gradient(135deg, #6a5cff, #3b82f6);
+}
+.lg-shadow-accent {
+  box-shadow: 0 4px 18px rgba(106, 92, 255, 0.40);
+}
+.lg-ease {
+  transition: transform 180ms cubic-bezier(0.32, 0.72, 0, 1), border-color 180ms cubic-bezier(0.32, 0.72, 0, 1), background-color 180ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lg-hover-lift:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass { background: #15151c; }
+  .glass-strong { background: #181821; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-ease, .lg-hover-lift { transition: none; }
+  .lg-hover-lift:hover { transform: none; }
 }
