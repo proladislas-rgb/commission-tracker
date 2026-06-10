@@ -41,3 +41,10 @@
 |----------|-------|
 | `PUT /api/sheets/presence` faisait 3 clears + 1 set séquentiels (Promise.all de writeSheetCell) = 4 appels Google Sheets par clic → quota 60w/min/user atteint en 15 clics, UI rollback les cases | Pour toute API externe avec quota strict (Sheets, GitHub, etc.), TOUJOURS batcher les writes sur une range au lieu de paralléliser N appels individuels. Promise.all économise du temps mais pas du quota. |
 | Supabase free tier auto-pause les projets après 7j d'inactivité → 503 silencieux, login "ne marche plus" alors que les mdp sont intacts | Quand un user signale une auth qui marche plus après un break > 1 semaine, vérifier en priorité le status du projet Supabase (`list_projects`). Restore = ~1-5min. Pour les outils internes critiques, garder un ping hebdomadaire ou passer Pro. |
+
+## 2026-06-10
+| Problème | Leçon |
+|----------|-------|
+| `git add -A` a ajouté `telegram-bot/` (repo git imbriqué) comme gitlink 160000 → faux submodule poussé sur main, clones cassés | Avant tout `git add -A`, vérifier `git status` pour les dossiers contenant un `.git/`. Un sous-repo indépendant doit être dans `.gitignore` (le dossier entier), jamais indexé. |
+| Grep `catch {}` ne détecte pas les catch silencieux avec commentaire (`catch { // silencieux }`) | L'audit de session doit utiliser `grep -rn -A1 "} catch" \| grep -i "silencieux\|silent"` en plus du pattern vide. |
+| `await supabase.from(...).insert(...)` dans un try/catch ne catche RIEN : supabase-js renvoie `{ error }` sans throw → échec RLS/contrainte invisible même avec catch | Toujours destructurer `const { error } = await supabase...` et `if (error) throw error`. Un try/catch seul autour d'un appel supabase-js est un faux filet de sécurité. |
