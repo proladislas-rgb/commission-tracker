@@ -60,3 +60,13 @@
 - [x] Vérifié : timers tous cleanup, useRealtime C4/C5 OK, useMessages C6 OK, hooks data exposent leurs erreurs
 - [x] lint 0 erreur + 41/41 tests + build OK
 - Hors scope volontaire : Reem AI (refonte totale prévue), ReemInsights catch localStorage (bénins)
+
+## Refonte UI « Liquid Glass » (spec validée 2026-06-10)
+Spec : `docs/superpowers/specs/2026-06-10-ui-redesign-liquid-glass-design.md`
+Design system global : `~/.claude/design-systems/liquid-glass.md` (réutilisable tous projets)
+- [x] Brainstorm visuel (compagnon navigateur) → direction « Glass sombre pro » validée par Hugues
+- [x] Spec écrite + design system extrait en global
+- [ ] Plan d'implémentation (writing-plans) — à faire à la reprise
+- [ ] Phases 0→6 : tokens → primitives → AppShell → Dashboard → Chat → autres pages → audit visuel
+- [ ] Contraintes : reskin pur (zéro changement hooks/lib/api), 41 tests verts à chaque phase, validation navigateur avant push
+- [ ] Ensuite : refonte fonctionnelle Reem AI (chantier séparé)
