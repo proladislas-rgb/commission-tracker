@@ -34,8 +34,8 @@ export function useAgentMessages(userId: string | undefined) {
       if (version === loadVersionRef.current) {
         setMessages((data ?? []) as AgentMessage[])
       }
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[reem] chargement historique échoué:', e)
     } finally {
       if (version === loadVersionRef.current) setLoading(false)
     }
@@ -78,8 +78,8 @@ export function useAgentMessages(userId: string | undefined) {
     try {
       await fetch('/api/agent/clear', { method: 'DELETE' })
       setMessages([])
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[reem] clear historique échoué:', e)
     }
   }, [userId])
 

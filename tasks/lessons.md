@@ -30,3 +30,14 @@
 | `refresh_failed` laisse le cookie google_tokens en place 30j → chaque requête paie un round-trip Google qui échoue | Auto-purger le cookie côté serveur dans TOUTES les routes qui tentent un refresh (`clearGoogleTokensCookie` dans `lib/google.ts`). Self-healing : prochaine requête voit `not_connected`, UI déclenche reconnect. |
 | CSRF sur `/api/auth/google/disconnect` (GET) : n'importe quel `<a href>` externe pouvait forcer un logout Google de l'utilisateur authentifié | Passer en POST + check Origin strict. Les liens UI utilisent un `<button>` qui fait `fetch POST` puis redirect. |
 | Détails d'erreur Supabase (`uploadError.message`, `insertError.message`) renvoyés au client → leak de noms de buckets/tables/policies | Logger les détails côté serveur (`console.error`), renvoyer au client un code opaque (`upload_failed`, `insert_failed`). |
+
+## 2026-04-27
+| Problème | Leçon |
+|----------|-------|
+| `catch {}` muet sur l'injection facture → paiement (`InvoicePreview.tsx`) : un échec Supabase (RLS, contrainte, réseau) laissait l'utilisateur croire que le paiement était passé — bug financier silencieux | La règle du 17/04 ("jamais de catch vide sur flux user-facing") s'applique AUSSI aux flux financiers/CRUD, pas seulement aux médias. Audit ponctuel : `grep -rn "catch {}" --include="*.tsx"` à chaque session pour traquer les régressions du pattern. |
+
+## 2026-06-01
+| Problème | Leçon |
+|----------|-------|
+| `PUT /api/sheets/presence` faisait 3 clears + 1 set séquentiels (Promise.all de writeSheetCell) = 4 appels Google Sheets par clic → quota 60w/min/user atteint en 15 clics, UI rollback les cases | Pour toute API externe avec quota strict (Sheets, GitHub, etc.), TOUJOURS batcher les writes sur une range au lieu de paralléliser N appels individuels. Promise.all économise du temps mais pas du quota. |
+| Supabase free tier auto-pause les projets après 7j d'inactivité → 503 silencieux, login "ne marche plus" alors que les mdp sont intacts | Quand un user signale une auth qui marche plus après un break > 1 semaine, vérifier en priorité le status du projet Supabase (`list_projects`). Restore = ~1-5min. Pour les outils internes critiques, garder un ping hebdomadaire ou passer Pro. |

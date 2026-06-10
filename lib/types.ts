@@ -79,7 +79,7 @@ export interface Client {
 }
 
 export type ActivityAction = 'create' | 'update' | 'delete'
-export type ActivityEntityType = 'commission' | 'paiement' | 'client' | 'user' | 'prime'
+export type ActivityEntityType = 'commission' | 'paiement' | 'client' | 'user' | 'prime' | 'somme_due'
 
 export interface ActivityLog {
   id: string

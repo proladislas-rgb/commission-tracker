@@ -8,7 +8,7 @@ import ChatSidebar from '@/components/chat/ChatSidebar'
 import ChatWindow from '@/components/chat/ChatWindow'
 
 export default function ChatPage() {
-  const { channels, loading } = useChannels()
+  const { channels, loading, error: channelsError, reload: reloadChannels } = useChannels()
   const { user } = useAuth()
   const [userSelectedId, setUserSelectedId] = useState<string | null>(null)
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
@@ -54,6 +54,20 @@ export default function ChatPage() {
     return (
       <div className="flex items-center justify-center" style={{ height: '100vh', backgroundColor: '#07080d' }}>
         <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.18)', borderTopColor: 'transparent' }} />
+      </div>
+    )
+  }
+
+  if (channelsError) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3" style={{ height: '100vh', backgroundColor: '#07080d' }}>
+        <p style={{ color: '#fda4af', fontSize: '13px' }}>{channelsError}</p>
+        <button
+          onClick={reloadChannels}
+          style={{ padding: '6px 14px', borderRadius: '8px', border: '0.5px solid rgba(255,255,255,0.15)', backgroundColor: '#151a24', color: '#e8edf5', fontSize: '12px', cursor: 'pointer' }}
+        >
+          Réessayer
+        </button>
       </div>
     )
   }

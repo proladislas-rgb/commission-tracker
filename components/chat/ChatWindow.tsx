@@ -28,7 +28,7 @@ function formatDateSeparator(dateStr: string): string {
 
 export default function ChatWindow({ channel }: ChatWindowProps) {
   const { user } = useAuth()
-  const { messages, loading, sendMessage, addReaction } = useMessages(channel?.id ?? null)
+  const { messages, loading, error: chatError, clearError: clearChatError, sendMessage, addReaction } = useMessages(channel?.id ?? null)
   const { typingUsers, setTyping } = useTyping(channel?.id ?? null, user?.id ?? null, user?.display_name ?? null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -275,6 +275,34 @@ export default function ChatWindow({ channel }: ChatWindowProps) {
             message="Connexion Google expirée — les notifs @mention ne partent pas."
             redirectTo="/dashboard/chat"
           />
+        </div>
+      )}
+
+      {/* Chat error banner (chargement ou envoi de message échoué) */}
+      {chatError && (
+        <div
+          style={{
+            margin: '0 16px 6px',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(244,63,94,0.10)',
+            border: '0.5px solid rgba(244,63,94,0.35)',
+            borderRadius: '8px',
+            color: '#fda4af',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          }}
+        >
+          <span style={{ flex: 1 }}>{chatError}</span>
+          <button
+            onClick={clearChatError}
+            style={{ background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}
+            title="Fermer"
+          >
+            ×
+          </button>
         </div>
       )}
 

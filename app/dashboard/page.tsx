@@ -75,8 +75,8 @@ export default function DashboardPage() {
         if (primesCount !== null && primesCount !== primes.length) {
           loadPrimes()
         }
-      } catch {
-        // silencieux
+      } catch (e) {
+        console.error('[dashboard] polling primes échoué:', e)
       }
     }, 10_000)
     return () => clearInterval(interval)
@@ -96,8 +96,8 @@ export default function DashboardPage() {
         entity_id:   entityId,
         details:     { description },
       })
-    } catch {
-      // log silencieux
+    } catch (e) {
+      console.error('[dashboard] activity_log insert échoué:', e)
     }
   }
 
@@ -207,8 +207,8 @@ export default function DashboardPage() {
           entity_id:   data.created_by,
           details:     { description: `Paiement de ${new Intl.NumberFormat('fr-FR').format(data.montant)} € ajouté` },
         })
-      } catch {
-        // log silencieux
+      } catch (e) {
+        console.error('[dashboard] activity_log paiement échoué:', e)
       }
       toast('Paiement ajouté', 'success')
     } catch (err) {
@@ -228,8 +228,8 @@ export default function DashboardPage() {
         entity_id:   id,
         details:     { description: `${user!.display_name} a supprimé le paiement ${paiement?.label ?? ''} de ${paiement ? new Intl.NumberFormat('fr-FR').format(Number(paiement.montant)) : '?'} €` },
       })
-    } catch {
-      // log silencieux
+    } catch (e) {
+      console.error('[dashboard] activity_log suppression paiement échoué:', e)
     }
   }, [removePaiement, paiements, user])
 

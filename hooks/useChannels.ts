@@ -8,9 +8,11 @@ import type { Channel } from '@/lib/types'
 export function useChannels() {
   const [channels, setChannels] = useState<Channel[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const { data, error } = await supabase
         .from('channels')
@@ -20,8 +22,9 @@ export function useChannels() {
 
       if (error) throw error
       setChannels((data ?? []) as Channel[])
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[chat] chargement canaux échoué:', e)
+      setError('Impossible de charger les canaux')
     } finally {
       setLoading(false)
     }
@@ -47,5 +50,5 @@ export function useChannels() {
     },
   })
 
-  return { channels, loading }
+  return { channels, loading, error, reload: load }
 }

@@ -8,6 +8,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 export function useMessages(channelId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const realtimeRef = useRef<RealtimeChannel | null>(null)
   const messagesRef = useRef(messages)
   useEffect(() => { messagesRef.current = messages })
@@ -25,8 +26,9 @@ export function useMessages(channelId: string | null) {
 
       if (error) throw error
       setMessages((data ?? []) as Message[])
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[chat] chargement messages échoué:', e)
+      setError('Impossible de charger les messages')
     } finally {
       setLoading(false)
     }
@@ -34,6 +36,7 @@ export function useMessages(channelId: string | null) {
 
   useEffect(() => {
     setMessages([])
+    setError(null)
     load()
   }, [load])
 
@@ -98,13 +101,17 @@ export function useMessages(channelId: string | null) {
   const sendMessage = useCallback(async (userId: string, content: string) => {
     if (!channelId || !content.trim()) return
     try {
-      await supabase.from('messages').insert({
+      const { error } = await supabase.from('messages').insert({
         channel_id: channelId,
         user_id: userId,
         content: content.trim(),
       })
-    } catch {
-      // silencieux
+      if (error) throw error
+    } catch (e) {
+      console.error('[chat] envoi message échoué:', e)
+      if (isMountedRef.current) {
+        setError(`Message non envoyé : « ${content.trim().slice(0, 60)}${content.trim().length > 60 ? '…' : ''} »`)
+      }
     }
   }, [channelId])
 
@@ -133,5 +140,7 @@ export function useMessages(channelId: string | null) {
     }
   }, [])
 
-  return { messages, loading, sendMessage, addReaction }
+  const clearError = useCallback(() => setError(null), [])
+
+  return { messages, loading, error, clearError, sendMessage, addReaction }
 }

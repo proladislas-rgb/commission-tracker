@@ -88,8 +88,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       const channelIds = (chans as Channel[]).map(ch => ch.id)
       const total = await fetchTotalUnread(userId, channelIds)
       setChatUnreadCount(total)
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[sidebar] fetch unread échoué:', e)
     }
   }, [user?.id])
 
@@ -110,8 +110,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
         .from('users')
         .select('id, username, display_name, role, avatar_color, last_seen, created_at')
       setUsers((data ?? []) as User[])
-    } catch {
-      // silencieux
+    } catch (e) {
+      console.error('[sidebar] chargement users échoué:', e)
     }
   }, [])
 
@@ -125,8 +125,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           await supabase.from('users').update({ last_seen: new Date().toISOString() }).eq('id', currentUserId)
           loadUsers()
         }
-      } catch {
-        // silencieux
+      } catch (e) {
+        console.error('[sidebar] ping last_seen échoué:', e)
       }
     }, 60_000)
     return () => clearInterval(interval)
@@ -142,8 +142,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           .order('created_at', { ascending: false })
           .limit(5)
         setActivityLogs((data ?? []) as (ActivityLog & { user?: User })[])
-      } catch {
-        // silencieux
+      } catch (e) {
+        console.error('[sidebar] chargement activité échoué:', e)
       }
     }
     loadActivity()
@@ -163,8 +163,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           if (logWithUser) {
             setActivityLogs(prev => [logWithUser as ActivityLog & { user?: User }, ...prev].slice(0, 5))
           }
-        } catch {
-          // silencieux
+        } catch (e) {
+          console.error('[sidebar] enrichissement activité realtime échoué:', e)
         }
       })
       .subscribe()

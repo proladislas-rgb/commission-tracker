@@ -51,3 +51,12 @@
 - `/api/auth/google/disconnect` → redirige vers OAuth consent, permet la reconnexion
 - `/dashboard/calendrier-presence` → si erreur OAuth, bouton "Reconnecter Google" visible
 - `/dashboard/chat` → cliquer sur le micro, vérifier qu'une erreur lisible s'affiche si permission refusée, ou que le vocal s'enregistre/s'envoie. Si upload échoue, lire le code d'erreur dans le bandeau pour diagnostic.
+
+## Terminé (2026-06-10) — Stabilisation (chasse aux catch silencieux)
+- [x] `useMessages` : envoi message — l'insert Supabase ne throwait pas (`{ error }` ignoré) → message perdu sans signal. Fix : check error + bandeau rose dans ChatWindow avec aperçu du message perdu
+- [x] `useMessages.load` + `useChannels.load` : échec = chat vide muet → désormais erreur exposée + bouton "Réessayer" sur la page chat
+- [x] 11 catch silencieux d'arrière-plan (Sidebar ×5, dashboard ×4, useAgentMessages ×2) → console.error avec contexte
+- [x] ESLint ignorait pas `telegram-bot/` (sous-repo séparé) → lint cassait en local. Fix : ajout aux ignores
+- [x] Vérifié : timers tous cleanup, useRealtime C4/C5 OK, useMessages C6 OK, hooks data exposent leurs erreurs
+- [x] lint 0 erreur + 41/41 tests + build OK
+- Hors scope volontaire : Reem AI (refonte totale prévue), ReemInsights catch localStorage (bénins)
