@@ -34,7 +34,7 @@ export default function AppShell({ children, associe, onRenameAssociate }: AppSh
       <main className="min-h-screen">
         <style>{`
           @media (min-width: 1024px) {
-            main { margin-right: ${collapsed ? '60px' : '220px'}; transition: margin-right 0.3s ease; }
+            main { margin-right: ${collapsed ? '96px' : '256px'}; transition: margin-right 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
           }
         `}</style>
         {isFullWidth ? (

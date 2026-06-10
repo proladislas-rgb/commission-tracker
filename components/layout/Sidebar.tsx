@@ -41,9 +41,9 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   '/dashboard/chat': (
     <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 10a2 2 0 01-2 2H5l-3 2V4a2 2 0 012-2h8a2 2 0 012 2v6z"/>
-      <circle cx="5.5" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
-      <circle cx="8" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
-      <circle cx="10.5" cy="7" r="0.7" fill="#a78bfa" stroke="none"/>
+      <circle cx="5.5" cy="7" r="0.7" fill="#8b7dff" stroke="none"/>
+      <circle cx="8" cy="7" r="0.7" fill="#8b7dff" stroke="none"/>
+      <circle cx="10.5" cy="7" r="0.7" fill="#8b7dff" stroke="none"/>
     </svg>
   ),
 }
@@ -252,13 +252,14 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                 justifyContent: collapsed ? 'center' : undefined,
                 fontSize: '13px',
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? '#e8edf5' : '#8898aa',
-                backgroundColor: isActive ? 'rgba(255,255,255,0.07)' : 'transparent',
-                transition: 'all 0.2s ease',
+                color: isActive ? '#f5f5f8' : '#9b9ba8',
+                backgroundColor: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                boxShadow: isActive ? 'inset 0 1px 0 rgba(255,255,255,0.10)' : 'none',
+                transition: 'all 0.18s cubic-bezier(0.32, 0.72, 0, 1)',
               }}
               title={collapsed ? item.label : undefined}
               onMouseEnter={e => {
-                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'
+                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
               }}
               onMouseLeave={e => {
                 if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'
@@ -267,7 +268,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
               <span
                 className="flex-shrink-0 flex items-center justify-center"
                 style={{
-                  color: isActive ? '#a78bfa' : '#8898aa',
+                  color: isActive ? '#8b7dff' : '#9b9ba8',
                   filter: 'none',
                   transition: 'all 0.2s ease',
                   position: 'relative',
@@ -279,10 +280,10 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                     position: 'absolute',
                     top: '2px',
                     right: '2px',
-                    background: '#f43f5e',
+                    background: 'linear-gradient(135deg, #6a5cff, #3b82f6)',
                     color: '#ffffff',
                     fontSize: '8px',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     minWidth: '15px',
                     height: '15px',
                     borderRadius: '20px',
@@ -290,7 +291,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '0 3px',
-                    border: '1.5px solid #07080d',
+                    border: '1.5px solid #0a0a0e',
                   }}>
                     {chatUnreadCount}
                   </span>
@@ -346,7 +347,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
               <div key={log.id} className="flex items-start gap-2 px-2 py-1.5 rounded-btn hover:bg-raised transition-colors">
                 <div
                   className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-white flex-shrink-0 mt-0.5"
-                  style={{ backgroundColor: log.user?.avatar_color ?? '#6366f1' }}
+                  style={{ backgroundColor: log.user?.avatar_color ?? '#6a5cff' }}
                 >
                   {log.user ? avatarInitials(log.user.display_name) : '?'}
                 </div>
@@ -390,7 +391,7 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
           )}
           <button
             onClick={logout}
-            className="w-full text-left rounded-btn text-xs text-txt2 hover:text-rose hover:bg-rose/10 transition-all duration-150 cursor-pointer"
+            className="w-full text-left rounded-full text-xs text-lg-muted hover:text-lg-danger hover:bg-[rgba(255,99,105,0.10)] transition-all duration-150 cursor-pointer"
             style={{
               padding: collapsed ? '6px 0' : '6px 12px',
               textAlign: collapsed ? 'center' : 'left',
@@ -412,13 +413,16 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
 
   return (
     <>
-      {/* Desktop */}
+      {/* Desktop — panneau verre flottant détaché */}
       <aside
-        className="hidden lg:flex fixed right-0 top-0 h-screen border-l border-border flex-col z-30"
+        className="hidden lg:flex fixed flex-col z-30 glass"
         style={{
-          width: collapsed ? '60px' : '220px',
-          transition: 'width 0.3s ease',
-          backgroundColor: '#0f1117',
+          top: 16,
+          right: 16,
+          height: 'calc(100vh - 32px)',
+          width: collapsed ? '64px' : '224px',
+          transition: 'width 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+          overflow: 'hidden',
         }}
       >
         {sidebarContent}
@@ -427,8 +431,8 @@ export default function Sidebar({ associe, onRenameAssociate, mobileOpen, onMobi
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
-          <div className="absolute inset-0 bg-black/60" onClick={onMobileClose} />
-          <aside className="absolute right-0 top-0 h-full border-l border-border" style={{ width: '220px', backgroundColor: '#0f1117' }}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onMobileClose} />
+          <aside className="absolute right-3 top-3 glass overflow-hidden" style={{ width: '224px', height: 'calc(100% - 24px)', background: 'rgba(20,20,26,0.92)' }}>
             {sidebarContent}
           </aside>
         </div>

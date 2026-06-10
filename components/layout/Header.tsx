@@ -18,8 +18,8 @@ export default function Header({ associe, primesCount, onRenameAssociate, onMobi
     <header className="flex items-start justify-between mb-8 animate-fadeIn">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-2.5 h-2.5 rounded-full bg-green animate-pulse2" />
-          <h1 className="text-xl font-bold text-txt tracking-tight" style={{ fontFamily: 'var(--font-sora), sans-serif' }}>Commission Tracker</h1>
+          <span className="w-2.5 h-2.5 rounded-full bg-lg-success animate-pulse2" />
+          <h1 className="text-[19px] font-extrabold text-lg-text tracking-[-0.02em]">Commission Tracker</h1>
         </div>
         <div className="flex items-center gap-2 text-sm text-txt2">
           <span>Associé :</span>
