@@ -48,19 +48,50 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
   useEffect(() => { setMounted(true) }, [])
 
   const { encaisse, enAttente, enRetard } = useMemo(() => ({
-    encaisse:  paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + Number(p.montant), 0),
-    enAttente: paiements.filter(p => p.status === 'en_attente').reduce((s, p) => s + Number(p.montant), 0),
-    enRetard:  paiements.filter(p => p.status === 'en_retard').reduce((s, p) => s + Number(p.montant), 0),
+    encaisse:  paiements.filter(p => p.status === 'effectue').reduce((s, p) => s + (Number(p.montant) || 0), 0),
+    enAttente: paiements.filter(p => p.status === 'en_attente').reduce((s, p) => s + (Number(p.montant) || 0), 0),
+    enRetard:  paiements.filter(p => p.status === 'en_retard').reduce((s, p) => s + (Number(p.montant) || 0), 0),
   }), [paiements])
   const progress = commissionsTotal > 0 ? Math.min(100, (encaisse / commissionsTotal) * 100) : 0
 
+  // Agrégation par mois (mois vides inclus) : barres empilées par statut + cumul encaissé.
+  // Index mensuel entier (année×12+mois) — pas d'objets Date dans la boucle, immunisé DST/timezone.
   const chartData = useMemo(() => {
-    const sorted = [...paiements].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    if (paiements.length === 0) return []
+    const monthIndex = (dateStr: string): number | null => {
+      const iso = /^(\d{4})-(\d{2})/.exec(dateStr)
+      if (iso) return Number(iso[1]) * 12 + (Number(iso[2]) - 1)
+      const d = new Date(dateStr)
+      return Number.isNaN(d.getTime()) ? null : d.getFullYear() * 12 + d.getMonth()
+    }
+    const byMonth = new Map<number, { effectue: number; enAttente: number; enRetard: number }>()
+    for (const p of paiements) {
+      const k = monthIndex(p.date)
+      if (k === null) continue
+      const e = byMonth.get(k) ?? { effectue: 0, enAttente: 0, enRetard: 0 }
+      const m = Number(p.montant) || 0
+      if (p.status === 'effectue')        e.effectue  += m
+      else if (p.status === 'en_attente') e.enAttente += m
+      else                                e.enRetard  += m
+      byMonth.set(k, e)
+    }
+    if (byMonth.size === 0) return []
+
+    const keys = [...byMonth.keys()]
+    const first = Math.min(...keys)
+    const last  = Math.max(...keys)
+    const out: Array<{ mois: string; effectue: number; enAttente: number; enRetard: number; cumul: number }> = []
     let cumul = 0
-    return sorted.map(p => {
-      cumul += Number(p.montant)
-      return { date: formatDate(p.date), montant: Number(p.montant), cumul, status: p.status }
-    })
+    for (let k = first; k <= last; k++) {
+      const e = byMonth.get(k) ?? { effectue: 0, enAttente: 0, enRetard: 0 }
+      cumul += e.effectue
+      out.push({
+        mois: new Date(Math.floor(k / 12), k % 12, 1).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }),
+        ...e,
+        cumul,
+      })
+    }
+    return out
   }, [paiements])
 
   async function handleSubmit() {
@@ -133,24 +164,53 @@ export default function PaiementTracker({ paiements, commissionsTotal, userId, i
         </div>
       </div>
 
-      {/* Graphique */}
+      {/* Graphique — versements par mois + cumul encaissé */}
       {chartData.length > 0 && (
-        <div className="glass p-4 mb-4 min-h-[220px]">
-          <ResponsiveContainer width="100%" height={180}>
-            <ComposedChart data={chartData} margin={{ left: 0, right: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="date" tick={{ fill: '#9b9ba8', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#9b9ba8', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
-                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+        <div className="glass p-4 mb-4 min-h-[240px]">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
+            <p className="text-[10px] uppercase tracking-[0.9px] font-semibold text-txt2">Versements par mois</p>
+            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1">
+              {[
+                { label: 'Effectué',   color: '#6a5cff' },
+                { label: 'En attente', color: STATUS_STYLES.en_attente.color },
+                { label: 'En retard',  color: STATUS_STYLES.en_retard.color },
+              ].map(l => (
+                <span key={l.label} className="inline-flex items-center gap-1.5 text-[10px] text-txt3">
+                  <span className="h-2 w-2 rounded-[3px] shrink-0" style={{ background: l.color }} />
+                  {l.label}
+                </span>
+              ))}
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-txt3">
+                <span className="h-[2.5px] w-3 rounded-full shrink-0" style={{ background: '#3ddc8b' }} />
+                Cumul encaissé
+              </span>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={190}>
+            <ComposedChart data={chartData} margin={{ left: 0, right: 8, top: 4 }} barCategoryGap="32%">
+              <defs>
+                <linearGradient id="pt-bar-effectue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#8b7dff" />
+                  <stop offset="1" stopColor="#5246c4" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="mois" tick={{ fill: '#9b9ba8', fontSize: 10.5 }} axisLine={false} tickLine={false} dy={4} />
+              <YAxis tick={{ fill: '#6b6b78', fontSize: 10 }} axisLine={false} tickLine={false} width={46}
+                tickFormatter={(v) => `${(Number(v) / 1000).toFixed(0)} k€`}
               />
               <Tooltip
+                cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                 contentStyle={CHART_TOOLTIP_STYLE}
                 formatter={(value) => formatCurrency(Number(value))}
-                labelStyle={{ color: '#f5f5f8' }}
-                itemStyle={{ color: '#9b9ba8' }}
+                labelStyle={{ color: '#f5f5f8', fontWeight: 600, marginBottom: 4 }}
               />
-              <Bar dataKey="montant" name="Montant" fill="#6a5cff" radius={[4, 4, 0, 0]} />
-              <Line dataKey="cumul" name="Cumul" stroke="#3ddc8b" strokeWidth={2} dot={false} />
+              <Bar dataKey="effectue"  name="Effectué"   stackId="mois" fill="url(#pt-bar-effectue)" maxBarSize={34} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="enAttente" name="En attente" stackId="mois" fill={STATUS_STYLES.en_attente.color} maxBarSize={34} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="enRetard"  name="En retard"  stackId="mois" fill={STATUS_STYLES.en_retard.color} maxBarSize={34} radius={[4, 4, 0, 0]} />
+              <Line type="monotone" dataKey="cumul" name="Cumul encaissé" stroke="#3ddc8b" strokeWidth={2.5} dot={false}
+                activeDot={{ r: 4, fill: '#3ddc8b', stroke: '#0a0a0e', strokeWidth: 2 }}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

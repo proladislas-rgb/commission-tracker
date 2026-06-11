@@ -48,3 +48,8 @@
 | `git add -A` a ajouté `telegram-bot/` (repo git imbriqué) comme gitlink 160000 → faux submodule poussé sur main, clones cassés | Avant tout `git add -A`, vérifier `git status` pour les dossiers contenant un `.git/`. Un sous-repo indépendant doit être dans `.gitignore` (le dossier entier), jamais indexé. |
 | Grep `catch {}` ne détecte pas les catch silencieux avec commentaire (`catch { // silencieux }`) | L'audit de session doit utiliser `grep -rn -A1 "} catch" \| grep -i "silencieux\|silent"` en plus du pattern vide. |
 | `await supabase.from(...).insert(...)` dans un try/catch ne catche RIEN : supabase-js renvoie `{ error }` sans throw → échec RLS/contrainte invisible même avec catch | Toujours destructurer `const { error } = await supabase...` et `if (error) throw error`. Un try/catch seul autour d'un appel supabase-js est un faux filet de sécurité. |
+
+## 2026-06-11
+| Problème | Leçon |
+|----------|-------|
+| Itération mensuelle avec des objets `Date` (`setMonth`) : `new Date("YYYY-MM-DD")` parse en UTC → l'heure locale héritée varie selon DST (01:00 vs 02:00), la boucle `cursor <= end` pouvait sauter le dernier mois | Pour grouper/itérer par mois, utiliser un index entier `année×12+mois` dérivé de la string ISO (`/^(\d{4})-(\d{2})/`), jamais d'arithmétique sur des objets Date |
