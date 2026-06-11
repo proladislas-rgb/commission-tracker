@@ -75,7 +75,7 @@ Design system global : `~/.claude/design-systems/liquid-glass.md` (réutilisable
 - [x] Tasks 1-6 du plan : tokens, primitives, sidebar verre, dashboard (héros+sparkline), chat, toutes les pages + login/register vitrine
 - [x] Task 7 partiel : Reem reskin minimal (palette), CLAUDE.md à jour, audit reviewer sous-agent passé (2 critiques corrigés : couleurs DB avatar/client restaurées)
 - [x] Vérifs : lint 0 erreur, 41/41 tests, build OK, smoke routes OK (login/register 200, middleware 307 OK)
-- [ ] **GATE : audit visuel Hugues en local (`npm run dev`) → merge vers main → push → promote Vercel**
+- [x] **GATE passé 2026-06-11 : validation Hugues sur preview → merge main → push → prod Vercel**
 - [ ] Ensuite : refonte fonctionnelle Reem AI (chantier dédié)
 
 ## Retouches UI post-déploiement (2026-06-11)
@@ -83,4 +83,4 @@ Demande Hugues (screenshots prod) :
 - [x] Héros « Solde dû » (KpiGrid) : décomposition précise du solde + barre de répartition segmentée
 - [x] Graphique Suivi paiements (PaiementTracker) : agrégation mensuelle, barres empilées par statut, cumul, légende
 - [x] lint + 41 tests + build + reviewer sous-agent (bug DST corrigé)
-- [ ] Push branche ui/liquid-glass → validation Hugues sur preview → merge main
+- [x] Push branche ui/liquid-glass → validation Hugues sur preview → merge main (2026-06-11)
