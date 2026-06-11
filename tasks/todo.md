@@ -84,3 +84,11 @@ Demande Hugues (screenshots prod) :
 - [x] Graphique Suivi paiements (PaiementTracker) : agrégation mensuelle, barres empilées par statut, cumul, légende
 - [x] lint + 41 tests + build + reviewer sous-agent (bug DST corrigé)
 - [x] Push branche ui/liquid-glass → validation Hugues sur preview → merge main (2026-06-11)
+
+## Refonte Reem AI — brainstorm en cours (2026-06-11)
+Direction validée : **Reem façon OpenClaw = membre du chat interne** (DM Reem + @reem, messages proactifs, cartes d'action inline). Widget flottant + insights dashboard supprimés à terme.
+Décisions : scope complet (saisie NL, chiffres fiables, alertes, récaps) · autonome sauf actions sensibles · alertes in-app only, pas de relance client · anti-chatbot-nul : chiffres = SQL exact, streaming, zéro bavardage, proactivité parcimonieuse.
+- [ ] **REPRISE ICI** : valider archi option 1 (routes Next.js + after() + Vercel Cron) + Reem dans `users` (rôle agent) + fonctions SQL d'agrégation
+- [ ] Design section par section → spec docs/superpowers/specs/2026-06-11-reem-ai-refonte-design.md → self-review → revue Hugues → writing-plans
+- Maquette validée : .superpowers/brainstorm/30658-1781169174/content/form-factor-v2-openclaw.html
+- Détail complet : mémoire Claude `project_reem_refonte.md`
