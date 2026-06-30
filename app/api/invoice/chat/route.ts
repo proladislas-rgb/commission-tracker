@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth'
+import { CLAUDE_MODEL } from '@/lib/constants'
 import Anthropic from '@anthropic-ai/sdk'
 
 const SYSTEM_PROMPT = `Tu es l'assistant facturation de LR Consulting. Tu génères des factures pour ECODISTRIB.
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
     ]
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: CLAUDE_MODEL,
       max_tokens: 1000,
       system: SYSTEM_PROMPT,
       messages,

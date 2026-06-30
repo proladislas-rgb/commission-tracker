@@ -50,10 +50,17 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
       doc.write(generateInvoiceHTML(data))
       doc.close()
 
-      // Attendre le rendu complet puis les polices (évite un PDF vide/partiel)
+      // Attendre le rendu complet puis les polices (évite un PDF vide/partiel).
+      // Garde-fou timeout : avec document.write, l'event `load` est peu fiable
+      // selon les navigateurs — sans ce fallback la promesse pourrait pendre
+      // indéfiniment (bouton bloqué + iframe orpheline).
       await new Promise<void>(resolve => {
-        if (doc.readyState === 'complete') resolve()
-        else iframe!.onload = () => resolve()
+        if (doc.readyState === 'complete') {
+          resolve()
+          return
+        }
+        iframe!.onload = () => resolve()
+        setTimeout(resolve, 1500)
       })
       try {
         if (doc.fonts?.ready) await doc.fonts.ready
@@ -76,9 +83,16 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
         height: page.offsetHeight,
       })
 
-      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+      })
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297)
-      pdf.save(`Facture-${data.invoiceNumber}.pdf`)
+      // Nettoie le numéro pour un nom de fichier sûr (pas de / ni d'espaces parasites)
+      const safeNumber = String(data.invoiceNumber).replace(/[^\w.-]+/g, '_') || 'facture'
+      pdf.save(`Facture-${safeNumber}.pdf`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur inconnue'
       console.error('[invoice/pdf]', err)

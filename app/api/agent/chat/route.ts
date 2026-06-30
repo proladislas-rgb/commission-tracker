@@ -3,6 +3,7 @@ import { z } from 'zod'
 import Anthropic from '@anthropic-ai/sdk'
 import { getSessionUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { CLAUDE_MODEL } from '@/lib/constants'
 import { AGENT_TOOLS, executeAgentTool } from '@/lib/agent-tools'
 import type { ReemContext } from '@/lib/reem-types'
 
@@ -114,7 +115,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = buildSystemPrompt(context)
 
     let response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: CLAUDE_MODEL,
       max_tokens: 2048,
       system: systemPrompt,
       tools: AGENT_TOOLS,
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
       messages.push({ role: 'user', content: toolResults })
 
       response = await client.messages.create({
-        model: 'claude-sonnet-4-6',
+        model: CLAUDE_MODEL,
         max_tokens: 2048,
         system: systemPrompt,
         tools: AGENT_TOOLS,

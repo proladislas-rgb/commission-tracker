@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getSessionUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { CLAUDE_MODEL } from '@/lib/constants'
 import type { Insight } from '@/lib/reem-types'
 
 const INSIGHTS_TOOL: Anthropic.Tool = {
@@ -71,7 +72,7 @@ export async function GET() {
     const client = new Anthropic({ apiKey })
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: CLAUDE_MODEL,
       max_tokens: 1024,
       system:
         'Tu es un analyste business pour LR Consulting W.L.L. Analyse les données fournies et identifie ' +

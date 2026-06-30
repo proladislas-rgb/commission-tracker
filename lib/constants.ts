@@ -1,3 +1,9 @@
+// Modèle Anthropic utilisé par toutes les routes IA (Reem chat, insights, facturation).
+// Alias non daté → suit toujours une version active (cf. lessons 2026-06-30 :
+// un ID daté finit par être retiré et provoque un 404 sur toutes les routes).
+// Source unique de vérité : ne pas hardcoder le modèle ailleurs.
+export const CLAUDE_MODEL = 'claude-sonnet-4-6'
+
 export const PRIME_COLORS = [
   { value: '#6366f1', label: 'Indigo' },
   { value: '#f59e0b', label: 'Amber' },
