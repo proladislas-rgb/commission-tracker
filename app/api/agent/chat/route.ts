@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = buildSystemPrompt(context)
 
     let response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       system: systemPrompt,
       tools: AGENT_TOOLS,
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
       messages.push({ role: 'user', content: toolResults })
 
       response = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 2048,
         system: systemPrompt,
         tools: AGENT_TOOLS,

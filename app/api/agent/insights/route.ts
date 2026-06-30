@@ -71,7 +71,7 @@ export async function GET() {
     const client = new Anthropic({ apiKey })
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system:
         'Tu es un analyste business pour LR Consulting W.L.L. Analyse les données fournies et identifie ' +

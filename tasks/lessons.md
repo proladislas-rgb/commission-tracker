@@ -1,5 +1,11 @@
 # Lessons Learned
 
+## 2026-06-30
+| Problème | Leçon |
+|----------|-------|
+| `model: 'claude-sonnet-4-20250514'` hardcodé dans 3 routes API → 404 `not_found_error` du jour où Anthropic a retiré le modèle (15/06/2026), facturation + chat Reem + insights cassés simultanément, UI affichait juste "Erreur serveur." | Les model IDs datés ont une date de retraite. Utiliser les alias non datés (`claude-sonnet-4-6`) qui pointent toujours sur une version active. Surveiller les annonces de dépréciation Anthropic. |
+| Le `catch` de invoice/chat renvoyait `'Erreur serveur.'` opaque alors que l'erreur réelle (404 model not found) était parfaitement diagnostiquable | Diagnostic d'une erreur API tierce = TOUJOURS lire les logs runtime Vercel (`get_runtime_logs`) plutôt que deviner. Le message générique côté client masque la cause exacte loggée côté serveur. |
+
 ## 2026-04-08
 | Problème | Leçon |
 |----------|-------|
