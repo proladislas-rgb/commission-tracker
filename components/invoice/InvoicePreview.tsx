@@ -24,15 +24,68 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
   const [injected, setInjected] = useState(false)
   const [showInjectForm, setShowInjectForm] = useState(false)
   const [injectLabel, setInjectLabel] = useState('')
+  const [downloading, setDownloading] = useState(false)
 
-  function handleDownloadPDF() {
-    const html = generateInvoiceHTML(data)
-    const printWindow = window.open('', '_blank')
-    if (!printWindow) return
-    printWindow.document.write(html)
-    printWindow.document.close()
-    printWindow.onload = () => {
-      printWindow.print()
+  // Génère un vrai fichier PDF téléchargé en 1 clic (nom garanti `Facture-N.pdf`).
+  // Le HTML est rendu dans une iframe isolée (aucune fuite de styles vers l'app),
+  // capturé via html2canvas puis placé dans un PDF A4 plein cadre.
+  async function handleDownloadPDF() {
+    if (downloading) return
+    setDownloading(true)
+    let iframe: HTMLIFrameElement | null = null
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+
+      iframe = document.createElement('iframe')
+      iframe.style.cssText =
+        'position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;'
+      document.body.appendChild(iframe)
+
+      const doc = iframe.contentDocument
+      if (!doc) throw new Error('document iframe indisponible')
+      doc.open()
+      doc.write(generateInvoiceHTML(data))
+      doc.close()
+
+      // Attendre le rendu complet puis les polices (évite un PDF vide/partiel)
+      await new Promise<void>(resolve => {
+        if (doc.readyState === 'complete') resolve()
+        else iframe!.onload = () => resolve()
+      })
+      try {
+        if (doc.fonts?.ready) await doc.fonts.ready
+      } catch {
+        /* polices: best-effort, on continue */
+      }
+      // Laisser passer un cycle de paint avant la capture (évite un rendu partiel)
+      await new Promise<void>(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      )
+
+      const page = doc.querySelector('.page') as HTMLElement | null
+      if (!page) throw new Error('contenu de la facture introuvable')
+
+      const canvas = await html2canvas(page, {
+        scale: 2, // ~192 dpi : texte net pour impression
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        width: page.offsetWidth,
+        height: page.offsetHeight,
+      })
+
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297)
+      pdf.save(`Facture-${data.invoiceNumber}.pdf`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue'
+      console.error('[invoice/pdf]', err)
+      toast(`Échec de la génération du PDF : ${msg}`, 'error')
+    } finally {
+      if (iframe) document.body.removeChild(iframe)
+      setDownloading(false)
     }
   }
 
@@ -109,9 +162,10 @@ export default function InvoicePreview({ data, associeId, onModify, onInjected }
       <div className="px-4 py-3 border-t border-border flex gap-2 flex-wrap">
         <button
           onClick={handleDownloadPDF}
-          className="px-3 py-1.5 rounded-btn text-xs font-medium bg-indigo text-white hover:bg-indigo/80 transition-colors cursor-pointer"
+          disabled={downloading}
+          className="px-3 py-1.5 rounded-btn text-xs font-medium bg-indigo text-white hover:bg-indigo/80 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
         >
-          Télécharger PDF
+          {downloading ? 'Génération…' : 'Télécharger PDF'}
         </button>
         <button
           onClick={onModify}
